@@ -1,0 +1,33 @@
+{
+  "name": "weekly-planner",
+  "version": "1.0.0",
+  "description": "A simple weekly planning desktop app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.yourname.weekly-planner",
+    "productName": "Weekly Planner",
+    "publish": {
+      "provider": "github"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "runAfterFinish": true
+    }
+  }
+}
