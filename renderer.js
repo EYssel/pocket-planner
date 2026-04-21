@@ -19,31 +19,9 @@ const modeBanner   = document.getElementById('mode-banner');
 const modeText     = document.getElementById('mode-text');
 const savedFlash   = document.getElementById('saved-flash');
 
-// ── Week key helpers ──────────────────────────────────────────────────────────
-function getCurrentISOWeekKey() {
-  const d = new Date();
-  const utc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const day = utc.getUTCDay() || 7;
-  utc.setUTCDate(utc.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
-  const week = Math.ceil((((utc - yearStart) / 86400000) + 1) / 7);
-  return `${utc.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
-}
-
-function weeksInYear(year) {
-  const jan1 = new Date(Date.UTC(year, 0, 1)).getUTCDay();
-  const dec31 = new Date(Date.UTC(year, 11, 31)).getUTCDay();
-  return (jan1 === 4 || dec31 === 4) ? 53 : 52;
-}
-
-function offsetWeekKey(key, delta) {
-  const [yearStr, wStr] = key.split('-W');
-  let year = parseInt(yearStr, 10);
-  let week = parseInt(wStr, 10) + delta;
-  while (week < 1) { year--; week += weeksInYear(year); }
-  while (week > weeksInYear(year)) { week -= weeksInYear(year); year++; }
-  return `${year}-W${String(week).padStart(2, '0')}`;
-}
+// ── Week key helpers (via preload — single source of truth in weekUtils.js) ───
+const getCurrentISOWeekKey = () => window.planner.currentWeekKey();
+const offsetWeekKey        = (key, delta) => window.planner.offsetWeekKey(key, delta);
 
 // ── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
