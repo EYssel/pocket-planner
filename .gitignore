@@ -2,10 +2,6 @@ node_modules/
 dist/
 out/
 
-# electron-store data
-*.json
-!package.json
-
 # OS
 .DS_Store
 Thumbs.db

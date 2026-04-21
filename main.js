@@ -7,8 +7,9 @@ const { createTray, init: initTray }       = require('./src/tray');
 const { init: initNotifications, reschedule } = require('./src/notifications');
 const { registerHandlers }                 = require('./src/ipc');
 
-// Global quit flag (read by window.js close handler)
 global.isQuitting = false;
+
+app.setAppUserModelId('Weekly Planner');
 
 // Bail out immediately if another instance is already running
 if (!initSingleInstance()) process.exit(0);
