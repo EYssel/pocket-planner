@@ -45,14 +45,14 @@ function reschedule() {
   }
 
   const job = cron.schedule(cronExpr, () => {
-    const now       = new Date();
-    const isMonday  = now.getDay() === 1;
-    const isFirstFire = now.getHours() === WORK_START;
+    const now          = new Date();
+    const isMonday     = now.getDay() === 1;
+    const isFirstFire  = now.getHours() === WORK_START;
 
     if (isMonday && isFirstFire) {
-      sendNotification('📋 Plan your week', 'Take 5 minutes to set your priorities for the week ahead.', 'planner');
+      sendNotification('📋 Plan your week', 'Set your tasks for each day this week.', 'planner');
     } else {
-      sendNotification('☀️ Check in', 'How are your plans going?', 'checkin');
+      sendNotification('☀️ Daily check-in', 'How is your day going? Review your tasks.', 'checkin');
     }
   });
 

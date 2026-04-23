@@ -2,7 +2,7 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-// ── Week utilities (inlined — contextBridge can't require across boundary) ────
+// ── Week/day utilities (inlined — require is unreliable across context bridge) ─
 
 function weeksInYear(year) {
   const jan1  = new Date(Date.UTC(year, 0, 1)).getUTCDay();
@@ -29,16 +29,23 @@ function offsetWeekKey(key, delta) {
   return `${year}-W${String(week).padStart(2, '0')}`;
 }
 
+function currentDayKey() {
+  const now = new Date();
+  const utc = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const y = utc.getUTCFullYear();
+  const m = String(utc.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(utc.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 // ── Exposed API ───────────────────────────────────────────────────────────────
 
 contextBridge.exposeInMainWorld('planner', {
-  currentWeekKey: ()            => currentWeekKey(),
-  offsetWeekKey:  (key, delta)  => offsetWeekKey(key, delta),
-  weeksInYear:    (year)        => weeksInYear(year),
+  currentWeekKey: ()           => currentWeekKey(),
+  offsetWeekKey:  (key, delta) => offsetWeekKey(key, delta),
+  currentDayKey:  ()           => currentDayKey(),
 
-  getWeekInfo: (key)        => ipcRenderer.invoke('get-week-info', key),
-  getPlans:    (key)        => ipcRenderer.invoke('get-plans', key),
-  savePlans:   (key, plans) => ipcRenderer.invoke('save-plans', { key, plans }),
-  getWeekKeys: ()           => ipcRenderer.invoke('get-week-keys'),
-  onSetMode:   (cb)         => ipcRenderer.on('set-mode', (_, mode) => cb(mode)),
+  getWeek:    (weekKey)         => ipcRenderer.invoke('get-week', weekKey),
+  savePlans:  (dayKey, plans)   => ipcRenderer.invoke('save-plans', { dayKey, plans }),
+  onSetMode:  (cb)              => ipcRenderer.on('set-mode', (_, mode) => cb(mode)),
 });

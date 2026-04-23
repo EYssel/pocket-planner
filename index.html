@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Weekly Planner</title>
+  <title>Daily Planner</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:        #0c0c0c;
-      --surface:   #141414;
-      --border:    #2a2a2a;
-      --accent:    #e8ff47;
-      --accent2:   #ff6b35;
-      --text:      #f0f0f0;
-      --muted:     #666;
-      --done:      #3a3a3a;
-      --done-text: #555;
-      --radius:    4px;
+      --bg:       #0c0c0c;
+      --surface:  #141414;
+      --surface2: #1a1a1a;
+      --border:   #2a2a2a;
+      --accent:   #e8ff47;
+      --accent2:  #ff6b35;
+      --text:     #f0f0f0;
+      --muted:    #555;
+      --done:     #2a2a2a;
+      --done-text:#444;
+      --today-bg: #1c1f0f;
+      --today-border: #e8ff47;
+      --radius:   4px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,7 +42,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 28px 14px;
+      padding: 14px 20px;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
@@ -87,7 +90,6 @@
       border: 1px solid var(--border);
       color: var(--muted);
       font-size: 18px;
-      line-height: 1;
       width: 28px;
       height: 28px;
       border-radius: var(--radius);
@@ -102,85 +104,104 @@
     .nav-btn:disabled { opacity: 0.2; cursor: default; }
     .nav-btn:disabled:hover { border-color: var(--border); color: var(--muted); }
 
-    /* ── Mode banner ── */
-    #mode-banner {
-      padding: 10px 28px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    #mode-banner .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex-shrink: 0;
-    }
-
-    #mode-banner.checkin .dot { background: var(--accent2); }
-
-    /* ── Task area ── */
-    main {
+    /* ── Grid ── */
+    .grid {
       flex: 1;
-      overflow-y: auto;
-      padding: 20px 28px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--border);
+      overflow: hidden;
     }
 
-    .section-title {
+    .day-col {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .day-col.today {
+      background: var(--today-bg);
+    }
+
+    /* Day header */
+    .day-header {
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .day-col.today .day-header {
+      border-bottom-color: var(--today-border);
+    }
+
+    .day-name {
       font-family: 'Space Mono', monospace;
       font-size: 10px;
+      font-weight: 700;
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 12px;
     }
 
-    /* ── Task items ── */
-    .task-list {
+    .day-col.today .day-name { color: var(--accent); }
+
+    .day-date {
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.1;
+      margin-top: 2px;
+    }
+
+    .day-col.today .day-date { color: var(--accent); }
+
+    .day-month {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Task area */
+    .day-tasks {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 8px 4px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-bottom: 24px;
+      gap: 4px;
     }
 
+    /* Task item */
     .task-item {
       display: grid;
-      grid-template-columns: 32px 1fr auto;
-      align-items: center;
-      gap: 10px;
-      background: var(--surface);
-      border: 1px solid var(--border);
+      grid-template-columns: 20px 1fr 16px;
+      align-items: start;
+      gap: 6px;
+      padding: 6px 6px;
       border-radius: var(--radius);
-      padding: 10px 12px;
-      transition: border-color 0.15s;
-      animation: fadeIn 0.2s ease both;
+      border: 1px solid transparent;
+      transition: border-color 0.1s;
+      animation: fadeIn 0.15s ease both;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
+      from { opacity: 0; transform: translateY(3px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .task-item:hover { border-color: #444; }
+    .task-item:hover { border-color: var(--border); }
 
-    .task-item.done {
-      background: var(--done);
-      border-color: var(--done);
-    }
+    .task-item.done { opacity: 0.5; }
 
-    /* Checkbox */
     .check-btn {
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       border: 1.5px solid var(--border);
       border-radius: 3px;
       background: transparent;
@@ -189,9 +210,10 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: all 0.15s;
+      margin-top: 2px;
+      transition: all 0.1s;
       color: transparent;
-      font-size: 11px;
+      font-size: 9px;
     }
 
     .check-btn:hover { border-color: var(--accent); }
@@ -202,17 +224,19 @@
       color: #000;
     }
 
-    /* Text input */
     .task-text {
       background: transparent;
       border: none;
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 14px;
+      font-size: 12px;
       outline: none;
       width: 100%;
       line-height: 1.4;
+      resize: none;
+      overflow: hidden;
+      min-height: 18px;
     }
 
     .task-item.done .task-text {
@@ -222,136 +246,77 @@
 
     .task-text::placeholder { color: var(--muted); }
 
-    /* Delete */
     .del-btn {
+      background: transparent;
+      border: none;
+      color: transparent;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0;
+      margin-top: 1px;
+      flex-shrink: 0;
+      transition: color 0.1s;
+    }
+
+    .task-item:hover .del-btn { color: var(--muted); }
+    .del-btn:hover { color: var(--accent2) !important; }
+
+    /* Add task button */
+    .add-task-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
       background: transparent;
       border: none;
       color: var(--muted);
       cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-      padding: 2px 4px;
-      border-radius: 2px;
-      opacity: 0;
-      transition: opacity 0.15s, color 0.15s;
-    }
-
-    .task-item:hover .del-btn { opacity: 1; }
-    .del-btn:hover { color: var(--accent2); }
-
-    /* ── Add button ── */
-    .add-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: transparent;
-      border: 1px dashed var(--border);
+      font-size: 11px;
+      padding: 4px 6px;
       border-radius: var(--radius);
-      color: var(--muted);
-      cursor: pointer;
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 10px 14px;
       width: 100%;
-      transition: all 0.15s;
-      margin-bottom: 24px;
+      text-align: left;
+      transition: color 0.1s;
+      flex-shrink: 0;
+      margin-bottom: 4px;
     }
 
-    .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .add-task-btn:hover { color: var(--accent); }
 
-    /* ── Progress ── */
-    .progress-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .progress-bar-wrap {
-      flex: 1;
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 2px;
-      transition: width 0.4s cubic-bezier(.4,0,.2,1);
-    }
-
-    .progress-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    /* ── Footer ── */
-    footer {
-      padding: 14px 28px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
+    /* Progress pip row */
+    .day-footer {
+      padding: 4px 8px 8px;
       flex-shrink: 0;
     }
 
-    .btn {
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 9px 20px;
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: all 0.15s;
+    .progress-pips {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
     }
 
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
+    .pip {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.2s;
     }
 
-    .btn-ghost:hover { border-color: #555; color: var(--text); }
-
-    .btn-primary {
-      background: var(--accent);
-      border: 1px solid var(--accent);
-      color: #000;
-      font-weight: 700;
-    }
-
-    .btn-primary:hover { background: #d4eb30; }
-
-    /* ── Empty state ── */
-    .empty {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.8;
-    }
-
-    .empty .icon { font-size: 32px; margin-bottom: 12px; }
+    .pip.done { background: var(--accent); }
 
     /* Saved flash */
     #saved-flash {
       position: fixed;
-      bottom: 64px;
-      right: 28px;
+      bottom: 16px;
+      right: 16px;
       background: var(--accent);
       color: #000;
       font-family: 'Space Mono', monospace;
       font-size: 10px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      padding: 7px 14px;
+      padding: 6px 12px;
       border-radius: var(--radius);
       opacity: 0;
       transition: opacity 0.2s;
@@ -364,7 +329,7 @@
 <body>
 
 <header>
-  <span class="logo">Weekly Planner</span>
+  <span class="logo">Daily Planner</span>
   <div class="week-nav">
     <button class="nav-btn" id="prev-week" title="Previous week">‹</button>
     <div class="week-info">
@@ -375,29 +340,7 @@
   </div>
 </header>
 
-<div id="mode-banner">
-  <span class="dot"></span>
-  <span id="mode-text">Plan your week</span>
-</div>
-
-<main>
-  <div class="section-title">This week's tasks</div>
-
-  <div class="task-list" id="task-list"></div>
-
-  <button class="add-btn" id="add-btn">+ Add task</button>
-
-  <div class="progress-row" id="progress-row" style="display:none">
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
-    </div>
-    <span class="progress-label" id="progress-label">0 / 0</span>
-  </div>
-</main>
-
-<footer>
-  <button class="btn btn-ghost" id="clear-done-btn">Clear done</button>
-</footer>
+<div class="grid" id="week-grid"></div>
 
 <div id="saved-flash">Saved ✓</div>
 

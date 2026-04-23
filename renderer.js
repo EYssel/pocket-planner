@@ -1,174 +1,210 @@
-// ── State ────────────────────────────────────────────────────────────────────
-let plans = [];
-let currentMode = 'planner';
-let currentWeekKey = null;   // e.g. "2026-W16"
-let currentWeekInfo = null;  // { key, cwLabel, dateRange, year, week }
+'use strict';
 
-// ── DOM refs ─────────────────────────────────────────────────────────────────
-const taskList     = document.getElementById('task-list');
-const addBtn       = document.getElementById('add-btn');
-const clearDoneBtn = document.getElementById('clear-done-btn');
-const cwLabel      = document.getElementById('cw-label');
-const weekLabel    = document.getElementById('week-label');
-const prevBtn      = document.getElementById('prev-week');
-const nextBtn      = document.getElementById('next-week');
-const progressRow  = document.getElementById('progress-row');
-const progressFill = document.getElementById('progress-fill');
-const progressLbl  = document.getElementById('progress-label');
-const modeBanner   = document.getElementById('mode-banner');
-const modeText     = document.getElementById('mode-text');
-const savedFlash   = document.getElementById('saved-flash');
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentWeekKey = null;
+let weekData       = null; // { cwLabel, dateRange, days: [...] }
 
-// ── Week key helpers (via preload — single source of truth in weekUtils.js) ───
-const getCurrentISOWeekKey = () => window.planner.currentWeekKey();
-const offsetWeekKey        = (key, delta) => window.planner.offsetWeekKey(key, delta);
+// ── DOM refs ──────────────────────────────────────────────────────────────────
+const grid      = document.getElementById('week-grid');
+const cwLabel   = document.getElementById('cw-label');
+const weekLabel = document.getElementById('week-label');
+const prevBtn   = document.getElementById('prev-week');
+const nextBtn   = document.getElementById('next-week');
+const flash     = document.getElementById('saved-flash');
 
-// ── Init ─────────────────────────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
-  currentWeekKey = getCurrentISOWeekKey();
+  currentWeekKey = window.planner.currentWeekKey();
   await loadWeek(currentWeekKey);
 }
 
 async function loadWeek(key) {
   currentWeekKey = key;
-  currentWeekInfo = await window.planner.getWeekInfo(key);
-  plans = await window.planner.getPlans(key);
-
-  cwLabel.textContent   = currentWeekInfo.cwLabel;
-  weekLabel.textContent = currentWeekInfo.dateRange;
-  nextBtn.disabled = (key === getCurrentISOWeekKey());
-
-  renderTasks();
+  weekData = await window.planner.getWeek(key);
+  cwLabel.textContent   = weekData.cwLabel;
+  weekLabel.textContent = weekData.dateRange;
+  nextBtn.disabled = (key === window.planner.currentWeekKey());
+  renderGrid();
 }
 
 // ── Navigation ────────────────────────────────────────────────────────────────
-prevBtn.addEventListener('click', () => loadWeek(offsetWeekKey(currentWeekKey, -1)));
-nextBtn.addEventListener('click', () => loadWeek(offsetWeekKey(currentWeekKey, +1)));
+prevBtn.addEventListener('click', () => loadWeek(window.planner.offsetWeekKey(currentWeekKey, -1)));
+nextBtn.addEventListener('click', () => loadWeek(window.planner.offsetWeekKey(currentWeekKey, +1)));
 
-// ── Mode ──────────────────────────────────────────────────────────────────────
-function applyMode(mode) {
-  currentMode = mode;
-  if (mode === 'checkin') {
-    modeText.textContent = 'Morning check-in — how are things going?';
-    modeBanner.classList.add('checkin');
-  } else {
-    modeText.textContent = 'Plan your week — add and prioritise your tasks';
-    modeBanner.classList.remove('checkin');
-  }
-}
-
-window.planner.onSetMode((mode) => {
-  currentWeekKey = getCurrentISOWeekKey();
+// ── Mode (from notifications) ─────────────────────────────────────────────────
+window.planner.onSetMode(() => {
+  currentWeekKey = window.planner.currentWeekKey();
   loadWeek(currentWeekKey);
-  applyMode(mode);
 });
 
 // ── Render ────────────────────────────────────────────────────────────────────
-function renderTasks() {
-  taskList.innerHTML = '';
-
-  if (plans.length === 0) {
-    taskList.innerHTML = `
-      <div class="empty">
-        <div class="icon">📋</div>
-        No tasks yet.<br>Add something to focus on this week.
-      </div>`;
-    progressRow.style.display = 'none';
-    return;
-  }
-
-  plans.forEach((task, i) => {
-    const item = document.createElement('div');
-    item.className = 'task-item' + (task.done ? ' done' : '');
-    item.dataset.index = i;
-    item.innerHTML = `
-      <button class="check-btn" data-i="${i}" title="Toggle done">✓</button>
-      <input class="task-text" type="text" value="${escapeHtml(task.text)}" placeholder="Task…" data-i="${i}" />
-      <button class="del-btn" data-i="${i}" title="Delete">×</button>
-    `;
-    taskList.appendChild(item);
-  });
-
-  updateProgress();
+function renderGrid() {
+  grid.innerHTML = '';
+  weekData.days.forEach(day => grid.appendChild(buildDayCol(day)));
 }
 
-function updateProgress() {
-  const total = plans.length;
-  const done  = plans.filter(t => t.done).length;
-  if (total === 0) { progressRow.style.display = 'none'; return; }
-  progressRow.style.display = 'flex';
-  progressFill.style.width = Math.round((done / total) * 100) + '%';
-  progressLbl.textContent  = `${done} / ${total}`;
+function buildDayCol(day) {
+  const col = document.createElement('div');
+  col.className = 'day-col' + (day.isToday ? ' today' : '');
+  col.dataset.dayKey = day.key;
+
+  // Header
+  col.innerHTML = `
+    <div class="day-header">
+      <div class="day-name">${day.dayName}</div>
+      <div class="day-date">${day.date}</div>
+      <div class="day-month">${day.month}</div>
+    </div>
+    <div class="day-tasks" id="tasks-${day.key}"></div>
+    <button class="add-task-btn" data-day="${day.key}">+ task</button>
+    <div class="day-footer">
+      <div class="progress-pips" id="pips-${day.key}"></div>
+    </div>
+  `;
+
+  // Render tasks into the tasks div
+  const tasksEl = col.querySelector(`#tasks-${day.key}`);
+  day.plans.forEach((task, i) => tasksEl.appendChild(buildTaskItem(day.key, task, i)));
+  updatePips(day.key, day.plans);
+
+  return col;
+}
+
+function buildTaskItem(dayKey, task, index) {
+  const item = document.createElement('div');
+  item.className = 'task-item' + (task.done ? ' done' : '');
+  item.dataset.dayKey = dayKey;
+  item.dataset.index  = index;
+
+  item.innerHTML = `
+    <button class="check-btn" title="Toggle">${task.done ? '✓' : ''}</button>
+    <textarea class="task-text" placeholder="Task…" rows="1">${escapeHtml(task.text)}</textarea>
+    <button class="del-btn" title="Delete">×</button>
+  `;
+
+  // Auto-resize textarea
+  const ta = item.querySelector('.task-text');
+  requestAnimationFrame(() => autoResize(ta));
+  ta.addEventListener('input', () => autoResize(ta));
+
+  return item;
+}
+
+function autoResize(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
+
+function updatePips(dayKey, plans) {
+  const pipsEl = document.getElementById(`pips-${dayKey}`);
+  if (!pipsEl) return;
+  pipsEl.innerHTML = plans
+    .map(p => `<div class="pip${p.done ? ' done' : ''}"></div>`)
+    .join('');
 }
 
 function escapeHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ── Helper: get live plans for a day from the DOM ─────────────────────────────
+function getPlansFromDOM(dayKey) {
+  const items = grid.querySelectorAll(`.task-item[data-day-key="${dayKey}"]`);
+  return Array.from(items).map(item => ({
+    text: item.querySelector('.task-text').value,
+    done: item.classList.contains('done'),
+  }));
+}
+
 // ── Save ──────────────────────────────────────────────────────────────────────
-async function save() {
-  const toSave = plans.filter(t => t.text.trim() !== '');
-  await window.planner.savePlans(currentWeekKey, toSave);
+async function saveDay(dayKey) {
+  const plans = getPlansFromDOM(dayKey).filter(p => p.text.trim() !== '');
+  await window.planner.savePlans(dayKey, plans);
+  // Update pip row without full re-render
+  updatePips(dayKey, plans);
   flashSaved();
 }
 
 function flashSaved() {
-  savedFlash.classList.add('show');
-  setTimeout(() => savedFlash.classList.remove('show'), 1800);
+  flash.classList.add('show');
+  clearTimeout(flashSaved._t);
+  flashSaved._t = setTimeout(() => flash.classList.remove('show'), 1600);
 }
 
-// ── Events ────────────────────────────────────────────────────────────────────
-addBtn.addEventListener('click', () => {
-  plans.push({ text: '', done: false });
-  renderTasks();
-  const inputs = taskList.querySelectorAll('.task-text');
-  if (inputs.length) inputs[inputs.length - 1].focus();
+// ── Events (delegated on grid) ────────────────────────────────────────────────
+grid.addEventListener('click', (e) => {
+  const item   = e.target.closest('.task-item');
+  const dayKey = item?.dataset.dayKey;
+  if (!item || !dayKey) return;
+
+  if (e.target.classList.contains('check-btn')) {
+    item.classList.toggle('done');
+    const isDone = item.classList.contains('done');
+    e.target.textContent = isDone ? '✓' : '';
+    saveDay(dayKey);
+  }
+
+  if (e.target.classList.contains('del-btn')) {
+    item.remove();
+    saveDay(dayKey);
+  }
 });
 
-taskList.addEventListener('click', (e) => {
-  const i = parseInt(e.target.dataset.i, 10);
-  if (isNaN(i)) return;
-  if (e.target.classList.contains('check-btn')) { plans[i].done = !plans[i].done; renderTasks(); save(); }
-  if (e.target.classList.contains('del-btn'))   { plans.splice(i, 1); renderTasks(); save(); }
+// Add task button
+grid.addEventListener('click', (e) => {
+  const btn = e.target.closest('.add-task-btn');
+  if (!btn) return;
+  const dayKey  = btn.dataset.day;
+  const tasksEl = document.getElementById(`tasks-${dayKey}`);
+  const plans   = getPlansFromDOM(dayKey);
+  const newItem = buildTaskItem(dayKey, { text: '', done: false }, plans.length);
+  tasksEl.appendChild(newItem);
+  newItem.querySelector('.task-text').focus();
 });
 
-taskList.addEventListener('input', (e) => {
+// Save on blur of any task textarea
+grid.addEventListener('focusout', (e) => {
   if (e.target.classList.contains('task-text')) {
-    const i = parseInt(e.target.dataset.i, 10);
-    if (!isNaN(i)) plans[i].text = e.target.value;
+    const dayKey = e.target.closest('.task-item')?.dataset.dayKey;
+    if (dayKey) saveDay(dayKey);
   }
 });
 
-// Save on blur (focus leaving a task input)
-taskList.addEventListener('focusout', (e) => {
-  if (e.target.classList.contains('task-text')) save();
+// Textarea live input
+grid.addEventListener('input', (e) => {
+  if (e.target.classList.contains('task-text')) autoResize(e.target);
 });
 
-taskList.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && e.target.classList.contains('task-text')) {
-    e.preventDefault(); addBtn.click();
+// Enter to add next task; Backspace on empty to delete
+grid.addEventListener('keydown', (e) => {
+  if (!e.target.classList.contains('task-text')) return;
+  const item   = e.target.closest('.task-item');
+  const dayKey = item?.dataset.dayKey;
+
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    const tasksEl = document.getElementById(`tasks-${dayKey}`);
+    const plans   = getPlansFromDOM(dayKey);
+    const newItem = buildTaskItem(dayKey, { text: '', done: false }, plans.length);
+    tasksEl.appendChild(newItem);
+    newItem.querySelector('.task-text').focus();
   }
-  if (e.key === 'Backspace' && e.target.classList.contains('task-text')) {
-    const i = parseInt(e.target.dataset.i, 10);
-    if (!isNaN(i) && plans[i].text === '') {
-      e.preventDefault();
-      plans.splice(i, 1);
-      renderTasks();
-      save();
-      const inputs = taskList.querySelectorAll('.task-text');
-      if (inputs.length) inputs[Math.max(0, i - 1)].focus();
-    }
+
+  if (e.key === 'Backspace' && e.target.value === '') {
+    e.preventDefault();
+    const prev = item.previousElementSibling;
+    item.remove();
+    saveDay(dayKey);
+    if (prev) prev.querySelector('.task-text')?.focus();
   }
 });
 
-clearDoneBtn.addEventListener('click', () => {
-  plans = plans.filter(t => !t.done);
-  renderTasks();
-  save();
-});
-
+// Ctrl+S saves all days
 document.addEventListener('keydown', (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); save(); }
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault();
+    weekData.days.forEach(d => saveDay(d.key));
+  }
 });
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
