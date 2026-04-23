@@ -1,25 +1,24 @@
 'use strict';
 
 const { ipcMain } = require('electron');
-const { getPlans, savePlans, getWeekKeys } = require('./store');
-const { weekInfoFromKey, currentWeekKey } = require('./weekUtils');
+const { getPlans, savePlans } = require('./store');
+const { weekInfoFromKey, currentWeekKey, weekDayKeys, dayInfoFromKey } = require('./weekUtils');
 
 function registerHandlers() {
-  ipcMain.handle('get-week-info', (_, key) => {
-    return weekInfoFromKey(key || currentWeekKey());
+  // Returns week metadata + all 5 days with their tasks in one call
+  ipcMain.handle('get-week', (_, weekKey) => {
+    const key  = weekKey || currentWeekKey();
+    const info = weekInfoFromKey(key);
+    const days = weekDayKeys(key).map(dayKey => ({
+      ...dayInfoFromKey(dayKey),
+      plans: getPlans(dayKey),
+    }));
+    return { ...info, days };
   });
 
-  ipcMain.handle('get-plans', (_, key) => {
-    return getPlans(key || currentWeekKey());
-  });
-
-  ipcMain.handle('save-plans', (_, { key, plans }) => {
-    savePlans(key, plans);
+  ipcMain.handle('save-plans', (_, { dayKey, plans }) => {
+    savePlans(dayKey, plans);
     return true;
-  });
-
-  ipcMain.handle('get-week-keys', () => {
-    return getWeekKeys();
   });
 }
 

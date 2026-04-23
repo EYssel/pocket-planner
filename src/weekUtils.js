@@ -1,9 +1,5 @@
 'use strict';
 
-// NOTE: these functions are intentionally inlined from src/weekUtils.js.
-// require('./src/weekUtils') is unreliable in preload across packaged builds.
-// Keep in sync manually if weekUtils.js changes.
-
 /**
  * Returns ISO 8601 week number and year for a given date.
  * Week starts Monday. Jan 4 is always in week 1.
@@ -81,6 +77,58 @@ function weekInfoFromKey(key) {
   };
 }
 
+/**
+ * Returns a day key string for a given date, e.g. "2026-04-23".
+ */
+function formatDayKey(date) {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(date.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * Returns today's day key.
+ */
+function currentDayKey() {
+  const now = new Date();
+  return formatDayKey(new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())));
+}
+
+/**
+ * Returns the Monday–Friday day keys for a given week key.
+ */
+function weekDayKeys(weekKey) {
+  const { year, week } = parseWeekKey(weekKey);
+  const jan4    = new Date(Date.UTC(year, 0, 4));
+  const jan4Day = jan4.getUTCDay() || 7;
+  const monday  = new Date(jan4);
+  monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7);
+  return Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(monday);
+    d.setUTCDate(monday.getUTCDate() + i);
+    return formatDayKey(d);
+  });
+}
+
+/**
+ * Returns display info for a day key.
+ */
+function dayInfoFromKey(dayKey) {
+  const [y, m, d] = dayKey.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return {
+    key:      dayKey,
+    dayName:  dayNames[date.getUTCDay()],
+    date:     date.getUTCDate(),
+    month:    monthNames[date.getUTCMonth()],
+    isToday:  dayKey === currentDayKey(),
+    isWeekend: date.getUTCDay() === 0 || date.getUTCDay() === 6,
+  };
+}
+
 module.exports = {
   getISOWeek,
   weeksInYear,
@@ -89,4 +137,8 @@ module.exports = {
   parseWeekKey,
   offsetWeekKey,
   weekInfoFromKey,
+  formatDayKey,
+  currentDayKey,
+  weekDayKeys,
+  dayInfoFromKey,
 };

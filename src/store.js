@@ -1,14 +1,13 @@
 'use strict';
 
 const Store = require('electron-store');
-const { parseWeekKey } = require('./weekUtils');
 
 const store = new Store({
   defaults: {
     settings: {
       notificationInterval: 60,
     },
-    weeks: {},
+    days: {},
   },
 });
 
@@ -22,29 +21,19 @@ function setSetting(key, value) {
   store.set(`settings.${key}`, value);
 }
 
-// ── Plans ─────────────────────────────────────────────────────────────────────
+// ── Plans (day-keyed) ─────────────────────────────────────────────────────────
 
-function storeKeyForWeek(weekKey) {
-  return `weeks.${weekKey}`;
+function getPlans(dayKey) {
+  return store.get(`days.${dayKey}`, []);
 }
 
-function getPlans(weekKey) {
-  return store.get(storeKeyForWeek(weekKey), []);
-}
-
-function savePlans(weekKey, plans) {
-  // Basic validation — ensure plans is an array of { text, done }
+function savePlans(dayKey, plans) {
   if (!Array.isArray(plans)) throw new Error('plans must be an array');
   const validated = plans.map(p => ({
     text: typeof p.text === 'string' ? p.text : '',
     done: typeof p.done === 'boolean' ? p.done : false,
   }));
-  store.set(storeKeyForWeek(weekKey), validated);
+  store.set(`days.${dayKey}`, validated);
 }
 
-function getWeekKeys() {
-  const weeks = store.get('weeks', {});
-  return Object.keys(weeks).sort();
-}
-
-module.exports = { getSetting, setSetting, getPlans, savePlans, getWeekKeys };
+module.exports = { getSetting, setSetting, getPlans, savePlans };
