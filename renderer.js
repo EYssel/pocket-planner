@@ -67,6 +67,8 @@ function buildDayCol(day) {
   day.plans.forEach((task, i) => tasksEl.appendChild(buildTaskItem(day.key, task, i)));
   updatePips(day.key, day.plans);
 
+  setupDropTarget(tasksEl, day.key);
+
   return col;
 }
 
@@ -75,6 +77,7 @@ function buildTaskItem(dayKey, task, index) {
   item.className = 'task-item' + (task.done ? ' done' : '');
   item.dataset.dayKey = dayKey;
   item.dataset.index  = index;
+  item.draggable      = true;
 
   item.innerHTML = `
     <button class="check-btn" title="Toggle">${task.done ? '✓' : ''}</button>
@@ -86,6 +89,17 @@ function buildTaskItem(dayKey, task, index) {
   const ta = item.querySelector('.task-text');
   requestAnimationFrame(() => autoResize(ta));
   ta.addEventListener('input', () => autoResize(ta));
+
+  // Drag events
+  item.addEventListener('dragstart', (e) => {
+    item.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', JSON.stringify({ dayKey, index }));
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  item.addEventListener('dragend', () => {
+    item.classList.remove('dragging');
+  });
 
   return item;
 }
@@ -114,6 +128,59 @@ function getPlansFromDOM(dayKey) {
     text: item.querySelector('.task-text').value,
     done: item.classList.contains('done'),
   }));
+}
+
+// ── Drag & Drop Logic ─────────────────────────────────────────────────────────
+function setupDropTarget(tasksEl, dayKey) {
+  tasksEl.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    const dragging = document.querySelector('.dragging');
+    if (!dragging) return;
+
+    const afterElement = getDragAfterElement(tasksEl, e.clientY);
+    
+    // Only move if the position has actually changed to prevent flickering
+    if (afterElement == null) {
+      if (tasksEl.lastElementChild !== dragging) {
+        tasksEl.appendChild(dragging);
+      }
+    } else {
+      if (afterElement !== dragging && afterElement.previousElementSibling !== dragging) {
+        tasksEl.insertBefore(dragging, afterElement);
+      }
+    }
+  });
+
+  tasksEl.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    const dataTransferText = e.dataTransfer.getData('text/plain');
+    if (!dataTransferText) return;
+
+    const data = JSON.parse(dataTransferText);
+    const sourceDayKey = data.dayKey;
+    
+    // Always save both days to be sure, or just the current if internal
+    await saveDay(sourceDayKey);
+    if (sourceDayKey !== dayKey) {
+      await saveDay(dayKey);
+    }
+  });
+}
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
+
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
 // ── Save ──────────────────────────────────────────────────────────────────────
