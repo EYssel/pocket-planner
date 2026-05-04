@@ -1,6 +1,8 @@
 node_modules/
 dist/
 out/
+dev-data/
+*.json.bak
 
 # OS
 .DS_Store

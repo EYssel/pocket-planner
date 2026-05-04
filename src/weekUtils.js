@@ -57,6 +57,13 @@ function offsetWeekKey(key, delta) {
 }
 
 /**
+ * Returns the week key for the previous week.
+ */
+function getPreviousWeekKey(key) {
+  return offsetWeekKey(key, -1);
+}
+
+/**
  * Returns display metadata for a given week key.
  */
 function weekInfoFromKey(key) {
@@ -65,17 +72,21 @@ function weekInfoFromKey(key) {
   const jan4Day = jan4.getUTCDay() || 7;
   const monday  = new Date(jan4);
   monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7);
-  const friday  = new Date(monday);
-  friday.setUTCDate(monday.getUTCDate() + 4);
-  const fmt = (d) => d.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  const sunday  = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fmt = (d) => `${d.getUTCDate()} ${monthNames[d.getUTCMonth()]}`;
+
   return {
     key,
     cwLabel:   `CW ${week}`,
-    dateRange: `${fmt(monday)} – ${fmt(friday)}`,
+    dateRange: `${fmt(monday)} – ${fmt(sunday)}`,
     year,
     week,
   };
 }
+
 
 /**
  * Returns a day key string for a given date, e.g. "2026-04-23".
@@ -96,7 +107,7 @@ function currentDayKey() {
 }
 
 /**
- * Returns the Monday–Friday day keys for a given week key.
+ * Returns the Monday–Sunday day keys for a given week key.
  */
 function weekDayKeys(weekKey) {
   const { year, week } = parseWeekKey(weekKey);
@@ -104,7 +115,7 @@ function weekDayKeys(weekKey) {
   const jan4Day = jan4.getUTCDay() || 7;
   const monday  = new Date(jan4);
   monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7);
-  return Array.from({ length: 5 }, (_, i) => {
+  return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
     d.setUTCDate(monday.getUTCDate() + i);
     return formatDayKey(d);
@@ -129,6 +140,16 @@ function dayInfoFromKey(dayKey) {
   };
 }
 
+/**
+ * Returns the week key for a given day key.
+ */
+function weekKeyFromDayKey(dayKey) {
+  const [y, m, d] = dayKey.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const { week, year } = getISOWeek(date);
+  return formatWeekKey(year, week);
+}
+
 module.exports = {
   getISOWeek,
   weeksInYear,
@@ -136,9 +157,11 @@ module.exports = {
   formatWeekKey,
   parseWeekKey,
   offsetWeekKey,
+  getPreviousWeekKey,
   weekInfoFromKey,
   formatDayKey,
   currentDayKey,
   weekDayKeys,
   dayInfoFromKey,
+  weekKeyFromDayKey,
 };
