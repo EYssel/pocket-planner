@@ -74,6 +74,27 @@ describe('store', () => {
       expect(setCall[1][0].text).toBe('Deleted task');
       expect(setCall[1][0].deletedAt).toBeDefined();
     });
+
+    test('restoreFromRecycleBin should move task back to its original day', () => {
+      const task = { text: 'Restorable task', done: false, dayKey: '2026-04-23', deletedAt: '...' };
+      mockStoreInstance.get.mockImplementation((key) => {
+        if (key === 'recycleBin') return [task];
+        if (key === 'days.2026-04-23') return [];
+        return null;
+      });
+
+      store.restoreFromRecycleBin(0);
+
+      // Should have cleared the bin
+      expect(mockStoreInstance.set).toHaveBeenCalledWith('recycleBin', []);
+      // Should have added to the day
+      expect(mockStoreInstance.set).toHaveBeenCalledWith('days.2026-04-23', [{ text: 'Restorable task', done: false }]);
+    });
+
+    test('clearRecycleBin should empty the bin', () => {
+      store.clearRecycleBin();
+      expect(mockStoreInstance.set).toHaveBeenCalledWith('recycleBin', []);
+    });
   });
 });
 

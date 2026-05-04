@@ -58,4 +58,29 @@ function addToRecycleBin(task) {
   store.set('recycleBin', bin);
 }
 
-module.exports = { getSetting, setSetting, getPlans, savePlans, getRecycleBin, addToRecycleBin };
+function restoreFromRecycleBin(index) {
+  const bin = getRecycleBin();
+  const [task] = bin.splice(index, 1);
+  if (!task) return;
+
+  const { dayKey, text, done } = task;
+  const plans = getPlans(dayKey);
+  plans.push({ text, done });
+  savePlans(dayKey, plans);
+  store.set('recycleBin', bin);
+}
+
+function clearRecycleBin() {
+  store.set('recycleBin', []);
+}
+
+module.exports = { 
+  getSetting, 
+  setSetting, 
+  getPlans, 
+  savePlans, 
+  getRecycleBin, 
+  addToRecycleBin, 
+  restoreFromRecycleBin, 
+  clearRecycleBin 
+};
