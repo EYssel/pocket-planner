@@ -1,7 +1,7 @@
 'use strict';
 
 const { ipcMain } = require('electron');
-const { getPlans, savePlans, addToRecycleBin, getRecycleBin } = require('./store');
+const { getPlans, savePlans, addToRecycleBin, getRecycleBin, getSetting, setSetting } = require('./store');
 const { 
   weekInfoFromKey, 
   currentWeekKey, 
@@ -14,6 +14,13 @@ const {
 } = require('./weekUtils');
 
 function registerHandlers() {
+  // Settings handlers
+  ipcMain.handle('get-setting', (_, key) => getSetting(key));
+  ipcMain.handle('set-setting', (_, { key, value }) => {
+    setSetting(key, value);
+    return true;
+  });
+
   // Utility handlers
   ipcMain.handle('get-current-week-key', () => currentWeekKey());
   ipcMain.handle('get-offset-week-key', (_, { key, delta }) => offsetWeekKey(key, delta));
