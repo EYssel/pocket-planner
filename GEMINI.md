@@ -37,7 +37,7 @@ The application follows a standard Electron multi-process architecture with a cl
 
 ### UI/UX
 -   **Styling:** Custom CSS in `index.html` using a dark-themed, monospace-leaning aesthetic.
--   **Responsiveness:** Grid-based layout for the full 7-day week.
+-   **Responsiveness:** Grid-based layout with 6 columns (Monday–Friday + combined Saturday/Sunday).
 
 ## Workflows
 
