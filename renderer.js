@@ -425,16 +425,19 @@ function setupEventListeners() {
     const item = e.target.closest('.task-item');
     if (item) {
       const dayKey = item.dataset.dayKey;
-      if (e.target.classList.contains('check-btn')) {
+      const checkBtn = e.target.closest('.check-btn');
+      const delBtn = e.target.closest('.del-btn');
+
+      if (checkBtn) {
         item.classList.toggle('done');
-        e.target.textContent = item.classList.contains('done') ? '✓' : '';
+        checkBtn.textContent = item.classList.contains('done') ? '✓' : '';
         saveDay(dayKey);
-      }
-      if (e.target.classList.contains('del-btn')) {
+      } else if (delBtn) {
         const text = item.querySelector('.task-text').value;
         const isDone = item.classList.contains('done');
-        await window.planner.addToRecycleBin({ text, done: isDone, dayKey });
+        // Remove from DOM immediately for snappy UI and to avoid race conditions in tests
         item.remove();
+        await window.planner.addToRecycleBin({ text, done: isDone, dayKey });
         saveDay(dayKey);
       }
     } else {
