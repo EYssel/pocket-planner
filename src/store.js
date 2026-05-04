@@ -11,6 +11,7 @@ const store = new Store({
   defaults: {
     settings: {
       notificationInterval: 60,
+      theme: 'dark',
     },
     days: {},
     recycleBin: [],

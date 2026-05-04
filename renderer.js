@@ -12,12 +12,13 @@ let staleTasks     = [];   // [{ text, dayKey, originalIndex }]
 let cleanupQueue   = Promise.resolve();
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
-const grid      = document.getElementById('week-grid');
-const cwLabel   = document.getElementById('cw-label');
-const weekLabel = document.getElementById('week-label');
-const prevBtn   = document.getElementById('prev-week');
-const nextBtn   = document.getElementById('next-week');
-const flash     = document.getElementById('saved-flash');
+const grid        = document.getElementById('week-grid');
+const cwLabel     = document.getElementById('cw-label');
+const weekLabel   = document.getElementById('week-label');
+const prevBtn     = document.getElementById('prev-week');
+const nextBtn     = document.getElementById('next-week');
+const themeSelect = document.getElementById('theme-select');
+const flash       = document.getElementById('saved-flash');
 
 const staleBanner  = document.getElementById('stale-banner');
 const staleCount   = document.getElementById('stale-count');
@@ -31,6 +32,7 @@ const closeCleanup = document.getElementById('close-cleanup');
 async function init() {
   try {
     setupEventListeners();
+    await initTheme();
     currentWeekKey = await window.planner.currentWeekKey();
     await loadWeek(currentWeekKey);
     await checkStaleTasks();
@@ -42,6 +44,20 @@ async function init() {
         <p>${err.message}</p>
       </div>`;
     }
+  }
+}
+
+async function initTheme() {
+  const theme = await window.planner.getSetting('theme');
+  applyTheme(theme);
+  if (themeSelect) themeSelect.value = theme;
+}
+
+function applyTheme(theme) {
+  const classes = Array.from(document.body.classList).filter(c => c.startsWith('theme-'));
+  if (classes.length > 0) document.body.classList.remove(...classes);
+  if (theme !== 'dark') {
+    document.body.classList.add(`theme-${theme}`);
   }
 }
 
@@ -327,6 +343,12 @@ function flashSaved() {
 function setupEventListeners() {
   prevBtn?.addEventListener('click', async () => loadWeek(await window.planner.offsetWeekKey(currentWeekKey, -1)));
   nextBtn?.addEventListener('click', async () => loadWeek(await window.planner.offsetWeekKey(currentWeekKey, +1)));
+
+  themeSelect?.addEventListener('change', async (e) => {
+    const newTheme = e.target.value;
+    applyTheme(newTheme);
+    await window.planner.setSetting('theme', newTheme);
+  });
 
   window.planner.onSetMode(async () => {
     currentWeekKey = await window.planner.currentWeekKey();

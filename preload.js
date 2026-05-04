@@ -9,6 +9,10 @@ contextBridge.exposeInMainWorld('planner', {
   currentDayKey:  ()           => ipcRenderer.invoke('get-current-day-key'),
   weekKeyFromDayKey: (dayKey)  => ipcRenderer.invoke('get-week-key-from-day-key', dayKey),
 
+  // Settings methods
+  getSetting: (key) => ipcRenderer.invoke('get-setting', key),
+  setSetting: (key, value) => ipcRenderer.invoke('set-setting', { key, value }),
+
   // Core data methods
   getWeek:    (weekKey)         => ipcRenderer.invoke('get-week', weekKey),
   savePlans:  (dayKey, plans)   => ipcRenderer.invoke('save-plans', { dayKey, plans }),
