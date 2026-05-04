@@ -1,23 +1,22 @@
-name: Release
+name: CI
 
 on:
   push:
-    branches:
+    branches-ignore:
       - master
 
-jobs:
-  release:
-    runs-on: windows-latest
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
-    permissions:
-      contents: write
+
+jobs:
+  test:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -49,21 +48,3 @@ jobs:
 
       - name: Run E2E Tests
         run: npm run test:e2e
-
-      - name: Bump patch version
-        id: version
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          npm version patch --no-git-tag-version
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          git add package.json
-          git commit -m "chore: bump version to $VERSION [skip ci]"
-          git push
-
-      - name: Build & publish
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --win --publish always
