@@ -14,9 +14,9 @@ function createWindow(mode = 'planner') {
   }
 
   mainWindow = new BrowserWindow({
-    width: 780,
+    width: 1000,
     height: 620,
-    minWidth: 640,
+    minWidth: 800,
     minHeight: 500,
     icon: path.join(__dirname, '..', 'icon.ico'),
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',

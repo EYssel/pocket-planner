@@ -38,10 +38,10 @@ function reschedule() {
 
   let cronExpr;
   if (minutes < 60) {
-    cronExpr = `*/${minutes} ${WORK_START}-${WORK_END - 1} * * 1-5`;
+    cronExpr = `*/${minutes} ${WORK_START}-${WORK_END - 1} * * *`;
   } else {
     const hours = minutes / 60;
-    cronExpr = `0 ${WORK_START}-${WORK_END}/${hours} * * 1-5`;
+    cronExpr = `0 ${WORK_START}-${WORK_END}/${hours} * * *`;
   }
 
   const job = cron.schedule(cronExpr, () => {

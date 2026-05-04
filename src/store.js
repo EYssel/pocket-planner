@@ -1,13 +1,19 @@
 'use strict';
 
+const path = require('path');
+const { app } = require('electron');
 const Store = require('electron-store');
 
+const isDev = app ? !app.isPackaged : true;
+
 const store = new Store({
+  name: isDev ? 'config-dev' : 'config',
   defaults: {
     settings: {
       notificationInterval: 60,
     },
     days: {},
+    recycleBin: [],
   },
 });
 
@@ -36,4 +42,19 @@ function savePlans(dayKey, plans) {
   store.set(`days.${dayKey}`, validated);
 }
 
-module.exports = { getSetting, setSetting, getPlans, savePlans };
+// ── Recycle Bin ───────────────────────────────────────────────────────────────
+
+function getRecycleBin() {
+  return store.get('recycleBin', []);
+}
+
+function addToRecycleBin(task) {
+  const bin = getRecycleBin();
+  bin.push({
+    ...task,
+    deletedAt: new Date().toISOString(),
+  });
+  store.set('recycleBin', bin);
+}
+
+module.exports = { getSetting, setSetting, getPlans, savePlans, getRecycleBin, addToRecycleBin };

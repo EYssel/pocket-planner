@@ -108,7 +108,7 @@
     .grid {
       flex: 1;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(7, 1fr);
       gap: 1px;
       background: var(--border);
       overflow: hidden;
@@ -344,6 +344,154 @@
     }
 
     #saved-flash.show { opacity: 1; }
+
+    /* ── Carry-over Banner ── */
+    .banner {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--accent);
+      padding: 10px 20px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      animation: slideDown 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .banner.show { display: flex; }
+
+    .banner-text {
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .banner-text strong { color: var(--accent); }
+
+    .banner-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .banner-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 4px 12px;
+      border-radius: var(--radius);
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+
+    .banner-btn.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .banner-btn:hover { opacity: 0.8; }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
+    }
+
+    /* ── Cleanup Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 500px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 16px;
+      color: var(--accent);
+    }
+
+    .modal-body {
+      padding: 10px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .stale-task-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--surface2);
+    }
+
+    .stale-task-info {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    .stale-task-text {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .stale-task-date {
+      font-size: 10px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .stale-task-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .action-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .action-btn[title="Discard"]:hover { border-color: var(--accent2); color: var(--accent2); }
   </style>
 </head>
 <body>
@@ -360,7 +508,31 @@
   </div>
 </header>
 
+<div class="banner" id="stale-banner">
+  <div class="banner-text">
+    <strong id="stale-count">0</strong> incomplete tasks found from last week.
+  </div>
+  <div class="banner-btns">
+    <button class="banner-btn" id="open-cleanup">Review & Cleanup</button>
+    <button class="banner-btn secondary" id="close-banner">Dismiss</button>
+  </div>
+</div>
+
 <div class="grid" id="week-grid"></div>
+
+<div class="modal-overlay" id="cleanup-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Weekly Cleanup</div>
+    </div>
+    <div class="modal-body" id="cleanup-list">
+      <!-- Stale tasks injected here -->
+    </div>
+    <div class="modal-footer">
+      <button class="banner-btn secondary" id="close-cleanup">Close</button>
+    </div>
+  </div>
+</div>
 
 <div id="saved-flash">Saved ✓</div>
 
