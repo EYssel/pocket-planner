@@ -9,15 +9,19 @@
     "start:clean": "node scripts/clean-dev-data.js && electron .",
     "build": "electron-builder --win",
     "seed": "node scripts/seed-test-data.js",
-    "clean": "node scripts/clean-dev-data.js"
+    "clean": "node scripts/clean-dev-data.js",
+    "test": "jest",
+    "test:e2e": "playwright test test/e2e"
   },
   "dependencies": {
     "electron-store": "^8.1.0",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "electron": "^28.0.0",
-    "electron-builder": "^24.0.0"
+    "electron-builder": "^24.0.0",
+    "jest": "^30.3.0"
   },
   "build": {
     "appId": "com.yourname.weekly-planner",
