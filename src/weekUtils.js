@@ -140,6 +140,16 @@ function dayInfoFromKey(dayKey) {
   };
 }
 
+/**
+ * Returns the week key for a given day key.
+ */
+function weekKeyFromDayKey(dayKey) {
+  const [y, m, d] = dayKey.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const { week, year } = getISOWeek(date);
+  return formatWeekKey(year, week);
+}
+
 module.exports = {
   getISOWeek,
   weeksInYear,
@@ -153,4 +163,5 @@ module.exports = {
   currentDayKey,
   weekDayKeys,
   dayInfoFromKey,
+  weekKeyFromDayKey,
 };
