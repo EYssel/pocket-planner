@@ -36,6 +36,11 @@ async function init() {
     currentWeekKey = await window.planner.currentWeekKey();
     await loadWeek(currentWeekKey);
     await checkStaleTasks();
+
+    // Re-size after fonts are loaded to ensure scrollHeight is correct
+    document.fonts.ready.then(() => {
+      document.querySelectorAll('.task-text').forEach(ta => autoResize(ta));
+    });
   } catch (err) {
     console.error('Initialization failed:', err);
     if (grid) {
@@ -222,6 +227,13 @@ function createDaySection(day) {
   `;
 
   const tasksEl = section.querySelector(`#tasks-${day.key}`);
+  
+  // Resize all tasks in this day if the container width changes (e.g. scrollbar appears)
+  const ro = new ResizeObserver(() => {
+    tasksEl.querySelectorAll('.task-text').forEach(ta => autoResize(ta));
+  });
+  ro.observe(tasksEl);
+
   day.plans.forEach((task, i) => tasksEl.appendChild(buildTaskItem(day.key, task, i)));
   updatePips(day.key, day.plans);
   setupDropTarget(tasksEl, day.key);
@@ -244,7 +256,6 @@ function buildTaskItem(dayKey, task, index) {
 
   const ta = item.querySelector('.task-text');
   requestAnimationFrame(() => autoResize(ta));
-  ta.addEventListener('input', () => autoResize(ta));
 
   item.addEventListener('dragstart', (e) => {
     item.classList.add('dragging');
@@ -260,7 +271,7 @@ function buildTaskItem(dayKey, task, index) {
 }
 
 function autoResize(ta) {
-  if (!ta) return;
+  if (!ta || !ta.offsetParent) return;
   ta.style.height = 'auto';
   ta.style.height = ta.scrollHeight + 'px';
 }
@@ -427,6 +438,10 @@ function setupEventListeners() {
       e.preventDefault();
       weekData?.days?.forEach(d => saveDay(d.key));
     }
+  });
+
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.task-text').forEach(ta => autoResize(ta));
   });
 }
 
