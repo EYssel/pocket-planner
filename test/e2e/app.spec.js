@@ -2,9 +2,9 @@ const { _electron: electron } = require('@playwright/test');
 const { test, expect } = require('@playwright/test');
 const path = require('path');
 
-test.setTimeout(60000);
-
 test.describe('Weekly Planner E2E', () => {
+  test.describe.configure({ timeout: 60000 });
+
   let electronApp;
   let window;
 
