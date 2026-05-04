@@ -160,7 +160,14 @@ function renderGrid() {
   if (!grid) return;
   grid.innerHTML = '';
   if (weekData && weekData.days) {
-    weekData.days.forEach(day => grid.appendChild(buildDayCol(day)));
+    // Mon - Fri
+    for (let i = 0; i < 5; i++) {
+      grid.appendChild(buildDayCol(weekData.days[i]));
+    }
+    // Weekend
+    if (weekData.days.length >= 7) {
+      grid.appendChild(buildWeekendCol(weekData.days[5], weekData.days[6]));
+    }
   }
 }
 
@@ -168,8 +175,24 @@ function buildDayCol(day) {
   const col = document.createElement('div');
   col.className = 'day-col' + (day.isToday ? ' today' : '');
   col.dataset.dayKey = day.key;
+  col.appendChild(createDaySection(day));
+  return col;
+}
 
-  col.innerHTML = `
+function buildWeekendCol(sat, sun) {
+  const col = document.createElement('div');
+  col.className = 'day-col weekend-col';
+  col.appendChild(createDaySection(sat));
+  col.appendChild(createDaySection(sun));
+  return col;
+}
+
+function createDaySection(day) {
+  const section = document.createElement('div');
+  section.className = 'day-section' + (day.isToday ? ' today' : '');
+  section.dataset.dayKey = day.key;
+
+  section.innerHTML = `
     <div class="day-header">
       <div class="day-name">${day.dayName}</div>
       <div class="day-date">${day.date}</div>
@@ -182,12 +205,12 @@ function buildDayCol(day) {
     </div>
   `;
 
-  const tasksEl = col.querySelector(`#tasks-${day.key}`);
+  const tasksEl = section.querySelector(`#tasks-${day.key}`);
   day.plans.forEach((task, i) => tasksEl.appendChild(buildTaskItem(day.key, task, i)));
   updatePips(day.key, day.plans);
   setupDropTarget(tasksEl, day.key);
 
-  return col;
+  return section;
 }
 
 function buildTaskItem(dayKey, task, index) {

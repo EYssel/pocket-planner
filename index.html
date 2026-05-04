@@ -108,7 +108,7 @@
     .grid {
       flex: 1;
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 1px;
       background: var(--border);
       overflow: hidden;
@@ -121,8 +121,24 @@
       overflow: hidden;
     }
 
-    .day-col.today {
+    .day-col.today, .day-section.today {
       background: var(--today-bg);
+    }
+
+    .day-section {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .weekend-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .weekend-col .day-section:first-child {
+      border-bottom: 1px solid var(--border);
     }
 
     /* Day header */
@@ -132,7 +148,7 @@
       flex-shrink: 0;
     }
 
-    .day-col.today .day-header {
+    .day-col.today .day-header, .day-section.today .day-header {
       border-bottom-color: var(--today-border);
     }
 
@@ -145,7 +161,7 @@
       color: var(--muted);
     }
 
-    .day-col.today .day-name { color: var(--accent); }
+    .day-col.today .day-name, .day-section.today .day-name { color: var(--accent); }
 
     .day-date {
       font-family: 'Space Mono', monospace;
@@ -156,7 +172,7 @@
       margin-top: 2px;
     }
 
-    .day-col.today .day-date { color: var(--accent); }
+    .day-col.today .day-date, .day-section.today .day-date { color: var(--accent); }
 
     .day-month {
       font-size: 10px;
