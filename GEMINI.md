@@ -41,15 +41,25 @@ The application follows a standard Electron multi-process architecture with a cl
 
 ## Workflows
 
+### Command Environment (Windows/PowerShell)
+The agent executes shell commands using PowerShell. To avoid execution policy errors (e.g., with `.ps1` files), always use the `.cmd` wrapper for Node.js tools (e.g., `npm.cmd`, `npx.cmd`) instead of the bare command.
+
 ### Running the App
 ```bash
-npm start
+npm.cmd start
 ```
 
 ### Building the App
 ```bash
-npm run build
+npm.cmd run build
 ```
+
+### Testing
+```bash
+npm.cmd test
+npm.cmd run test:e2e
+```
+
 Builds a Windows executable using `electron-builder`.
 
 ## Planned Features / Future Work
