@@ -1,7 +1,16 @@
 'use strict';
 
 const { ipcMain } = require('electron');
-const { getPlans, savePlans, addToRecycleBin, getRecycleBin, getSetting, setSetting } = require('./store');
+const { 
+  getPlans, 
+  savePlans, 
+  addToRecycleBin, 
+  getRecycleBin, 
+  restoreFromRecycleBin,
+  clearRecycleBin,
+  getSetting, 
+  setSetting 
+} = require('./store');
 const { 
   weekInfoFromKey, 
   currentWeekKey, 
@@ -50,6 +59,16 @@ function registerHandlers() {
 
   ipcMain.handle('get-recycle-bin', () => {
     return getRecycleBin();
+  });
+
+  ipcMain.handle('restore-from-recycle-bin', (_, index) => {
+    restoreFromRecycleBin(index);
+    return true;
+  });
+
+  ipcMain.handle('clear-recycle-bin', () => {
+    clearRecycleBin();
+    return true;
   });
 
   ipcMain.handle('get-previous-week-key', (_, key) => {

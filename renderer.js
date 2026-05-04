@@ -28,6 +28,12 @@ const cleanupList  = document.getElementById('cleanup-list');
 const cleanupModal = document.getElementById('cleanup-overlay');
 const closeCleanup = document.getElementById('close-cleanup');
 
+const recycleBinOverlay = document.getElementById('recycle-bin-overlay');
+const recycleBinList    = document.getElementById('recycle-bin-list');
+const openRecycleBin    = document.getElementById('open-recycle-bin');
+const closeRecycleBin   = document.getElementById('close-recycle-bin');
+const clearBinBtn       = document.getElementById('clear-bin-btn');
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {
@@ -164,6 +170,55 @@ async function handleCleanupAction(index, action) {
     }
   });
   return cleanupQueue;
+}
+
+// ── Recycle Bin Logic ─────────────────────────────────────────────────────────
+async function renderRecycleBin() {
+  const bin = await window.planner.getRecycleBin();
+  recycleBinList.innerHTML = '';
+  
+  if (bin.length === 0) {
+    recycleBinList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">The bin is empty.</div>';
+    return;
+  }
+
+  bin.forEach((task, i) => {
+    const item = document.createElement('div');
+    item.className = 'bin-task-item';
+    item.innerHTML = `
+      <div class="bin-task-info">
+        <div class="bin-task-text">${escapeHtml(task.text)}</div>
+        <div class="bin-task-date">Deleted from ${task.dayKey}</div>
+      </div>
+      <div class="bin-task-actions">
+        <button class="action-btn" data-index="${i}" data-action="restore" title="Restore">🔄</button>
+      </div>
+    `;
+    recycleBinList.appendChild(item);
+  });
+}
+
+async function handleBinAction(index, action) {
+  if (action === 'restore') {
+    const bin = await window.planner.getRecycleBin();
+    const task = bin[index];
+    if (!task) return;
+
+    // Use dayKey to determine which week to refresh before restoring (as task is removed from bin)
+    const restoredWeekKey = await window.planner.weekKeyFromDayKey(task.dayKey);
+    
+    await window.planner.restoreFromRecycleBin(index);
+    
+    // Refresh current week if the task was restored to it
+    if (restoredWeekKey === currentWeekKey) {
+      await loadWeek(currentWeekKey);
+    }
+    
+    await renderRecycleBin();
+    if ((await window.planner.getRecycleBin()).length === 0) {
+      recycleBinOverlay.classList.remove('show');
+    }
+  }
 }
 
 async function getPlansForDay(dayKey) {
@@ -400,6 +455,19 @@ function setupEventListeners() {
   cleanupList?.addEventListener('click', (e) => {
     const btn = e.target.closest('.action-btn');
     if (btn) handleCleanupAction(parseInt(btn.dataset.index, 10), btn.dataset.action);
+  });
+
+  openRecycleBin?.addEventListener('click', () => { renderRecycleBin(); recycleBinOverlay.classList.add('show'); });
+  closeRecycleBin?.addEventListener('click', () => { recycleBinOverlay.classList.remove('show'); });
+  clearBinBtn?.addEventListener('click', async () => {
+    if (confirm('Permanently clear all items in the recycle bin?')) {
+      await window.planner.clearRecycleBin();
+      renderRecycleBin();
+    }
+  });
+  recycleBinList?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.action-btn');
+    if (btn) handleBinAction(parseInt(btn.dataset.index, 10), btn.dataset.action);
   });
 
   grid?.addEventListener('focusout', (e) => {

@@ -19,7 +19,9 @@ contextBridge.exposeInMainWorld('planner', {
   onSetMode:  (cb)              => ipcRenderer.on('set-mode', (_, mode) => cb(mode)),
 
   // Support methods
-  addToRecycleBin:      (task) => ipcRenderer.invoke('add-to-recycle-bin', task),
-  getRecycleBin:        ()     => ipcRenderer.invoke('get-recycle-bin'),
-  getPreviousWeekKey:   (key)  => ipcRenderer.invoke('get-previous-week-key', key),
+  addToRecycleBin:      (task)  => ipcRenderer.invoke('add-to-recycle-bin', task),
+  getRecycleBin:        ()      => ipcRenderer.invoke('get-recycle-bin'),
+  restoreFromRecycleBin: (index) => ipcRenderer.invoke('restore-from-recycle-bin', index),
+  clearRecycleBin:      ()      => ipcRenderer.invoke('clear-recycle-bin'),
+  getPreviousWeekKey:   (key)   => ipcRenderer.invoke('get-previous-week-key', key),
 });

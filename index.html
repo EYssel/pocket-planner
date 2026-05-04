@@ -267,6 +267,51 @@
       gap: 12px;
     }
 
+    .icon-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .bin-task-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--surface2);
+    }
+
+    .bin-task-info {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    .bin-task-text {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .bin-task-date {
+      font-size: 10px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .bin-task-actions {
+      display: flex;
+      gap: 6px;
+    }
+
     .theme-select {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -701,6 +746,7 @@
     <button class="nav-btn" id="next-week" title="Next week">›</button>
   </div>
   <div class="header-right">
+    <button class="icon-btn" id="open-recycle-bin" title="Recycle Bin">🗑️</button>
     <select id="theme-select" class="theme-select">
       <option value="dark">Dark (Default)</option>
       <option value="light">Light</option>
@@ -754,6 +800,21 @@
     </div>
     <div class="modal-footer">
       <button class="banner-btn secondary" id="close-cleanup">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="recycle-bin-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Recycle Bin</div>
+    </div>
+    <div class="modal-body" id="recycle-bin-list">
+      <!-- Deleted tasks injected here -->
+    </div>
+    <div class="modal-footer">
+      <button class="banner-btn secondary" id="clear-bin-btn">Clear All</button>
+      <button class="banner-btn secondary" id="close-recycle-bin">Close</button>
     </div>
   </div>
 </div>
