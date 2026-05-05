@@ -23,11 +23,11 @@ export function createWindow(mode: string = 'planner'): void {
     height: 620,
     minWidth: 800,
     minHeight: 500,
-    icon: path.join(__dirname, '..', '..', 'icon.ico'),
+    icon: path.join(__dirname, '..', 'icon.ico'),
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
       // preload.js will be in dist/
-      preload: path.join(__dirname, '..', 'preload.js'),
+      preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -35,7 +35,7 @@ export function createWindow(mode: string = 'planner'): void {
     backgroundColor: '#0f0f0f',
   });
 
-  mainWindow.loadFile(path.join(__dirname, '..', '..', 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
 
   mainWindow.once('ready-to-show', () => {
     if (mainWindow) {
