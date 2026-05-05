@@ -880,10 +880,34 @@
           <label class="settings-label">Work End (Hour 0-23)</label>
           <input type="number" id="work-end" class="settings-input" min="0" max="23">
         </div>
+        <div class="settings-group" style="grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 20px;">
+          <label class="settings-label">Integrations</label>
+          <div id="outlook-status" style="display: flex; align-items: center; justify-content: space-between; background: var(--surface2); padding: 12px; border-radius: var(--radius); margin-top: 6px;">
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 13px; font-weight: 500;">Outlook Calendar</span>
+              <span id="outlook-account-info" style="font-size: 11px; color: var(--muted);">Not connected</span>
+            </div>
+            <button class="banner-btn" id="connect-outlook-btn">Connect</button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="banner-btn secondary" id="close-settings">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="meetings-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="meetings-modal-title">Meetings</div>
+    </div>
+    <div class="modal-body" id="meetings-list">
+      <!-- Meetings injected here -->
+    </div>
+    <div class="modal-footer">
+      <button class="banner-btn secondary" id="close-meetings">Close</button>
     </div>
   </div>
 </div>

@@ -21,6 +21,9 @@ async function build() {
       ...commonConfig,
       entryPoints: ['main.ts'],
       outfile: 'dist/main.js',
+      define: {
+        'process.env.OUTLOOK_CLIENT_ID': JSON.stringify(process.env.OUTLOOK_CLIENT_ID || ''),
+      },
     }),
     
     // Preload Script
