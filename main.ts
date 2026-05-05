@@ -1,10 +1,12 @@
 'use strict';
 
 import { app } from 'electron';
+import * as path from 'path';
 import { createWindow, initSingleInstance } from './src/window';
 import { createTray, init as initTray } from './src/tray';
 import { init as initNotifications, reschedule } from './src/notifications';
 import { registerHandlers } from './src/ipc';
+import { initUpdater } from './src/updater';
 
 // Declare global isQuitting (also handled in window.ts, but let's be safe)
 declare global {
@@ -13,7 +15,16 @@ declare global {
 
 global.isQuitting = false;
 
-app.setAppUserModelId('Weekly Planner');
+// If in development, isolate the app data and name to allow running alongside production
+if (!app.isPackaged) {
+  const devName = 'Weekly Planner Dev';
+  app.setName(devName);
+  const userDataPath = path.join(app.getPath('appData'), devName);
+  app.setPath('userData', userDataPath);
+  app.setAppUserModelId(devName);
+} else {
+  app.setAppUserModelId('Weekly Planner');
+}
 
 // Bail out immediately if another instance is already running
 if (!initSingleInstance()) {
@@ -31,6 +42,7 @@ app.whenReady().then(() => {
   createTray();
   createWindow('planner');
   reschedule();
+  initUpdater();
 });
 
 app.on('window-all-closed', (e: Electron.IpcMainEvent | any) => {

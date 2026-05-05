@@ -1,6 +1,6 @@
 'use strict';
 
-import { ipcMain } from 'electron';
+import { ipcMain, app } from 'electron';
 import { 
   getPlans, 
   savePlans, 
@@ -25,6 +25,12 @@ import {
 import { Task, SettingOptions, WeekData } from './types';
 
 export function registerHandlers(): void {
+  // App info
+  ipcMain.handle('get-app-info', () => ({
+    name: app.getName(),
+    version: app.getVersion(),
+  }));
+
   // Settings handlers
   ipcMain.handle('get-setting', <K extends keyof SettingOptions>(_: any, key: K) => getSetting(key));
   ipcMain.handle('set-setting', <K extends keyof SettingOptions>(_: any, { key, value }: { key: K, value: SettingOptions[K] }) => {

@@ -4,9 +4,14 @@ import { Tray, Menu, nativeImage, app } from 'electron';
 import * as store from '../src/store';
 import * as notifications from '../src/notifications';
 import { init, createTray } from '../src/tray';
+import { checkForUpdates } from '../src/updater';
 
 jest.mock('electron', () => ({
-  app: { quit: jest.fn() },
+  app: { 
+    quit: jest.fn(),
+    getName: jest.fn().mockReturnValue('Weekly Planner'),
+    getAppPath: jest.fn().mockReturnValue('/mock/path'),
+  },
   Tray: jest.fn().mockImplementation(() => ({
     setToolTip: jest.fn(),
     on: jest.fn(),
@@ -16,11 +21,16 @@ jest.mock('electron', () => ({
     buildFromTemplate: jest.fn().mockReturnValue({}),
   },
   nativeImage: {
-    createFromPath: jest.fn().mockReturnValue({}),
+    createFromPath: jest.fn().mockReturnValue({
+      isEmpty: jest.fn().mockReturnValue(false),
+    }),
   },
 }));
 
 jest.mock('../src/store');
+jest.mock('../src/updater', () => ({
+  checkForUpdates: jest.fn(),
+}));
 jest.mock('../src/notifications', () => ({
   INTERVAL_OPTIONS: [
     { label: 'Every hour', minutes: 60 },
@@ -69,5 +79,15 @@ describe('tray', () => {
     
     expect(global.isQuitting).toBe(true);
     expect(app.quit).toHaveBeenCalled();
+  });
+
+  test('clicking Check for Updates should call checkForUpdates', () => {
+    createTray();
+    const template = (Menu.buildFromTemplate as jest.Mock).mock.calls[0][0];
+    const updateItem = template.find((i: any) => i.label === 'Check for Updates');
+    
+    updateItem.click();
+    
+    expect(checkForUpdates).toHaveBeenCalled();
   });
 });

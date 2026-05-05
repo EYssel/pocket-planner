@@ -45,6 +45,13 @@ const workEndInput    = document.getElementById('work-end') as HTMLInputElement;
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {
+    const appInfo = await window.planner.getAppInfo();
+    if (appInfo) {
+      document.title = appInfo.name;
+      const logo = document.querySelector('.logo');
+      if (logo) logo.textContent = appInfo.name;
+    }
+
     setupEventListeners();
     await initTheme();
     await initSettings();

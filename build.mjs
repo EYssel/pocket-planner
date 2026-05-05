@@ -11,7 +11,7 @@ const commonConfig = {
   format: 'cjs',
   platform: 'node',
   // Externalize all built-in node modules and electron
-  external: ['electron', 'electron-store', 'node-cron', ...builtinModules, ...builtinModules.map(m => `node:${m}`)],
+  external: ['electron', 'electron-updater', 'electron-store', 'node-cron', ...builtinModules, ...builtinModules.map(m => `node:${m}`)],
 };
 
 async function build() {

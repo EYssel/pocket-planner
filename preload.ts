@@ -4,6 +4,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('planner', {
   // Utility methods (delegated to main process for single source of truth)
+  getAppInfo:      ()           => ipcRenderer.invoke('get-app-info'),
   currentWeekKey: ()           => ipcRenderer.invoke('get-current-week-key'),
   offsetWeekKey:  (key: string, delta: number) => ipcRenderer.invoke('get-offset-week-key', { key, delta }),
   currentDayKey:  ()           => ipcRenderer.invoke('get-current-day-key'),
