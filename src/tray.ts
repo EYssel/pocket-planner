@@ -26,9 +26,16 @@ export function rebuild(): void {
 export function createTray(): void {
   if (!_openWindow) return;
 
-  const icon = nativeImage.createFromPath(path.join(__dirname, '..', '..', 'icon.ico'));
+  // app.getAppPath() is usually the project root in dev or the resources/app[.asar] in production
+  const iconPath = path.join(app.getAppPath(), 'icon.ico');
+  const icon = nativeImage.createFromPath(iconPath);
+  
+  if (icon.isEmpty()) {
+    console.error('Failed to load tray icon from:', iconPath);
+  }
+
   tray = new Tray(icon);
-  tray.setToolTip('Weekly Planner');
+  tray.setToolTip(app.getName());
   tray.on('click', () => _openWindow!('planner'));
   rebuild();
 }
