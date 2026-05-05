@@ -17,6 +17,7 @@ const cwLabel     = document.getElementById('cw-label') as HTMLElement;
 const weekLabel   = document.getElementById('week-label') as HTMLElement;
 const prevBtn     = document.getElementById('prev-week') as HTMLButtonElement;
 const nextBtn     = document.getElementById('next-week') as HTMLButtonElement;
+const todayBtn    = document.getElementById('today-btn') as HTMLButtonElement;
 const themeSelect = document.getElementById('theme-select') as HTMLSelectElement;
 const flash       = document.getElementById('saved-flash') as HTMLElement;
 
@@ -99,7 +100,7 @@ async function loadWeek(key: string) {
   
   cwLabel.textContent   = weekData.cwLabel;
   weekLabel.textContent = weekData.dateRange;
-  nextBtn.disabled = (key === await window.planner.currentWeekKey());
+  todayBtn.disabled = (key === await window.planner.currentWeekKey());
   
   renderGrid();
 }
@@ -435,6 +436,7 @@ function flashSaved() {
 function setupEventListeners() {
   prevBtn?.addEventListener('click', async () => loadWeek(await window.planner.offsetWeekKey(currentWeekKey!, -1)));
   nextBtn?.addEventListener('click', async () => loadWeek(await window.planner.offsetWeekKey(currentWeekKey!, +1)));
+  todayBtn?.addEventListener('click', async () => loadWeek(await window.planner.currentWeekKey()));
 
   themeSelect?.addEventListener('change', async (e: Event) => {
     const newTheme = (e.target as HTMLSelectElement).value;
