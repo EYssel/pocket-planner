@@ -1,10 +1,10 @@
 'use strict';
 
-const { Notification } = require('electron');
-const cron = require('node-cron');
-const { getSetting } = require('./store');
+import { Notification } from 'electron';
+import * as cron from 'node-cron';
+import { getSetting } from './store';
 
-const INTERVAL_OPTIONS = [
+export const INTERVAL_OPTIONS = [
   { label: 'Every 30 minutes', minutes: 30  },
   { label: 'Every hour',       minutes: 60  },
   { label: 'Every 2 hours',    minutes: 120 },
@@ -12,21 +12,21 @@ const INTERVAL_OPTIONS = [
   { label: 'Off',              minutes: 0   },
 ];
 
-let cronJobs = [];
-let _openWindow = null; // injected to avoid circular dep with window.js
+let cronJobs: cron.ScheduledTask[] = [];
+let _openWindow: ((mode: string) => void) | null = null; // injected to avoid circular dep with window.js
 
-function init(openWindowFn) {
+export function init(openWindowFn: (mode: string) => void): void {
   _openWindow = openWindowFn;
 }
 
-function sendNotification(title, body, mode) {
+export function sendNotification(title: string, body: string, mode: string): void {
   if (!Notification.isSupported()) return;
   const notif = new Notification({ title, body, silent: false });
   notif.on('click', () => _openWindow && _openWindow(mode));
   notif.show();
 }
 
-function reschedule() {
+export function reschedule(): void {
   cronJobs.forEach(j => j.stop());
   cronJobs = [];
 
@@ -36,7 +36,7 @@ function reschedule() {
   const workStart = getSetting('workStart') || 8;
   const workEnd   = getSetting('workEnd')   || 18;
 
-  let cronExpr;
+  let cronExpr: string;
   if (minutes < 60) {
     cronExpr = `*/${minutes} ${workStart}-${workEnd - 1} * * *`;
   } else {
@@ -58,5 +58,3 @@ function reschedule() {
 
   cronJobs.push(job);
 }
-
-module.exports = { init, reschedule, sendNotification, INTERVAL_OPTIONS };

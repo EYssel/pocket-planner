@@ -1,11 +1,16 @@
 'use strict';
 
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
+import { app, BrowserWindow } from 'electron';
+import * as path from 'path';
 
-let mainWindow = null;
+let mainWindow: BrowserWindow | null = null;
 
-function createWindow(mode = 'planner') {
+// Extend the NodeJS Global interface to include isQuitting
+declare global {
+  var isQuitting: boolean;
+}
+
+export function createWindow(mode: string = 'planner'): void {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('set-mode', mode);
     mainWindow.show();
@@ -18,9 +23,10 @@ function createWindow(mode = 'planner') {
     height: 620,
     minWidth: 800,
     minHeight: 500,
-    icon: path.join(__dirname, '..', 'icon.ico'),
+    icon: path.join(__dirname, '..', '..', 'icon.ico'),
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
+      // preload.js will be in dist/
       preload: path.join(__dirname, '..', 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
@@ -29,22 +35,24 @@ function createWindow(mode = 'planner') {
     backgroundColor: '#0f0f0f',
   });
 
-  mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, '..', '..', 'index.html'));
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
-    mainWindow.webContents.send('set-mode', mode);
+    if (mainWindow) {
+      mainWindow.show();
+      mainWindow.webContents.send('set-mode', mode);
+    }
   });
 
   mainWindow.on('close', (e) => {
     if (!global.isQuitting) {
       e.preventDefault();
-      mainWindow.hide();
+      mainWindow?.hide();
     }
   });
 }
 
-function initSingleInstance() {
+export function initSingleInstance(): boolean {
   const gotLock = app.requestSingleInstanceLock();
   if (!gotLock) {
     app.quit();
@@ -59,5 +67,3 @@ function initSingleInstance() {
   });
   return true;
 }
-
-module.exports = { createWindow, initSingleInstance };

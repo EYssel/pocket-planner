@@ -1,12 +1,18 @@
 'use strict';
 
-const path = require('path');
-const { app } = require('electron');
-const Store = require('electron-store');
+import { app } from 'electron';
+import Store from 'electron-store';
+import { Task, SettingOptions } from './types';
+
+interface Schema {
+  settings: SettingOptions;
+  days: Record<string, Task[]>;
+  recycleBin: (Task & { dayKey: string; deletedAt: string })[];
+}
 
 const isDev = app ? !app.isPackaged : true;
 
-const store = new Store({
+const store = new Store<Schema>({
   name: isDev ? 'config-dev' : 'config',
   defaults: {
     settings: {
@@ -22,23 +28,23 @@ const store = new Store({
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 
-function getSetting(key) {
-  return store.get(`settings.${key}`);
+export function getSetting<K extends keyof SettingOptions>(key: K): SettingOptions[K] {
+  return store.get(`settings.${key}` as any) as SettingOptions[K];
 }
 
-function setSetting(key, value) {
-  store.set(`settings.${key}`, value);
+export function setSetting<K extends keyof SettingOptions>(key: K, value: SettingOptions[K]): void {
+  store.set(`settings.${key}` as any, value);
 }
 
 // ── Plans (day-keyed) ─────────────────────────────────────────────────────────
 
-function getPlans(dayKey) {
+export function getPlans(dayKey: string): Task[] {
   return store.get(`days.${dayKey}`, []);
 }
 
-function savePlans(dayKey, plans) {
+export function savePlans(dayKey: string, plans: Task[]): void {
   if (!Array.isArray(plans)) throw new Error('plans must be an array');
-  const validated = plans.map(p => ({
+  const validated: Task[] = plans.map(p => ({
     text: typeof p.text === 'string' ? p.text : '',
     done: typeof p.done === 'boolean' ? p.done : false,
   }));
@@ -47,11 +53,11 @@ function savePlans(dayKey, plans) {
 
 // ── Recycle Bin ───────────────────────────────────────────────────────────────
 
-function getRecycleBin() {
+export function getRecycleBin(): (Task & { dayKey: string; deletedAt: string })[] {
   return store.get('recycleBin', []);
 }
 
-function addToRecycleBin(task) {
+export function addToRecycleBin(task: Task & { dayKey: string }): void {
   const bin = getRecycleBin();
   bin.push({
     ...task,
@@ -60,7 +66,7 @@ function addToRecycleBin(task) {
   store.set('recycleBin', bin);
 }
 
-function restoreFromRecycleBin(index) {
+export function restoreFromRecycleBin(index: number): void {
   const bin = getRecycleBin();
   const [task] = bin.splice(index, 1);
   if (!task) return;
@@ -72,17 +78,6 @@ function restoreFromRecycleBin(index) {
   store.set('recycleBin', bin);
 }
 
-function clearRecycleBin() {
+export function clearRecycleBin(): void {
   store.set('recycleBin', []);
 }
-
-module.exports = { 
-  getSetting, 
-  setSetting, 
-  getPlans, 
-  savePlans, 
-  getRecycleBin, 
-  addToRecycleBin, 
-  restoreFromRecycleBin, 
-  clearRecycleBin 
-};

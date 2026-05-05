@@ -15,7 +15,7 @@ jest.mock('electron-store', () => {
   return jest.fn().mockImplementation(() => mockStoreInstance);
 });
 
-const store = require('../src/store');
+import * as store from '../src/store';
 
 describe('store', () => {
   beforeEach(() => {
@@ -25,12 +25,12 @@ describe('store', () => {
   describe('Settings', () => {
     test('getSetting should call store.get', () => {
       mockStoreInstance.get.mockReturnValue('dark');
-      expect(store.getSetting('theme')).toBe('dark');
+      expect(store.getSetting('theme' as any)).toBe('dark');
       expect(mockStoreInstance.get).toHaveBeenCalledWith('settings.theme');
     });
 
     test('setSetting should call store.set', () => {
-      store.setSetting('theme', 'light');
+      store.setSetting('theme' as any, 'light' as any);
       expect(mockStoreInstance.set).toHaveBeenCalledWith('settings.theme', 'light');
     });
   });
@@ -43,7 +43,7 @@ describe('store', () => {
     });
 
     test('savePlans should validate and call store.set', () => {
-      const plans = [{ text: 'Task 1', done: true }, { text: 123, done: 'not-bool' }];
+      const plans = [{ text: 'Task 1', done: true }, { text: 123, done: 'not-bool' }] as any;
       store.savePlans('2026-04-23', plans);
       expect(mockStoreInstance.set).toHaveBeenCalledWith('days.2026-04-23', [
         { text: 'Task 1', done: true },
@@ -52,7 +52,7 @@ describe('store', () => {
     });
 
     test('savePlans should throw if plans is not an array', () => {
-      expect(() => store.savePlans('2026-04-23', 'not-an-array')).toThrow('plans must be an array');
+      expect(() => store.savePlans('2026-04-23', 'not-an-array' as any)).toThrow('plans must be an array');
     });
   });
 
@@ -65,7 +65,7 @@ describe('store', () => {
 
     test('addToRecycleBin should add task with deletedAt', () => {
       mockStoreInstance.get.mockReturnValue([]);
-      const task = { text: 'Deleted task', done: false };
+      const task = { text: 'Deleted task', done: false, dayKey: '2026-04-23' };
       store.addToRecycleBin(task);
       
       expect(mockStoreInstance.get).toHaveBeenCalledWith('recycleBin', []);
@@ -97,5 +97,3 @@ describe('store', () => {
     });
   });
 });
-
-

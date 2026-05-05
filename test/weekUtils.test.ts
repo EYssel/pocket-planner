@@ -1,6 +1,6 @@
 'use strict';
 
-const { 
+import { 
   formatWeekKey, 
   parseWeekKey, 
   offsetWeekKey, 
@@ -12,7 +12,7 @@ const {
   weekDayKeys, 
   dayInfoFromKey, 
   weekKeyFromDayKey 
-} = require('../src/weekUtils');
+} from '../src/weekUtils';
 
 describe('weekUtils', () => {
   describe('formatWeekKey', () => {
@@ -130,4 +130,3 @@ describe('weekUtils', () => {
     });
   });
 });
-

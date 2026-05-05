@@ -1,21 +1,21 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const { currentWeekKey, getPreviousWeekKey, weekDayKeys } = require('../src/weekUtils');
+import * as fs from 'fs';
+import * as path from 'path';
+import { currentWeekKey, getPreviousWeekKey, weekDayKeys } from '../src/weekUtils';
 
 /**
  * Seed script to generate test data for the previous calendar week.
  * This script writes directly to the config-dev.json file in the app's data directory.
  */
 
-function getUserDataPath() {
+function getUserDataPath(): string {
   const appName = 'weekly-planner';
-  const home = process.env.HOME || process.env.USERPROFILE;
+  const home = process.env.HOME || process.env.USERPROFILE || '';
   
   switch (process.platform) {
     case 'win32':
-      return path.join(process.env.APPDATA, appName);
+      return path.join(process.env.APPDATA || '', appName);
     case 'darwin':
       return path.join(home, 'Library', 'Application Support', appName);
     default:
@@ -49,7 +49,7 @@ const sampleTasks = [
   "Read a book chapter"
 ];
 
-const data = {
+const data: any = {
   settings: {
     notificationInterval: 60
   },

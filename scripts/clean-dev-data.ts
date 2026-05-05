@@ -1,19 +1,19 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * Clean script to remove the dev-data config file.
  */
 
-function getUserDataPath() {
+function getUserDataPath(): string {
   const appName = 'weekly-planner';
-  const home = process.env.HOME || process.env.USERPROFILE;
+  const home = process.env.HOME || process.env.USERPROFILE || '';
   
   switch (process.platform) {
     case 'win32':
-      return path.join(process.env.APPDATA, appName);
+      return path.join(process.env.APPDATA || '', appName);
     case 'darwin':
       return path.join(home, 'Library', 'Application Support', appName);
     default:

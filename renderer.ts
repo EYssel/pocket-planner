@@ -6,40 +6,40 @@
  */
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let currentWeekKey = null;
-let weekData       = null; // { cwLabel, dateRange, days: [...] }
-let staleTasks     = [];   // [{ text, dayKey, originalIndex }]
-let cleanupQueue   = Promise.resolve();
+let currentWeekKey: string | null = null;
+let weekData: any = null; // { cwLabel, dateRange, days: [...] }
+let staleTasks: any[] = [];   // [{ text, dayKey, originalIndex }]
+let cleanupQueue: Promise<any> = Promise.resolve();
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
-const grid        = document.getElementById('week-grid');
-const cwLabel     = document.getElementById('cw-label');
-const weekLabel   = document.getElementById('week-label');
-const prevBtn     = document.getElementById('prev-week');
-const nextBtn     = document.getElementById('next-week');
-const themeSelect = document.getElementById('theme-select');
-const flash       = document.getElementById('saved-flash');
+const grid        = document.getElementById('week-grid') as HTMLElement;
+const cwLabel     = document.getElementById('cw-label') as HTMLElement;
+const weekLabel   = document.getElementById('week-label') as HTMLElement;
+const prevBtn     = document.getElementById('prev-week') as HTMLButtonElement;
+const nextBtn     = document.getElementById('next-week') as HTMLButtonElement;
+const themeSelect = document.getElementById('theme-select') as HTMLSelectElement;
+const flash       = document.getElementById('saved-flash') as HTMLElement;
 
-const staleBanner  = document.getElementById('stale-banner');
-const staleCount   = document.getElementById('stale-count');
-const openCleanup  = document.getElementById('open-cleanup');
-const closeBanner  = document.getElementById('close-banner');
-const cleanupList  = document.getElementById('cleanup-list');
-const cleanupModal = document.getElementById('cleanup-overlay');
-const closeCleanup = document.getElementById('close-cleanup');
+const staleBanner  = document.getElementById('stale-banner') as HTMLElement;
+const staleCount   = document.getElementById('stale-count') as HTMLElement;
+const openCleanup  = document.getElementById('open-cleanup') as HTMLElement;
+const closeBanner  = document.getElementById('close-banner') as HTMLElement;
+const cleanupList  = document.getElementById('cleanup-list') as HTMLElement;
+const cleanupModal = document.getElementById('cleanup-overlay') as HTMLElement;
+const closeCleanup = document.getElementById('close-cleanup') as HTMLElement;
 
-const recycleBinOverlay = document.getElementById('recycle-bin-overlay');
-const recycleBinList    = document.getElementById('recycle-bin-list');
-const openRecycleBin    = document.getElementById('open-recycle-bin');
-const closeRecycleBin   = document.getElementById('close-recycle-bin');
-const clearBinBtn       = document.getElementById('clear-bin-btn');
+const recycleBinOverlay = document.getElementById('recycle-bin-overlay') as HTMLElement;
+const recycleBinList    = document.getElementById('recycle-bin-list') as HTMLElement;
+const openRecycleBin    = document.getElementById('open-recycle-bin') as HTMLElement;
+const closeRecycleBin   = document.getElementById('close-recycle-bin') as HTMLElement;
+const clearBinBtn       = document.getElementById('clear-bin-btn') as HTMLElement;
 
-const settingsOverlay = document.getElementById('settings-overlay');
-const openSettings    = document.getElementById('open-settings');
-const closeSettings   = document.getElementById('close-settings');
-const intervalSelect  = document.getElementById('interval-select');
-const workStartInput  = document.getElementById('work-start');
-const workEndInput    = document.getElementById('work-end');
+const settingsOverlay = document.getElementById('settings-overlay') as HTMLElement;
+const openSettings    = document.getElementById('open-settings') as HTMLElement;
+const closeSettings   = document.getElementById('close-settings') as HTMLElement;
+const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;
+const workStartInput  = document.getElementById('work-start') as HTMLInputElement;
+const workEndInput    = document.getElementById('work-end') as HTMLInputElement;
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
@@ -49,10 +49,10 @@ async function init() {
     await initSettings();
 
     // Re-size after fonts are loaded to ensure scrollHeight is correct
-    document.fonts.ready.then(() => {
-      document.querySelectorAll('.task-text').forEach(ta => autoResize(ta));
+    (document as any).fonts.ready.then(() => {
+      document.querySelectorAll('.task-text').forEach(ta => autoResize(ta as HTMLTextAreaElement));
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error('Initialization failed:', err);
     if (grid) {
       grid.innerHTML = `<div style="grid-column: 1/8; padding: 40px; text-align: center; color: var(--accent2);">
@@ -75,16 +75,16 @@ async function initSettings() {
     .map(opt => `<option value="${opt.minutes}">${opt.label}</option>`)
     .join('');
 
-  intervalSelect.value = await window.planner.getSetting('notificationInterval');
-  workStartInput.value = await window.planner.getSetting('workStart');
-  workEndInput.value   = await window.planner.getSetting('workEnd');
+  intervalSelect.value = (await window.planner.getSetting('notificationInterval')).toString();
+  workStartInput.value = (await window.planner.getSetting('workStart')).toString();
+  workEndInput.value   = (await window.planner.getSetting('workEnd')).toString();
 
   currentWeekKey = await window.planner.currentWeekKey();
   await loadWeek(currentWeekKey);
   await checkStaleTasks();
 }
 
-function applyTheme(theme) {
+function applyTheme(theme: string) {
   const classes = Array.from(document.body.classList).filter(c => c.startsWith('theme-'));
   if (classes.length > 0) document.body.classList.remove(...classes);
   if (theme !== 'dark') {
@@ -92,7 +92,7 @@ function applyTheme(theme) {
   }
 }
 
-async function loadWeek(key) {
+async function loadWeek(key: string) {
   currentWeekKey = key;
   weekData = await window.planner.getWeek(key);
   if (!weekData) throw new Error('No week data returned from backend');
@@ -106,13 +106,14 @@ async function loadWeek(key) {
 
 // ── Stale Tasks Detection ─────────────────────────────────────────────────────
 async function checkStaleTasks() {
+  if (!currentWeekKey) return;
   const prevKey = await window.planner.getPreviousWeekKey(currentWeekKey);
   const prevWeek = await window.planner.getWeek(prevKey);
   
   staleTasks = [];
   if (prevWeek && prevWeek.days) {
-    prevWeek.days.forEach(day => {
-      day.plans.forEach((plan, index) => {
+    prevWeek.days.forEach((day: any) => {
+      day.plans.forEach((plan: any, index: number) => {
         if (!plan.done) {
           staleTasks.push({ ...plan, dayKey: day.key, originalIndex: index });
         }
@@ -121,7 +122,7 @@ async function checkStaleTasks() {
   }
 
   if (staleTasks.length > 0) {
-    staleCount.textContent = staleTasks.length;
+    staleCount.textContent = staleTasks.length.toString();
     staleBanner.classList.add('show');
   } else {
     staleBanner.classList.remove('show');
@@ -149,16 +150,17 @@ function renderCleanupList() {
 }
 
 // ── Cleanup Actions ───────────────────────────────────────────────────────────
-async function handleCleanupAction(index, action) {
+async function handleCleanupAction(index: number, action: string) {
   cleanupQueue = cleanupQueue.then(async () => {
     const task = staleTasks[index];
-    if (!task) return;
+    if (!task || !currentWeekKey) return;
 
     const prevKey = await window.planner.getPreviousWeekKey(currentWeekKey);
     const prevWeek = await window.planner.getWeek(prevKey);
     
-    const sourceDay = prevWeek.days.find(d => d.key === task.dayKey);
-    const taskIndexInSource = sourceDay.plans.findIndex(p => p.text === task.text && !p.done);
+    const sourceDay = prevWeek.days.find((d: any) => d.key === task.dayKey);
+    if (!sourceDay) return;
+    const taskIndexInSource = sourceDay.plans.findIndex((p: any) => p.text === task.text && !p.done);
 
     if (taskIndexInSource === -1) return;
 
@@ -166,12 +168,12 @@ async function handleCleanupAction(index, action) {
     await window.planner.savePlans(task.dayKey, sourceDay.plans);
 
     if (action === 'carry') {
-      const todayKey = window.planner.currentDayKey();
+      const todayKey = await window.planner.currentDayKey();
       const todayPlans = await getPlansForDay(todayKey);
       todayPlans.push({ text: task.text, done: false });
       await window.planner.savePlans(todayKey, todayPlans);
       
-      const todayWeekKey = window.planner.weekKeyFromDayKey(todayKey);
+      const todayWeekKey = await window.planner.weekKeyFromDayKey(todayKey);
       if (todayWeekKey === currentWeekKey) await loadWeek(currentWeekKey);
     } else if (action === 'done') {
       sourceDay.plans.splice(taskIndexInSource, 0, { ...task, done: true });
@@ -186,7 +188,7 @@ async function handleCleanupAction(index, action) {
       cleanupModal.classList.remove('show');
     } else {
       renderCleanupList();
-      staleCount.textContent = staleTasks.length;
+      staleCount.textContent = staleTasks.length.toString();
     }
   });
   return cleanupQueue;
@@ -202,7 +204,7 @@ async function renderRecycleBin() {
     return;
   }
 
-  bin.forEach((task, i) => {
+  bin.forEach((task: any, i: number) => {
     const item = document.createElement('div');
     item.className = 'bin-task-item';
     item.innerHTML = `
@@ -218,7 +220,7 @@ async function renderRecycleBin() {
   });
 }
 
-async function handleBinAction(index, action) {
+async function handleBinAction(index: number, action: string) {
   if (action === 'restore') {
     const bin = await window.planner.getRecycleBin();
     const task = bin[index];
@@ -231,7 +233,7 @@ async function handleBinAction(index, action) {
     
     // Refresh current week if the task was restored to it
     if (restoredWeekKey === currentWeekKey) {
-      await loadWeek(currentWeekKey);
+      await loadWeek(currentWeekKey!);
     }
     
     await renderRecycleBin();
@@ -241,13 +243,13 @@ async function handleBinAction(index, action) {
   }
 }
 
-async function getPlansForDay(dayKey) {
-  const loadedDay = weekData?.days?.find(d => d.key === dayKey);
+async function getPlansForDay(dayKey: string): Promise<any[]> {
+  const loadedDay = weekData?.days?.find((d: any) => d.key === dayKey);
   if (loadedDay) return getPlansFromDOM(dayKey);
   
-  const weekKey = window.planner.weekKeyFromDayKey(dayKey);
+  const weekKey = await window.planner.weekKeyFromDayKey(dayKey);
   const week = await window.planner.getWeek(weekKey);
-  const day = week.days.find(d => d.key === dayKey);
+  const day = week.days.find((d: any) => d.key === dayKey);
   return day ? day.plans : [];
 }
 
@@ -267,7 +269,7 @@ function renderGrid() {
   }
 }
 
-function buildDayCol(day) {
+function buildDayCol(day: any) {
   const col = document.createElement('div');
   col.className = 'day-col' + (day.isToday ? ' today' : '');
   col.dataset.dayKey = day.key;
@@ -275,7 +277,7 @@ function buildDayCol(day) {
   return col;
 }
 
-function buildWeekendCol(sat, sun) {
+function buildWeekendCol(sat: any, sun: any) {
   const col = document.createElement('div');
   col.className = 'day-col weekend-col';
   col.appendChild(createDaySection(sat));
@@ -283,7 +285,7 @@ function buildWeekendCol(sat, sun) {
   return col;
 }
 
-function createDaySection(day) {
+function createDaySection(day: any) {
   const section = document.createElement('div');
   section.className = 'day-section' + (day.isToday ? ' today' : '');
   section.dataset.dayKey = day.key;
@@ -301,26 +303,26 @@ function createDaySection(day) {
     </div>
   `;
 
-  const tasksEl = section.querySelector(`#tasks-${day.key}`);
+  const tasksEl = section.querySelector(`#tasks-${day.key}`) as HTMLElement;
   
   // Resize all tasks in this day if the container width changes (e.g. scrollbar appears)
   const ro = new ResizeObserver(() => {
-    tasksEl.querySelectorAll('.task-text').forEach(ta => autoResize(ta));
+    tasksEl.querySelectorAll('.task-text').forEach(ta => autoResize(ta as HTMLTextAreaElement));
   });
   ro.observe(tasksEl);
 
-  day.plans.forEach((task, i) => tasksEl.appendChild(buildTaskItem(day.key, task, i)));
+  day.plans.forEach((task: any, i: number) => tasksEl.appendChild(buildTaskItem(day.key, task, i)));
   updatePips(day.key, day.plans);
   setupDropTarget(tasksEl, day.key);
 
   return section;
 }
 
-function buildTaskItem(dayKey, task, index) {
+function buildTaskItem(dayKey: string, task: any, index: number) {
   const item = document.createElement('div');
   item.className = 'task-item' + (task.done ? ' done' : '');
   item.dataset.dayKey = dayKey;
-  item.dataset.index  = index;
+  item.dataset.index  = index.toString();
   item.draggable      = true;
 
   item.innerHTML = `
@@ -329,13 +331,13 @@ function buildTaskItem(dayKey, task, index) {
     <button class="del-btn" title="Delete">×</button>
   `;
 
-  const ta = item.querySelector('.task-text');
+  const ta = item.querySelector('.task-text') as HTMLTextAreaElement;
   requestAnimationFrame(() => autoResize(ta));
 
-  item.addEventListener('dragstart', (e) => {
+  item.addEventListener('dragstart', (e: DragEvent) => {
     item.classList.add('dragging');
-    e.dataTransfer.setData('text/plain', JSON.stringify({ dayKey, index }));
-    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer?.setData('text/plain', JSON.stringify({ dayKey, index }));
+    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
   });
 
   item.addEventListener('dragend', () => {
@@ -345,13 +347,13 @@ function buildTaskItem(dayKey, task, index) {
   return item;
 }
 
-function autoResize(ta) {
+function autoResize(ta: HTMLTextAreaElement) {
   if (!ta || !ta.offsetParent) return;
   ta.style.height = 'auto';
   ta.style.height = ta.scrollHeight + 'px';
 }
 
-function updatePips(dayKey, plans) {
+function updatePips(dayKey: string, plans: any[]) {
   const pipsEl = document.getElementById(`pips-${dayKey}`);
   if (!pipsEl) return;
   pipsEl.innerHTML = plans
@@ -359,25 +361,25 @@ function updatePips(dayKey, plans) {
     .join('');
 }
 
-function escapeHtml(str) {
+function escapeHtml(str: string) {
   if (!str) return '';
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function getPlansFromDOM(dayKey) {
+function getPlansFromDOM(dayKey: string): any[] {
   const items = grid.querySelectorAll(`.task-item[data-day-key="${dayKey}"]`);
   return Array.from(items).map(item => ({
-    text: item.querySelector('.task-text').value,
+    text: (item.querySelector('.task-text') as HTMLTextAreaElement).value,
     done: item.classList.contains('done'),
   }));
 }
 
 // ── Drag & Drop ───────────────────────────────────────────────────────────────
-function setupDropTarget(tasksEl, dayKey) {
-  tasksEl.addEventListener('dragover', (e) => {
+function setupDropTarget(tasksEl: HTMLElement, dayKey: string) {
+  tasksEl.addEventListener('dragover', (e: DragEvent) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    const dragging = document.querySelector('.dragging');
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    const dragging = document.querySelector('.dragging') as HTMLElement;
     if (!dragging) return;
 
     const afterElement = getDragAfterElement(tasksEl, e.clientY);
@@ -390,9 +392,9 @@ function setupDropTarget(tasksEl, dayKey) {
     }
   });
 
-  tasksEl.addEventListener('drop', async (e) => {
+  tasksEl.addEventListener('drop', async (e: DragEvent) => {
     e.preventDefault();
-    const dataTransferText = e.dataTransfer.getData('text/plain');
+    const dataTransferText = e.dataTransfer?.getData('text/plain');
     if (!dataTransferText) return;
     const { dayKey: sourceDayKey } = JSON.parse(dataTransferText);
     await saveDay(sourceDayKey);
@@ -400,9 +402,9 @@ function setupDropTarget(tasksEl, dayKey) {
   });
 }
 
-function getDragAfterElement(container, y) {
-  const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')];
-  return draggableElements.reduce((closest, child) => {
+function getDragAfterElement(container: HTMLElement, y: number): HTMLElement | null {
+  const draggableElements = [...container.querySelectorAll('.task-item:not(.dragging)')] as HTMLElement[];
+  return draggableElements.reduce((closest: any, child: HTMLElement) => {
     const box = child.getBoundingClientRect();
     const offset = y - box.top - box.height / 2;
     if (offset < 0 && offset > closest.offset) return { offset: offset, element: child };
@@ -411,7 +413,7 @@ function getDragAfterElement(container, y) {
 }
 
 // ── Persistence ───────────────────────────────────────────────────────────────
-async function saveDay(dayKey) {
+async function saveDay(dayKey: string) {
   const plans = getPlansFromDOM(dayKey).filter(p => p.text.trim() !== '');
   await window.planner.savePlans(dayKey, plans);
   updatePips(dayKey, plans);
@@ -421,19 +423,19 @@ async function saveDay(dayKey) {
 function flashSaved() {
   if (!flash) return;
   flash.classList.add('show');
-  clearTimeout(flashSaved._t);
-  flashSaved._t = setTimeout(() => flash.classList.remove('show'), 1600);
+  clearTimeout((flashSaved as any)._t);
+  (flashSaved as any)._t = setTimeout(() => flash.classList.remove('show'), 1600);
 }
 
 // ── Event Listeners ───────────────────────────────────────────────────────────
 function setupEventListeners() {
-  prevBtn?.addEventListener('click', async () => loadWeek(await window.planner.offsetWeekKey(currentWeekKey, -1)));
-  nextBtn?.addEventListener('click', async () => loadWeek(await window.planner.offsetWeekKey(currentWeekKey, +1)));
+  prevBtn?.addEventListener('click', async () => loadWeek(await window.planner.offsetWeekKey(currentWeekKey!, -1)));
+  nextBtn?.addEventListener('click', async () => loadWeek(await window.planner.offsetWeekKey(currentWeekKey!, +1)));
 
-  themeSelect?.addEventListener('change', async (e) => {
-    const newTheme = e.target.value;
+  themeSelect?.addEventListener('change', async (e: Event) => {
+    const newTheme = (e.target as HTMLSelectElement).value;
     applyTheme(newTheme);
-    await window.planner.setSetting('theme', newTheme);
+    await window.planner.setSetting('theme' as any, newTheme);
   });
 
   window.planner.onSetMode(async () => {
@@ -441,19 +443,19 @@ function setupEventListeners() {
     loadWeek(currentWeekKey);
   });
 
-  grid?.addEventListener('click', async (e) => {
-    const item = e.target.closest('.task-item');
+  grid?.addEventListener('click', async (e: MouseEvent) => {
+    const item = (e.target as HTMLElement).closest('.task-item') as HTMLElement;
     if (item) {
-      const dayKey = item.dataset.dayKey;
-      const checkBtn = e.target.closest('.check-btn');
-      const delBtn = e.target.closest('.del-btn');
+      const dayKey = item.dataset.dayKey!;
+      const checkBtn = (e.target as HTMLElement).closest('.check-btn');
+      const delBtn = (e.target as HTMLElement).closest('.del-btn');
 
       if (checkBtn) {
         item.classList.toggle('done');
         checkBtn.textContent = item.classList.contains('done') ? '✓' : '';
         saveDay(dayKey);
       } else if (delBtn) {
-        const text = item.querySelector('.task-text').value;
+        const text = (item.querySelector('.task-text') as HTMLTextAreaElement).value;
         const isDone = item.classList.contains('done');
         // Remove from DOM immediately for snappy UI and to avoid race conditions in tests
         item.remove();
@@ -461,13 +463,13 @@ function setupEventListeners() {
         saveDay(dayKey);
       }
     } else {
-      const addBtn = e.target.closest('.add-task-btn');
+      const addBtn = (e.target as HTMLElement).closest('.add-task-btn') as HTMLButtonElement;
       if (addBtn) {
-        const dayKey = addBtn.dataset.day;
-        const tasksEl = document.getElementById(`tasks-${dayKey}`);
+        const dayKey = addBtn.dataset.day!;
+        const tasksEl = document.getElementById(`tasks-${dayKey}`) as HTMLElement;
         const newItem = buildTaskItem(dayKey, { text: '', done: false }, 0);
         tasksEl.appendChild(newItem);
-        newItem.querySelector('.task-text').focus();
+        (newItem.querySelector('.task-text') as HTMLTextAreaElement).focus();
       }
     }
   });
@@ -475,9 +477,9 @@ function setupEventListeners() {
   openCleanup?.addEventListener('click', () => { renderCleanupList(); cleanupModal.classList.add('show'); });
   closeBanner?.addEventListener('click', () => { staleBanner.classList.remove('show'); });
   closeCleanup?.addEventListener('click', () => { cleanupModal.classList.remove('show'); });
-  cleanupList?.addEventListener('click', (e) => {
-    const btn = e.target.closest('.action-btn');
-    if (btn) handleCleanupAction(parseInt(btn.dataset.index, 10), btn.dataset.action);
+  cleanupList?.addEventListener('click', (e: MouseEvent) => {
+    const btn = (e.target as HTMLElement).closest('.action-btn') as HTMLButtonElement;
+    if (btn) handleCleanupAction(parseInt(btn.dataset.index!, 10), btn.dataset.action!);
   });
 
   openRecycleBin?.addEventListener('click', () => { renderRecycleBin(); recycleBinOverlay.classList.add('show'); });
@@ -488,66 +490,66 @@ function setupEventListeners() {
       renderRecycleBin();
     }
   });
-  recycleBinList?.addEventListener('click', (e) => {
-    const btn = e.target.closest('.action-btn');
-    if (btn) handleBinAction(parseInt(btn.dataset.index, 10), btn.dataset.action);
+  recycleBinList?.addEventListener('click', (e: MouseEvent) => {
+    const btn = (e.target as HTMLElement).closest('.action-btn') as HTMLButtonElement;
+    if (btn) handleBinAction(parseInt(btn.dataset.index!, 10), btn.dataset.action!);
   });
 
   openSettings?.addEventListener('click',  () => settingsOverlay.classList.add('show'));
   closeSettings?.addEventListener('click', () => settingsOverlay.classList.remove('show'));
 
-  intervalSelect?.addEventListener('change', async (e) => {
-    await window.planner.setSetting('notificationInterval', parseInt(e.target.value, 10));
+  intervalSelect?.addEventListener('change', async (e: Event) => {
+    await window.planner.setSetting('notificationInterval' as any, parseInt((e.target as HTMLSelectElement).value, 10));
   });
 
-  workStartInput?.addEventListener('change', async (e) => {
-    await window.planner.setSetting('workStart', parseInt(e.target.value, 10));
+  workStartInput?.addEventListener('change', async (e: Event) => {
+    await window.planner.setSetting('workStart' as any, parseInt((e.target as HTMLInputElement).value, 10));
   });
 
-  workEndInput?.addEventListener('change', async (e) => {
-    await window.planner.setSetting('workEnd', parseInt(e.target.value, 10));
+  workEndInput?.addEventListener('change', async (e: Event) => {
+    await window.planner.setSetting('workEnd' as any, parseInt((e.target as HTMLInputElement).value, 10));
   });
 
-  grid?.addEventListener('focusout', (e) => {
-    if (e.target.classList.contains('task-text')) {
-      const dayKey = e.target.closest('.task-item')?.dataset.dayKey;
+  grid?.addEventListener('focusout', (e: FocusEvent) => {
+    if ((e.target as HTMLElement).classList.contains('task-text')) {
+      const dayKey = (e.target as HTMLElement).closest('.task-item')?.getAttribute('data-day-key');
       if (dayKey) saveDay(dayKey);
     }
   }, true);
 
-  grid?.addEventListener('input', (e) => {
-    if (e.target.classList.contains('task-text')) autoResize(e.target);
+  grid?.addEventListener('input', (e: Event) => {
+    if ((e.target as HTMLElement).classList.contains('task-text')) autoResize(e.target as HTMLTextAreaElement);
   });
 
-  grid?.addEventListener('keydown', (e) => {
-    if (!e.target.classList.contains('task-text')) return;
-    const item = e.target.closest('.task-item');
-    const dayKey = item?.dataset.dayKey;
+  grid?.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (!(e.target as HTMLElement).classList.contains('task-text')) return;
+    const item = (e.target as HTMLElement).closest('.task-item') as HTMLElement;
+    const dayKey = item?.dataset.dayKey!;
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      const tasksEl = document.getElementById(`tasks-${dayKey}`);
+      const tasksEl = document.getElementById(`tasks-${dayKey}`) as HTMLElement;
       const newItem = buildTaskItem(dayKey, { text: '', done: false }, 0);
       tasksEl.appendChild(newItem);
-      newItem.querySelector('.task-text').focus();
+      (newItem.querySelector('.task-text') as HTMLTextAreaElement).focus();
     }
-    if (e.key === 'Backspace' && e.target.value === '') {
+    if (e.key === 'Backspace' && (e.target as HTMLTextAreaElement).value === '') {
       e.preventDefault();
-      const prev = item.previousElementSibling;
+      const prev = item.previousElementSibling as HTMLElement;
       item.remove();
       saveDay(dayKey);
-      if (prev) prev.querySelector('.task-text')?.focus();
+      if (prev) (prev.querySelector('.task-text') as HTMLTextAreaElement)?.focus();
     }
   });
 
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 's') {
       e.preventDefault();
-      weekData?.days?.forEach(d => saveDay(d.key));
+      weekData?.days?.forEach((d: any) => saveDay(d.key));
     }
   });
 
   window.addEventListener('resize', () => {
-    document.querySelectorAll('.task-text').forEach(ta => autoResize(ta));
+    document.querySelectorAll('.task-text').forEach(ta => autoResize(ta as HTMLTextAreaElement));
   });
 }
 
