@@ -47,31 +47,21 @@ describe('tray', () => {
     expect(mockTrayInstance.on).toHaveBeenCalledWith('click', expect.any(Function));
   });
 
-  test('rebuild should create menu with correct radio status', () => {
-    store.getSetting.mockReturnValue(60);
+  test('rebuild should create minimal menu', () => {
     createTray();
     
     const template = Menu.buildFromTemplate.mock.calls[0][0];
-    const notificationsItem = template.find(i => i.label === 'Notifications');
-    const everyHour = notificationsItem.submenu.find(i => i.label === 'Every hour');
-    const off = notificationsItem.submenu.find(i => i.label === 'Off');
+    const openPlanner = template.find(i => i.label === 'Open Planner');
+    const checkIn     = template.find(i => i.label === 'Check In');
+    const quit        = template.find(i => i.label === 'Quit');
+    const notifications = template.find(i => i.label === 'Notifications');
+    const testNotif   = template.find(i => i.label === 'Send Test Notification');
     
-    expect(everyHour.checked).toBe(true);
-    expect(off.checked).toBe(false);
-  });
-
-  test('clicking an interval should update setting and reschedule', () => {
-    store.getSetting.mockReturnValue(60);
-    createTray();
-
-    const template = Menu.buildFromTemplate.mock.calls[0][0];
-    const notificationsItem = template.find(i => i.label === 'Notifications');
-    const off = notificationsItem.submenu.find(i => i.label === 'Off');
-    
-    off.click();
-    
-    expect(store.setSetting).toHaveBeenCalledWith('notificationInterval', 0);
-    expect(notifications.reschedule).toHaveBeenCalled();
+    expect(openPlanner).toBeDefined();
+    expect(checkIn).toBeDefined();
+    expect(quit).toBeDefined();
+    expect(notifications).toBeUndefined();
+    expect(testNotif).toBeUndefined();
   });
 
   test('clicking Quit should set isQuitting and call app.quit', () => {

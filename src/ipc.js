@@ -11,6 +11,7 @@ const {
   getSetting, 
   setSetting 
 } = require('./store');
+const { reschedule, INTERVAL_OPTIONS } = require('./notifications');
 const { 
   weekInfoFromKey, 
   currentWeekKey, 
@@ -27,8 +28,13 @@ function registerHandlers() {
   ipcMain.handle('get-setting', (_, key) => getSetting(key));
   ipcMain.handle('set-setting', (_, { key, value }) => {
     setSetting(key, value);
+    if (['notificationInterval', 'workStart', 'workEnd'].includes(key)) {
+      reschedule();
+    }
     return true;
   });
+
+  ipcMain.handle('get-interval-options', () => INTERVAL_OPTIONS);
 
   // Utility handlers
   ipcMain.handle('get-current-week-key', () => currentWeekKey());

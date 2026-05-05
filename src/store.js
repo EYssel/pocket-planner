@@ -11,6 +11,8 @@ const store = new Store({
   defaults: {
     settings: {
       notificationInterval: 60,
+      workStart: 8,
+      workEnd: 18,
       theme: 'dark',
     },
     days: {},

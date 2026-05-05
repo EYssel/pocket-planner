@@ -63,38 +63,58 @@ describe('notifications', () => {
   });
 
   describe('reschedule', () => {
+    beforeEach(() => {
+      store.getSetting.mockImplementation((key) => {
+        if (key === 'notificationInterval') return 60;
+        if (key === 'workStart') return 8;
+        if (key === 'workEnd') return 18;
+        return null;
+      });
+    });
+
     test('should stop existing jobs', () => {
-      store.getSetting.mockReturnValue(60);
       reschedule(); // first call
       reschedule(); // second call should stop the first one
       expect(mockJob.stop).toHaveBeenCalled();
     });
 
     test('should schedule cron for minutes < 60', () => {
-      store.getSetting.mockReturnValue(30);
+      store.getSetting.mockImplementation((key) => {
+        if (key === 'notificationInterval') return 30;
+        if (key === 'workStart') return 8;
+        if (key === 'workEnd') return 18;
+        return null;
+      });
       reschedule();
       expect(cron.schedule).toHaveBeenCalledWith('*/30 8-17 * * *', expect.any(Function));
     });
 
     test('should schedule cron for minutes >= 60', () => {
-      store.getSetting.mockReturnValue(120);
+      store.getSetting.mockImplementation((key) => {
+        if (key === 'notificationInterval') return 120;
+        if (key === 'workStart') return 8;
+        if (key === 'workEnd') return 18;
+        return null;
+      });
       reschedule();
       expect(cron.schedule).toHaveBeenCalledWith('0 8-18/2 * * *', expect.any(Function));
     });
 
     test('should not schedule if interval is 0', () => {
-      store.getSetting.mockReturnValue(0);
+      store.getSetting.mockImplementation((key) => {
+        if (key === 'notificationInterval') return 0;
+        return null;
+      });
       reschedule();
       expect(cron.schedule).not.toHaveBeenCalled();
     });
 
     test('cron job callback should send "Plan your week" on Monday morning', () => {
-      store.getSetting.mockReturnValue(60);
       reschedule();
       const jobCallback = cron.schedule.mock.calls[0][1];
 
-      // Mock Monday 8:00 AM
-      const monday8AM = new Date(2026, 4, 4, 8, 0, 0); // May 4, 2026 is Monday
+      // Mock Monday 8:00 AM (May 4, 2026 is Monday)
+      const monday8AM = new Date(2026, 4, 4, 8, 0, 0); 
       jest.useFakeTimers().setSystemTime(monday8AM);
 
       jobCallback();
@@ -102,9 +122,10 @@ describe('notifications', () => {
       expect(Notification).toHaveBeenCalledWith(expect.objectContaining({
         title: '📋 Plan your week'
       }));
-      
+
       jest.useRealTimers();
     });
+
 
     test('cron job callback should send "Daily check-in" otherwise', () => {
       store.getSetting.mockReturnValue(60);

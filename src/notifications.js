@@ -4,9 +4,6 @@ const { Notification } = require('electron');
 const cron = require('node-cron');
 const { getSetting } = require('./store');
 
-const WORK_START = 8;
-const WORK_END   = 18;
-
 const INTERVAL_OPTIONS = [
   { label: 'Every 30 minutes', minutes: 30  },
   { label: 'Every hour',       minutes: 60  },
@@ -36,18 +33,21 @@ function reschedule() {
   const minutes = getSetting('notificationInterval');
   if (!minutes) return;
 
+  const workStart = getSetting('workStart') || 8;
+  const workEnd   = getSetting('workEnd')   || 18;
+
   let cronExpr;
   if (minutes < 60) {
-    cronExpr = `*/${minutes} ${WORK_START}-${WORK_END - 1} * * *`;
+    cronExpr = `*/${minutes} ${workStart}-${workEnd - 1} * * *`;
   } else {
     const hours = minutes / 60;
-    cronExpr = `0 ${WORK_START}-${WORK_END}/${hours} * * *`;
+    cronExpr = `0 ${workStart}-${workEnd}/${hours} * * *`;
   }
 
   const job = cron.schedule(cronExpr, () => {
     const now          = new Date();
     const isMonday     = now.getDay() === 1;
-    const isFirstFire  = now.getHours() === WORK_START;
+    const isFirstFire  = now.getHours() === workStart;
 
     if (isMonday && isFirstFire) {
       sendNotification('📋 Plan your week', 'Set your tasks for each day this week.', 'planner');
