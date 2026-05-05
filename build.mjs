@@ -39,6 +39,18 @@ async function build() {
       // Renderer doesn't need external node modules
       external: [],
     }),
+
+    // Helper Scripts
+    await esbuild.context({
+      ...commonConfig,
+      entryPoints: ['scripts/seed-test-data.ts'],
+      outfile: 'dist/scripts/seed-test-data.js',
+    }),
+    await esbuild.context({
+      ...commonConfig,
+      entryPoints: ['scripts/clean-dev-data.ts'],
+      outfile: 'dist/scripts/clean-dev-data.js',
+    }),
   ];
 
   if (isWatch) {

@@ -308,24 +308,45 @@ function createDaySection(day: any) {
         <div class="day-month">${day.month}</div>
       </div>
     </div>
-    <div class="day-tasks" id="tasks-${day.key}"></div>
+    <div class="day-tasks active-tasks" id="tasks-${day.key}"></div>
     <button class="add-task-btn" data-day="${day.key}">+ task</button>
+    <div style="flex: 1; min-height: 0;"></div>
+    <details open class="done-section" id="done-section-${day.key}" style="display: none; margin-top: 16px;">
+      <summary style="cursor: pointer; font-size: 11px; font-weight: 500; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--accent); user-select: none;">Done Tasks</summary>
+      <div class="day-tasks done-tasks" id="done-tasks-${day.key}" style="margin-top: 4px;"></div>
+    </details>
     <div class="day-footer">
       <div class="progress-pips" id="pips-${day.key}"></div>
     </div>
   `;
 
   const tasksEl = section.querySelector(`#tasks-${day.key}`) as HTMLElement;
+  const doneTasksEl = section.querySelector(`#done-tasks-${day.key}`) as HTMLElement;
+  const doneSectionEl = section.querySelector(`#done-section-${day.key}`) as HTMLElement;
   
   // Resize all tasks in this day if the container width changes (e.g. scrollbar appears)
   const ro = new ResizeObserver(() => {
-    tasksEl.querySelectorAll('.task-text').forEach(ta => autoResize(ta as HTMLTextAreaElement));
+    section.querySelectorAll('.task-text').forEach(ta => autoResize(ta as HTMLTextAreaElement));
   });
-  ro.observe(tasksEl);
+  ro.observe(section);
 
-  day.plans.forEach((task: any, i: number) => tasksEl.appendChild(buildTaskItem(day.key, task, i)));
+  let hasDoneTasks = false;
+  day.plans.forEach((task: any, i: number) => {
+    if (task.done) {
+      doneTasksEl.appendChild(buildTaskItem(day.key, task, i));
+      hasDoneTasks = true;
+    } else {
+      tasksEl.appendChild(buildTaskItem(day.key, task, i));
+    }
+  });
+
+  if (hasDoneTasks) {
+    doneSectionEl.style.display = 'block';
+  }
+
   updatePips(day.key, day.plans);
   setupDropTarget(tasksEl, day.key);
+  setupDropTarget(doneTasksEl, day.key);
 
   return section;
 }
@@ -465,7 +486,25 @@ function setupEventListeners() {
 
       if (checkBtn) {
         item.classList.toggle('done');
-        checkBtn.textContent = item.classList.contains('done') ? '✓' : '';
+        const isDone = item.classList.contains('done');
+        checkBtn.textContent = isDone ? '✓' : '';
+
+        // Move item to correct container
+        const tasksEl = document.getElementById(`tasks-${dayKey}`);
+        const doneTasksEl = document.getElementById(`done-tasks-${dayKey}`);
+        const doneSectionEl = document.getElementById(`done-section-${dayKey}`);
+
+        if (isDone) {
+          doneTasksEl?.appendChild(item);
+        } else {
+          tasksEl?.appendChild(item);
+        }
+
+        // Toggle visibility of the done section
+        if (doneSectionEl && doneTasksEl) {
+          doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'block' : 'none';
+        }
+
         saveDay(dayKey);
       } else if (delBtn) {
         const text = (item.querySelector('.task-text') as HTMLTextAreaElement).value;
