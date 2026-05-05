@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('planner', {
   // Settings methods
   getSetting: (key) => ipcRenderer.invoke('get-setting', key),
   setSetting: (key, value) => ipcRenderer.invoke('set-setting', { key, value }),
+  getIntervalOptions: () => ipcRenderer.invoke('get-interval-options'),
 
   // Core data methods
   getWeek:    (weekKey)         => ipcRenderer.invoke('get-week', weekKey),

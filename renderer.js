@@ -34,14 +34,19 @@ const openRecycleBin    = document.getElementById('open-recycle-bin');
 const closeRecycleBin   = document.getElementById('close-recycle-bin');
 const clearBinBtn       = document.getElementById('clear-bin-btn');
 
+const settingsOverlay = document.getElementById('settings-overlay');
+const openSettings    = document.getElementById('open-settings');
+const closeSettings   = document.getElementById('close-settings');
+const intervalSelect  = document.getElementById('interval-select');
+const workStartInput  = document.getElementById('work-start');
+const workEndInput    = document.getElementById('work-end');
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {
     setupEventListeners();
     await initTheme();
-    currentWeekKey = await window.planner.currentWeekKey();
-    await loadWeek(currentWeekKey);
-    await checkStaleTasks();
+    await initSettings();
 
     // Re-size after fonts are loaded to ensure scrollHeight is correct
     document.fonts.ready.then(() => {
@@ -62,6 +67,21 @@ async function initTheme() {
   const theme = await window.planner.getSetting('theme');
   applyTheme(theme);
   if (themeSelect) themeSelect.value = theme;
+}
+
+async function initSettings() {
+  const options = await window.planner.getIntervalOptions();
+  intervalSelect.innerHTML = options
+    .map(opt => `<option value="${opt.minutes}">${opt.label}</option>`)
+    .join('');
+
+  intervalSelect.value = await window.planner.getSetting('notificationInterval');
+  workStartInput.value = await window.planner.getSetting('workStart');
+  workEndInput.value   = await window.planner.getSetting('workEnd');
+
+  currentWeekKey = await window.planner.currentWeekKey();
+  await loadWeek(currentWeekKey);
+  await checkStaleTasks();
 }
 
 function applyTheme(theme) {
@@ -471,6 +491,21 @@ function setupEventListeners() {
   recycleBinList?.addEventListener('click', (e) => {
     const btn = e.target.closest('.action-btn');
     if (btn) handleBinAction(parseInt(btn.dataset.index, 10), btn.dataset.action);
+  });
+
+  openSettings?.addEventListener('click',  () => settingsOverlay.classList.add('show'));
+  closeSettings?.addEventListener('click', () => settingsOverlay.classList.remove('show'));
+
+  intervalSelect?.addEventListener('change', async (e) => {
+    await window.planner.setSetting('notificationInterval', parseInt(e.target.value, 10));
+  });
+
+  workStartInput?.addEventListener('change', async (e) => {
+    await window.planner.setSetting('workStart', parseInt(e.target.value, 10));
+  });
+
+  workEndInput?.addEventListener('change', async (e) => {
+    await window.planner.setSetting('workEnd', parseInt(e.target.value, 10));
   });
 
   grid?.addEventListener('focusout', (e) => {
