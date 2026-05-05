@@ -1,6 +1,6 @@
 {
   "name": "weekly-planner",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "A simple weekly planning desktop app",
   "main": "dist/main.js",
   "scripts": {
