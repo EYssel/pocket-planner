@@ -37,6 +37,12 @@
     "publish": {
       "provider": "github"
     },
+    "files": [
+      "dist/**/*",
+      "index.html",
+      "icon.ico",
+      "node_modules/**/*"
+    ],
     "win": {
       "target": "nsis",
       "icon": "icon.ico"
