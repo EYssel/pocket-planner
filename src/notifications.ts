@@ -2,7 +2,9 @@
 
 import { Notification } from 'electron';
 import * as cron from 'node-cron';
-import { getSetting } from './store';
+import { getSetting, getPlans } from './store';
+import { currentDayKey } from './weekUtils';
+import { getDynamicMessage } from './messages';
 
 export const INTERVAL_OPTIONS = [
   { label: 'Every 30 minutes', minutes: 30  },
@@ -45,15 +47,16 @@ export function reschedule(): void {
   }
 
   const job = cron.schedule(cronExpr, () => {
-    const now          = new Date();
-    const isMonday     = now.getDay() === 1;
-    const isFirstFire  = now.getHours() === workStart;
+    const now = new Date();
+    const hour = now.getHours();
+    const isMonday = now.getDay() === 1;
 
-    if (isMonday && isFirstFire) {
-      sendNotification('📋 Plan your week', 'Set your tasks for each day this week.', 'planner');
-    } else {
-      sendNotification('☀️ Daily check-in', 'How is your day going? Review your tasks.', 'checkin');
-    }
+    const tasks = getPlans(currentDayKey());
+    const totalTasks = tasks.length;
+    const doneTasks = tasks.filter(t => t.done).length;
+
+    const { title, body, mode } = getDynamicMessage(hour, totalTasks, doneTasks, isMonday);
+    sendNotification(title, body, mode);
   });
 
   cronJobs.push(job);

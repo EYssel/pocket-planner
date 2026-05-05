@@ -17,6 +17,9 @@ jest.mock('node-cron', () => ({
 }));
 
 jest.mock('../src/store');
+jest.mock('../src/weekUtils', () => ({
+  currentDayKey: jest.fn().mockReturnValue('2026-05-04'),
+}));
 
 describe('notifications', () => {
   let mockJob: any;
@@ -80,6 +83,7 @@ describe('notifications', () => {
         if (key === 'workEnd') return 18;
         return null;
       });
+      (store.getPlans as jest.Mock).mockReturnValue([]);
     });
 
     test('should stop existing jobs', () => {
