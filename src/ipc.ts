@@ -23,7 +23,6 @@ import {
   weekKeyFromDayKey
 } from './weekUtils';
 import { Task, SettingOptions, WeekData } from './types';
-import { connect, disconnect, getMeetings } from './outlook';
 
 export function registerHandlers(): void {
   // Settings handlers
@@ -82,9 +81,4 @@ export function registerHandlers(): void {
   ipcMain.handle('get-previous-week-key', (_: any, key: string) => {
     return getPreviousWeekKey(key || currentWeekKey());
   });
-
-  // Outlook handlers
-  ipcMain.handle('connect-outlook', () => connect());
-  ipcMain.handle('disconnect-outlook', () => disconnect());
-  ipcMain.handle('get-outlook-meetings', (_: any, { start, end }: { start: string, end: string }) => getMeetings(start, end));
 }
