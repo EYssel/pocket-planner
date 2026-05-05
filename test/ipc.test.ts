@@ -1,9 +1,9 @@
 'use strict';
 
-const { ipcMain } = require('electron');
-const store = require('../src/store');
-const weekUtils = require('../src/weekUtils');
-const { registerHandlers } = require('../src/ipc');
+import { ipcMain } from 'electron';
+import * as store from '../src/store';
+import * as weekUtils from '../src/weekUtils';
+import { registerHandlers } from '../src/ipc';
 
 jest.mock('electron', () => ({
   ipcMain: {
@@ -13,13 +13,17 @@ jest.mock('electron', () => ({
 
 jest.mock('../src/store');
 jest.mock('../src/weekUtils');
+jest.mock('../src/notifications', () => ({
+  reschedule: jest.fn(),
+  INTERVAL_OPTIONS: []
+}));
 
 describe('ipc', () => {
-  const handlers = {};
+  const handlers: Record<string, Function> = {};
 
   beforeEach(() => {
     jest.clearAllMocks();
-    ipcMain.handle.mockImplementation((name, fn) => {
+    (ipcMain.handle as jest.Mock).mockImplementation((name, fn) => {
       handlers[name] = fn;
     });
   });
@@ -44,7 +48,7 @@ describe('ipc', () => {
     });
 
     test('get-setting should call store.getSetting', async () => {
-      store.getSetting.mockReturnValue('val');
+      (store.getSetting as jest.Mock).mockReturnValue('val');
       const result = await handlers['get-setting']({}, 'theme');
       expect(result).toBe('val');
       expect(store.getSetting).toHaveBeenCalledWith('theme');
@@ -57,11 +61,11 @@ describe('ipc', () => {
     });
 
     test('get-week should aggregate info from weekUtils and store', async () => {
-      weekUtils.currentWeekKey.mockReturnValue('2026-W19');
-      weekUtils.weekInfoFromKey.mockReturnValue({ key: '2026-W19' });
-      weekUtils.weekDayKeys.mockReturnValue(['2026-05-04']);
-      weekUtils.dayInfoFromKey.mockReturnValue({ dayName: 'Mon' });
-      store.getPlans.mockReturnValue(['task']);
+      (weekUtils.currentWeekKey as jest.Mock).mockReturnValue('2026-W19');
+      (weekUtils.weekInfoFromKey as jest.Mock).mockReturnValue({ key: '2026-W19' });
+      (weekUtils.weekDayKeys as jest.Mock).mockReturnValue(['2026-05-04']);
+      (weekUtils.dayInfoFromKey as jest.Mock).mockReturnValue({ dayName: 'Mon' });
+      (store.getPlans as jest.Mock).mockReturnValue(['task']);
 
       const result = await handlers['get-week']({}, '2026-W19');
       

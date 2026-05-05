@@ -1,12 +1,15 @@
 'use strict';
 
-const { Notification } = require('electron');
-const cron = require('node-cron');
-const store = require('../src/store');
-const { init, reschedule, sendNotification } = require('../src/notifications');
+import { Notification } from 'electron';
+import * as cron from 'node-cron';
+import * as store from '../src/store';
+import { init, reschedule, sendNotification } from '../src/notifications';
 
 jest.mock('electron', () => ({
-  Notification: jest.fn(),
+  Notification: jest.fn().mockImplementation(() => ({
+    show: jest.fn(),
+    on: jest.fn(),
+  })),
 }));
 
 jest.mock('node-cron', () => ({
@@ -16,15 +19,13 @@ jest.mock('node-cron', () => ({
 jest.mock('../src/store');
 
 describe('notifications', () => {
-  let mockJob;
+  let mockJob: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockJob = { stop: jest.fn() };
-    cron.schedule.mockReturnValue(mockJob);
-    Notification.isSupported = jest.fn().mockReturnValue(true);
-    Notification.prototype.show = jest.fn();
-    Notification.prototype.on = jest.fn();
+    (cron.schedule as jest.Mock).mockReturnValue(mockJob);
+    (Notification.isSupported as jest.Mock) = jest.fn().mockReturnValue(true);
   });
 
   describe('sendNotification', () => {
@@ -38,25 +39,34 @@ describe('notifications', () => {
         body: 'Body',
         silent: false
       });
-      expect(Notification.prototype.show).toHaveBeenCalled();
+      // @ts-ignore
+      const instance = (Notification as jest.Mock).mock.results[0].value;
+      expect(instance.show).toHaveBeenCalled();
     });
 
     test('should handle click event', () => {
       const openWindow = jest.fn();
       init(openWindow);
       
-      let clickHandler;
-      Notification.prototype.on.mockImplementation((event, cb) => {
+      let clickHandler: any;
+      // @ts-ignore
+      (Notification.prototype.on as jest.Mock) = jest.fn().mockImplementation((event, cb) => {
         if (event === 'click') clickHandler = cb;
       });
 
       sendNotification('Title', 'Body', 'mode');
+      // @ts-ignore
+      const instance = (Notification as jest.Mock).mock.results[0].value;
+      instance.on.mock.calls.forEach((call: any) => {
+        if (call[0] === 'click') clickHandler = call[1];
+      });
+
       clickHandler();
       expect(openWindow).toHaveBeenCalledWith('mode');
     });
 
     test('should do nothing if notifications are not supported', () => {
-      Notification.isSupported.mockReturnValue(false);
+      (Notification.isSupported as jest.Mock).mockReturnValue(false);
       sendNotification('Title', 'Body', 'mode');
       expect(Notification).not.toHaveBeenCalled();
     });
@@ -64,7 +74,7 @@ describe('notifications', () => {
 
   describe('reschedule', () => {
     beforeEach(() => {
-      store.getSetting.mockImplementation((key) => {
+      (store.getSetting as jest.Mock).mockImplementation((key) => {
         if (key === 'notificationInterval') return 60;
         if (key === 'workStart') return 8;
         if (key === 'workEnd') return 18;
@@ -79,7 +89,7 @@ describe('notifications', () => {
     });
 
     test('should schedule cron for minutes < 60', () => {
-      store.getSetting.mockImplementation((key) => {
+      (store.getSetting as jest.Mock).mockImplementation((key) => {
         if (key === 'notificationInterval') return 30;
         if (key === 'workStart') return 8;
         if (key === 'workEnd') return 18;
@@ -90,7 +100,7 @@ describe('notifications', () => {
     });
 
     test('should schedule cron for minutes >= 60', () => {
-      store.getSetting.mockImplementation((key) => {
+      (store.getSetting as jest.Mock).mockImplementation((key) => {
         if (key === 'notificationInterval') return 120;
         if (key === 'workStart') return 8;
         if (key === 'workEnd') return 18;
@@ -101,7 +111,7 @@ describe('notifications', () => {
     });
 
     test('should not schedule if interval is 0', () => {
-      store.getSetting.mockImplementation((key) => {
+      (store.getSetting as jest.Mock).mockImplementation((key) => {
         if (key === 'notificationInterval') return 0;
         return null;
       });
@@ -111,7 +121,7 @@ describe('notifications', () => {
 
     test('cron job callback should send "Plan your week" on Monday morning', () => {
       reschedule();
-      const jobCallback = cron.schedule.mock.calls[0][1];
+      const jobCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
 
       // Mock Monday 8:00 AM (May 4, 2026 is Monday)
       const monday8AM = new Date(2026, 4, 4, 8, 0, 0); 
@@ -128,9 +138,9 @@ describe('notifications', () => {
 
 
     test('cron job callback should send "Daily check-in" otherwise', () => {
-      store.getSetting.mockReturnValue(60);
+      (store.getSetting as jest.Mock).mockReturnValue(60);
       reschedule();
-      const jobCallback = cron.schedule.mock.calls[0][1];
+      const jobCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
 
       // Mock Tuesday 10:00 AM
       const tuesday10AM = new Date(2026, 4, 5, 10, 0, 0);

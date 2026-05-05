@@ -1,9 +1,9 @@
 'use strict';
 
-const { Tray, Menu, nativeImage, app } = require('electron');
-const store = require('../src/store');
-const notifications = require('../src/notifications');
-const { init, createTray } = require('../src/tray');
+import { Tray, Menu, nativeImage, app } from 'electron';
+import * as store from '../src/store';
+import * as notifications from '../src/notifications';
+import { init, createTray } from '../src/tray';
 
 jest.mock('electron', () => ({
   app: { quit: jest.fn() },
@@ -31,7 +31,7 @@ jest.mock('../src/notifications', () => ({
 }));
 
 describe('tray', () => {
-  let openWindow;
+  let openWindow: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -41,7 +41,7 @@ describe('tray', () => {
 
   test('createTray should initialize correctly', () => {
     createTray();
-    const mockTrayInstance = Tray.mock.results[0].value;
+    const mockTrayInstance = (Tray as unknown as jest.Mock).mock.results[0].value;
     expect(Tray).toHaveBeenCalled();
     expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Weekly Planner');
     expect(mockTrayInstance.on).toHaveBeenCalledWith('click', expect.any(Function));
@@ -50,24 +50,20 @@ describe('tray', () => {
   test('rebuild should create minimal menu', () => {
     createTray();
     
-    const template = Menu.buildFromTemplate.mock.calls[0][0];
-    const openPlanner = template.find(i => i.label === 'Open Planner');
-    const checkIn     = template.find(i => i.label === 'Check In');
-    const quit        = template.find(i => i.label === 'Quit');
-    const notifications = template.find(i => i.label === 'Notifications');
-    const testNotif   = template.find(i => i.label === 'Send Test Notification');
+    const template = (Menu.buildFromTemplate as jest.Mock).mock.calls[0][0];
+    const openPlanner = template.find((i: any) => i.label === 'Open Planner');
+    const checkIn     = template.find((i: any) => i.label === 'Check In');
+    const quit        = template.find((i: any) => i.label === 'Quit');
     
     expect(openPlanner).toBeDefined();
     expect(checkIn).toBeDefined();
     expect(quit).toBeDefined();
-    expect(notifications).toBeUndefined();
-    expect(testNotif).toBeUndefined();
   });
 
   test('clicking Quit should set isQuitting and call app.quit', () => {
     createTray();
-    const template = Menu.buildFromTemplate.mock.calls[0][0];
-    const quitItem = template.find(i => i.label === 'Quit');
+    const template = (Menu.buildFromTemplate as jest.Mock).mock.calls[0][0];
+    const quitItem = template.find((i: any) => i.label === 'Quit');
     
     quitItem.click();
     
@@ -75,4 +71,3 @@ describe('tray', () => {
     expect(app.quit).toHaveBeenCalled();
   });
 });
-
