@@ -8,6 +8,7 @@
 // ── State ─────────────────────────────────────────────────────────────────────
 let currentWeekKey: string | null = null;
 let weekData: any = null; // { cwLabel, dateRange, days: [...] }
+let weekMeetings: any[] = []; // Outlook meetings for the week
 let staleTasks: any[] = [];   // [{ text, dayKey, originalIndex }]
 let cleanupQueue: Promise<any> = Promise.resolve();
 
@@ -41,12 +42,21 @@ const intervalSelect  = document.getElementById('interval-select') as HTMLSelect
 const workStartInput  = document.getElementById('work-start') as HTMLInputElement;
 const workEndInput    = document.getElementById('work-end') as HTMLInputElement;
 
+const outlookAccountInfo = document.getElementById('outlook-account-info') as HTMLElement;
+const connectOutlookBtn  = document.getElementById('connect-outlook-btn') as HTMLButtonElement;
+
+const meetingsOverlay    = document.getElementById('meetings-overlay') as HTMLElement;
+const meetingsModalTitle = document.getElementById('meetings-modal-title') as HTMLElement;
+const meetingsList       = document.getElementById('meetings-list') as HTMLElement;
+const closeMeetings      = document.getElementById('close-meetings') as HTMLElement;
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {
     setupEventListeners();
     await initTheme();
     await initSettings();
+    await updateOutlookUI();
 
     // Re-size after fonts are loaded to ensure scrollHeight is correct
     (document as any).fonts.ready.then(() => {
@@ -84,6 +94,21 @@ async function initSettings() {
   await checkStaleTasks();
 }
 
+async function updateOutlookUI() {
+  const connected = await window.planner.getSetting('outlookConnected');
+  const account = await window.planner.getSetting('outlookAccount');
+  
+  if (connected && account) {
+    outlookAccountInfo.textContent = account;
+    connectOutlookBtn.textContent = 'Disconnect';
+    connectOutlookBtn.classList.add('secondary');
+  } else {
+    outlookAccountInfo.textContent = 'Not connected';
+    connectOutlookBtn.textContent = 'Connect';
+    connectOutlookBtn.classList.remove('secondary');
+  }
+}
+
 function applyTheme(theme: string) {
   const classes = Array.from(document.body.classList).filter(c => c.startsWith('theme-'));
   if (classes.length > 0) document.body.classList.remove(...classes);
@@ -101,7 +126,25 @@ async function loadWeek(key: string) {
   weekLabel.textContent = weekData.dateRange;
   nextBtn.disabled = (key === await window.planner.currentWeekKey());
   
+  await fetchWeekMeetings();
   renderGrid();
+}
+
+async function fetchWeekMeetings() {
+  weekMeetings = [];
+  const connected = await window.planner.getSetting('outlookConnected');
+  if (!connected || !weekData || !weekData.days || weekData.days.length === 0) return;
+
+  const start = weekData.days[0].key; // YYYY-MM-DD
+  const end = weekData.days[weekData.days.length - 1].key;
+  
+  // Graph API needs ISO strings for calendarview. 
+  // We'll append T00:00:00 and T23:59:59
+  try {
+    weekMeetings = await window.planner.getOutlookMeetings(`${start}T00:00:00Z`, `${end}T23:59:59Z`);
+  } catch (err) {
+    console.error('Failed to fetch meetings:', err);
+  }
 }
 
 // ── Stale Tasks Detection ─────────────────────────────────────────────────────
@@ -253,6 +296,41 @@ async function getPlansForDay(dayKey: string): Promise<any[]> {
   return day ? day.plans : [];
 }
 
+// ── Meetings Modal ────────────────────────────────────────────────────────────
+function openMeetingsModal(dayKey: string) {
+  const day = weekData.days.find((d: any) => d.key === dayKey);
+  if (!day) return;
+
+  meetingsModalTitle.textContent = `Meetings for ${day.dayName}, ${day.date} ${day.month}`;
+  
+  const dayMeetings = weekMeetings.filter(m => m.start.startsWith(dayKey));
+  meetingsList.innerHTML = '';
+
+  if (dayMeetings.length === 0) {
+    meetingsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">No meetings for this day.</div>';
+  } else {
+    dayMeetings.forEach((m, i) => {
+      const startTime = new Date(m.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const endTime = new Date(m.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      const item = document.createElement('div');
+      item.className = 'stale-task-item';
+      item.innerHTML = `
+        <div class="stale-task-info">
+          <div class="stale-task-text">${escapeHtml(m.subject)}</div>
+          <div class="stale-task-date">${startTime} – ${endTime}</div>
+        </div>
+        <div class="stale-task-actions">
+          <button class="action-btn" data-subject="${escapeHtml(m.subject)}" data-day="${dayKey}" title="Add as Task">➕</button>
+        </div>
+      `;
+      meetingsList.appendChild(item);
+    });
+  }
+
+  meetingsOverlay.classList.add('show');
+}
+
 // ── Render ────────────────────────────────────────────────────────────────────
 function renderGrid() {
   if (!grid) return;
@@ -290,11 +368,21 @@ function createDaySection(day: any) {
   section.className = 'day-section' + (day.isToday ? ' today' : '');
   section.dataset.dayKey = day.key;
 
+  const dayMeetings = weekMeetings.filter(m => m.start.startsWith(day.key));
+  const meetingBadge = dayMeetings.length > 0 
+    ? `<span class="meeting-badge" style="background: var(--surface2); color: var(--accent); font-size: 10px; padding: 2px 5px; border-radius: 10px; cursor: pointer; border: 1px solid var(--border); margin-left: 8px;" data-day="${day.key}">📅 ${dayMeetings.length}</span>`
+    : '';
+
   section.innerHTML = `
-    <div class="day-header">
-      <div class="day-name">${day.dayName}</div>
-      <div class="day-date">${day.date}</div>
-      <div class="day-month">${day.month}</div>
+    <div class="day-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div class="day-name">${day.dayName}</div>
+        <div style="display: flex; align-items: baseline;">
+          <div class="day-date">${day.date}</div>
+          ${meetingBadge}
+        </div>
+        <div class="day-month">${day.month}</div>
+      </div>
     </div>
     <div class="day-tasks" id="tasks-${day.key}"></div>
     <button class="add-task-btn" data-day="${day.key}">+ task</button>
@@ -314,6 +402,14 @@ function createDaySection(day: any) {
   day.plans.forEach((task: any, i: number) => tasksEl.appendChild(buildTaskItem(day.key, task, i)));
   updatePips(day.key, day.plans);
   setupDropTarget(tasksEl, day.key);
+
+  const badge = section.querySelector('.meeting-badge');
+  if (badge) {
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openMeetingsModal(day.key);
+    });
+  }
 
   return section;
 }
@@ -508,6 +604,47 @@ function setupEventListeners() {
 
   workEndInput?.addEventListener('change', async (e: Event) => {
     await window.planner.setSetting('workEnd' as any, parseInt((e.target as HTMLInputElement).value, 10));
+  });
+
+  connectOutlookBtn?.addEventListener('click', async () => {
+    const connected = await window.planner.getSetting('outlookConnected');
+    if (connected) {
+      if (confirm('Disconnect Outlook account?')) {
+        await window.planner.disconnectOutlook();
+        await updateOutlookUI();
+        await loadWeek(currentWeekKey!);
+      }
+    } else {
+      const success = await window.planner.connectOutlook();
+      if (success) {
+        await updateOutlookUI();
+        await loadWeek(currentWeekKey!);
+      }
+    }
+  });
+
+  closeMeetings?.addEventListener('click', () => {
+    meetingsOverlay.classList.remove('show');
+  });
+
+  meetingsList?.addEventListener('click', async (e: MouseEvent) => {
+    const btn = (e.target as HTMLElement).closest('.action-btn') as HTMLButtonElement;
+    if (btn) {
+      const subject = btn.dataset.subject!;
+      const dayKey = btn.dataset.day!;
+      
+      const tasksEl = document.getElementById(`tasks-${dayKey}`) as HTMLElement;
+      if (tasksEl) {
+        const newItem = buildTaskItem(dayKey, { text: subject, done: false }, 0);
+        tasksEl.appendChild(newItem);
+        await saveDay(dayKey);
+        
+        // Visual feedback
+        btn.textContent = '✅';
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+      }
+    }
   });
 
   grid?.addEventListener('focusout', (e: FocusEvent) => {

@@ -24,11 +24,25 @@ export interface WeekData {
   days: Day[];
 }
 
+export interface OutlookMeeting {
+  id: string;
+  subject: string;
+  start: string;
+  end: string;
+}
+
 export interface SettingOptions {
-  theme: 'dark' | 'light' | 'nord';
+  theme: string;
   notificationInterval: number;
   workStart: number;
   workEnd: number;
+  outlookConnected?: boolean;
+  outlookAccount?: string;
+  outlookTokens?: {
+    accessToken: string;
+    refreshToken: string;
+    expiresAt: number;
+  };
 }
 
 export interface PlannerAPI {
@@ -47,6 +61,11 @@ export interface PlannerAPI {
   restoreFromRecycleBin: (index: number) => Promise<void>;
   clearRecycleBin: () => Promise<void>;
   getPreviousWeekKey: (key: string) => Promise<string>;
+
+  // Outlook
+  connectOutlook: () => Promise<boolean>;
+  disconnectOutlook: () => Promise<void>;
+  getOutlookMeetings: (start: string, end: string) => Promise<OutlookMeeting[]>;
 }
 
 declare global {

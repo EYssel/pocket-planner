@@ -24,5 +24,10 @@ contextBridge.exposeInMainWorld('planner', {
   getRecycleBin:        ()      => ipcRenderer.invoke('get-recycle-bin'),
   restoreFromRecycleBin: (index: number) => ipcRenderer.invoke('restore-from-recycle-bin', index),
   clearRecycleBin:      ()      => ipcRenderer.invoke('clear-recycle-bin'),
-  getPreviousWeekKey:   (key: string)   => ipcRenderer.invoke('get-previous-week-key', key),
-});
+  getPreviousWeekKey: (key: string) => ipcRenderer.invoke('get-previous-week-key', key),
+
+  // Outlook
+  connectOutlook: () => ipcRenderer.invoke('connect-outlook'),
+  disconnectOutlook: () => ipcRenderer.invoke('disconnect-outlook'),
+  getOutlookMeetings: (start: string, end: string) => ipcRenderer.invoke('get-outlook-meetings', { start, end }),
+  });
