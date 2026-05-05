@@ -115,7 +115,7 @@ export function currentDayKey(): string {
 }
 
 /**
- * Returns the Monday–Sunday day keys for a given week key.
+ * Returns the Monday–Friday and Weekend day keys for a given week key.
  */
 export function weekDayKeys(weekKey: string): string[] {
   const { year, week } = parseWeekKey(weekKey);
@@ -123,17 +123,22 @@ export function weekDayKeys(weekKey: string): string[] {
   const jan4Day = jan4.getUTCDay() || 7;
   const monday  = new Date(jan4);
   monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7);
-  return Array.from({ length: 7 }, (_, i) => {
+  
+  const keys = Array.from({ length: 5 }, (_, i) => {
     const d = new Date(monday);
     d.setUTCDate(monday.getUTCDate() + i);
     return formatDayKey(d);
   });
+  
+  // Add weekend key
+  keys.push(`${weekKey}-WE`);
+  return keys;
 }
 
 export interface DayInfo {
   key: string;
   dayName: string;
-  date: number;
+  date: number | string;
   month: string;
   isToday: boolean;
   isWeekend: boolean;
@@ -143,6 +148,33 @@ export interface DayInfo {
  * Returns display info for a day key.
  */
 export function dayInfoFromKey(dayKey: string): DayInfo {
+  if (dayKey.endsWith('-WE')) {
+    const weekKey = dayKey.replace('-WE', '');
+    const { year, week } = parseWeekKey(weekKey);
+    const jan4    = new Date(Date.UTC(year, 0, 4));
+    const jan4Day = jan4.getUTCDay() || 7;
+    const monday  = new Date(jan4);
+    monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7);
+    
+    const sat = new Date(monday);
+    sat.setUTCDate(monday.getUTCDate() + 5);
+    const sun = new Date(monday);
+    sun.setUTCDate(monday.getUTCDate() + 6);
+    
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const todayKey = currentDayKey();
+    const isToday = formatDayKey(sat) === todayKey || formatDayKey(sun) === todayKey;
+    
+    return {
+      key: dayKey,
+      dayName: 'Weekend',
+      date: `${sat.getUTCDate()}-${sun.getUTCDate()}`,
+      month: sat.getUTCMonth() === sun.getUTCMonth() ? monthNames[sat.getUTCMonth()] : `${monthNames[sat.getUTCMonth()]}/${monthNames[sun.getUTCMonth()]}`,
+      isToday,
+      isWeekend: true,
+    };
+  }
+
   const [y, m, d] = dayKey.split('-').map(Number);
   const date = new Date(Date.UTC(y, m - 1, d));
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -153,7 +185,7 @@ export function dayInfoFromKey(dayKey: string): DayInfo {
     date:     date.getUTCDate(),
     month:    monthNames[date.getUTCMonth()],
     isToday:  dayKey === currentDayKey(),
-    isWeekend: date.getUTCDay() === 0 || date.getUTCDay() === 6,
+    isWeekend: false,
   };
 }
 
@@ -161,6 +193,9 @@ export function dayInfoFromKey(dayKey: string): DayInfo {
  * Returns the week key for a given day key.
  */
 export function weekKeyFromDayKey(dayKey: string): string {
+  if (dayKey.endsWith('-WE')) {
+    return dayKey.replace('-WE', '');
+  }
   const [y, m, d] = dayKey.split('-').map(Number);
   const date = new Date(Date.UTC(y, m - 1, d));
   const { week, year } = getISOWeek(date);

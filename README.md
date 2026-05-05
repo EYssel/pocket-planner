@@ -31,3 +31,8 @@ npm start
 ## Data
 
 Plans are stored locally in your OS app-data folder via `electron-store`. No cloud, no account.
+
+## Author
+
+- **Estian Yssel**
+

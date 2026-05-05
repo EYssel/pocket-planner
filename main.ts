@@ -7,6 +7,8 @@ import { createTray, init as initTray } from './src/tray';
 import { init as initNotifications, reschedule } from './src/notifications';
 import { registerHandlers } from './src/ipc';
 import { initUpdater } from './src/updater';
+import { store } from './src/store';
+import { runMigrations } from './src/migrations';
 
 // Declare global isQuitting (also handled in window.ts, but let's be safe)
 declare global {
@@ -33,6 +35,9 @@ if (!initSingleInstance()) {
 
 app.whenReady().then(() => {
   app.setLoginItemSettings({ openAtLogin: true });
+
+  // Run data migrations
+  runMigrations(store);
 
   // Wire up cross-module dependency (avoids circular requires)
   initNotifications(createWindow);

@@ -12,7 +12,7 @@ interface Schema {
 
 const isDev = app ? !app.isPackaged : true;
 
-const store = new Store<Schema>({
+export const store = new Store<Schema>({
   name: isDev ? 'config-dev' : 'config',
   defaults: {
     settings: {

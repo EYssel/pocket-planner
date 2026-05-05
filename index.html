@@ -355,15 +355,6 @@
       overflow: hidden;
     }
 
-    .weekend-col {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .weekend-col .day-section:first-child {
-      border-bottom: 1px solid var(--border);
-    }
-
     /* Day header */
     .day-header {
       padding: 10px 12px 8px;
@@ -482,7 +473,25 @@
       color: #000;
     }
 
-    .task-text {
+    .task-text-container {
+      position: relative;
+      width: 100%;
+      min-height: 18px;
+    }
+
+    .task-display {
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--text);
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      white-space: pre-wrap;
+    }
+
+    .task-edit {
       background: transparent;
       border: none;
       color: var(--text);
@@ -494,15 +503,18 @@
       line-height: 1.4;
       resize: none;
       overflow: hidden;
-      min-height: 18px;
+      display: none;
     }
 
-    .task-item.done .task-text {
+    .task-item.editing .task-display { display: none; }
+    .task-item.editing .task-edit { display: block; }
+
+    .task-item.done .task-display {
       color: var(--done-text);
       text-decoration: line-through;
     }
 
-    .task-text::placeholder { color: var(--muted); }
+    .task-edit::placeholder { color: var(--muted); }
 
     .del-btn {
       background: transparent;
@@ -562,26 +574,6 @@
     }
 
     .pip.done { background: var(--accent); }
-
-    /* Saved flash */
-    #saved-flash {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      background: var(--accent);
-      color: #000;
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 6px 12px;
-      border-radius: var(--radius);
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-    }
-
-    #saved-flash.show { opacity: 1; }
 
     /* ── Carry-over Banner ── */
     .banner {
@@ -888,7 +880,6 @@
   </div>
 </div>
 
-<div id="saved-flash">Saved ✓</div>
 
 <script src="dist/renderer.js"></script>
 </body></html>
