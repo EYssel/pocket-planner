@@ -6,6 +6,7 @@ import { createWindow, initSingleInstance } from './src/window';
 import { createTray, init as initTray } from './src/tray';
 import { init as initNotifications, reschedule } from './src/notifications';
 import { registerHandlers } from './src/ipc';
+import { initUpdater } from './src/updater';
 
 // Declare global isQuitting (also handled in window.ts, but let's be safe)
 declare global {
@@ -41,6 +42,7 @@ app.whenReady().then(() => {
   createTray();
   createWindow('planner');
   reschedule();
+  initUpdater();
 });
 
 app.on('window-all-closed', (e: Electron.IpcMainEvent | any) => {

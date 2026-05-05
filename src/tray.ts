@@ -2,6 +2,7 @@
 
 import { app, Tray, Menu, nativeImage } from 'electron';
 import * as path from 'path';
+import { checkForUpdates } from './updater';
 
 let tray: Tray | null = null;
 let _openWindow: ((mode?: string) => void) | null = null;
@@ -16,6 +17,8 @@ export function rebuild(): void {
   const menu = Menu.buildFromTemplate([
     { label: 'Open Planner', click: () => _openWindow!('planner') },
     { label: 'Check In',     click: () => _openWindow!('checkin') },
+    { type: 'separator' },
+    { label: 'Check for Updates', click: () => checkForUpdates() },
     { type: 'separator' },
     { label: 'Quit', click: () => { global.isQuitting = true; app.quit(); } },
   ]);
