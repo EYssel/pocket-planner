@@ -33,7 +33,10 @@ The application follows a standard Electron multi-process architecture with a cl
 -   **Keys:** 
     -   Weeks are keyed by `YYYY-Www` (e.g., `2026-W17`).
     -   Days are keyed by `YYYY-MM-DD` (e.g., `2026-04-23`).
--   **Persistence:** Data is stored locally using `electron-store` under the `days` and `settings` keys.
+-   **Persistence:** 
+    -   Data is stored locally using `electron-store` under the `days` and `settings` keys.
+    -   **DOM Synchronization:** Task persistence follows a container-based strategy. `getPlansFromDOM(dayKey)` scans the specific containers (`#tasks-${dayKey}`, `#done-tasks-${dayKey}`) to ensure physical DOM position determines the saved state.
+    -   **Metadata:** Task elements maintain a `data-day-key` attribute which is synchronized during drag-and-drop operations to maintain consistency between the DOM and the state.
 
 ### UI/UX
 -   **Styling:** Custom CSS in `index.html` using a dark-themed, monospace-leaning aesthetic.
