@@ -448,6 +448,37 @@
 
     .task-item:hover { border-color: var(--border); }
 
+    .drop-indicator {
+      display: none;
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius);
+      margin: 4px;
+      color: var(--accent);
+      font-size: 10px;
+      text-align: center;
+      padding: 12px;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    body.dragging-active .drop-indicator,
+    body.dragging-active .day-tasks {
+      display: block;
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius);
+      background: rgba(232, 255, 71, 0.05); /* Slight tint using --accent */
+      min-height: 40px;
+    }
+
+    body.dragging-active .day-tasks {
+      margin: 4px;
+      padding: 8px;
+    }
+
+    body.dragging-active .done-section {
+      display: block !important;
+    }
+
     .check-btn {
       width: 16px;
       height: 16px;

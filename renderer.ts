@@ -304,9 +304,7 @@ function createDaySection(day: any) {
         <div class="day-month">${day.month}</div>
       </div>
     </div>
-    <div class="day-tasks active-tasks" id="tasks-${day.key}"></div>
-    <button class="add-task-btn" data-day="${day.key}">+ task</button>
-    <div style="flex: 1; min-height: 0;"></div>
+    <div class="day-tasks active-tasks" id="tasks-${day.key}" style="flex: 1;"></div>
     <details open class="done-section" id="done-section-${day.key}" style="display: none; margin-top: 16px;">
       <summary style="cursor: pointer; font-size: 11px; font-weight: 500; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--accent); user-select: none;">Done Tasks</summary>
       <div class="day-tasks done-tasks" id="done-tasks-${day.key}" style="margin-top: 4px;"></div>
@@ -335,6 +333,13 @@ function createDaySection(day: any) {
       tasksEl.appendChild(buildTaskItem(day.key, task, i));
     }
   });
+
+  // Add the "+ task" button to the end of the active tasks list
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-task-btn';
+  addBtn.dataset.day = day.key;
+  addBtn.textContent = '+ task';
+  tasksEl.appendChild(addBtn);
 
   if (hasDoneTasks) {
     doneSectionEl.style.display = 'block';
@@ -386,12 +391,14 @@ function buildTaskItem(dayKey: string, task: any, index: number) {
 
   item.addEventListener('dragstart', (e: DragEvent) => {
     item.classList.add('dragging');
+    document.body.classList.add('dragging-active');
     e.dataTransfer?.setData('text/plain', JSON.stringify({ dayKey, index }));
     if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
   });
 
   item.addEventListener('dragend', () => {
     item.classList.remove('dragging');
+    document.body.classList.remove('dragging-active');
   });
 
   return item;
