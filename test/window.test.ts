@@ -36,7 +36,7 @@ describe('window', () => {
       windowModule.createWindow('planner');
       expect(electron.BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
         width: 1000,
-        height: 620,
+        height: 650,
         backgroundColor: '#0f0f0f',
       }));
     });
