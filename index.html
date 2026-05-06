@@ -289,7 +289,10 @@
 </head>
 <body>
 <header>
-  <span class="logo">Weekly Planner</span>
+  <div style="display: flex; align-items: baseline; gap: 8px;">
+    <span class="logo">Weekly Planner</span>
+    <span id="app-version" style="font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); text-transform: none; letter-spacing: normal;">v0.0.0</span>
+  </div>
   <div class="week-nav">
     <button class="nav-btn" id="prev-week">‹</button>
     <div class="week-info">
@@ -304,6 +307,13 @@
     <button class="icon-btn" id="open-settings">⚙️</button>
   </div>
 </header>
+<div class="banner" id="update-banner" style="border-bottom-color: var(--accent2);">
+  <div class="banner-text"><strong>Update Ready</strong> A new version has been downloaded.</div>
+  <div class="banner-btns">
+    <button class="banner-btn" id="install-update-btn">Restart to Install</button>
+    <button class="banner-btn secondary" id="close-update-banner">Dismiss</button>
+  </div>
+</div>
 <div class="banner" id="stale-banner">
   <div class="banner-text"><strong id="stale-count">0</strong> incomplete tasks found from last week.</div>
   <div class="banner-btns">
@@ -314,6 +324,6 @@
 <div class="grid" id="week-grid"></div>
 <div class="modal-overlay" id="cleanup-overlay"><div class="modal"><div class="modal-header"><div class="modal-title">Weekly Cleanup</div></div><div class="modal-body" id="cleanup-list"></div><div class="modal-footer"><button class="banner-btn secondary" id="close-cleanup">Close</button></div></div></div>
 <div class="modal-overlay" id="recycle-bin-overlay"><div class="modal"><div class="modal-header"><div class="modal-title">Recycle Bin</div></div><div class="modal-body" id="recycle-bin-list"></div><div class="modal-footer"><button class="banner-btn secondary" id="clear-bin-btn">Clear All</button><button class="banner-btn secondary" id="close-recycle-bin">Close</button></div></div></div>
-<div class="modal-overlay" id="settings-overlay"><div class="modal"><div class="modal-header"><div class="modal-title">Settings</div></div><div class="modal-body"><div class="settings-grid"><div class="settings-group" style="grid-column: 1 / -1;"><label class="settings-label">Theme</label><select id="theme-select" class="settings-select"><option value="dark">Dark</option><option value="light">Light</option><option value="nord">Nord</option><option value="dracula">Dracula</option><option value="monokai">Monokai</option><option value="one-dark">One Dark</option><option value="solarized-dark">Solarized Dark</option><option value="solarized-light">Solarized Light</option><option value="gruvbox-dark">Gruvbox Dark</option><option value="synthwave">Synthwave '84</option><option value="cyberpunk">Cyberpunk</option><option value="matrix">Matrix</option><option value="midnight">Midnight</option><option value="high-contrast">High Contrast</option><option value="minimalist">Minimalist</option><option value="slate">Slate</option><option value="ocean">Oceanic</option><option value="forest">Forest</option><option value="emerald">Emerald</option><option value="ruby">Ruby</option><option value="amber">Amber (Retro)</option><option value="sepia">Sepia</option><option value="coffee">Coffee</option><option value="lavender">Lavender</option><option value="pastel">Pastel</option><option value="sakura">Sakura</option></select></div><div class="settings-group" style="grid-column: 1 / -1;"><label class="settings-label">Notification Interval</label><select id="interval-select" class="settings-select"></select></div><div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div></div></div><div class="modal-footer"><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
+<div class="modal-overlay" id="settings-overlay"><div class="modal"><div class="modal-header"><div class="modal-title">Settings</div></div><div class="modal-body"><div class="settings-grid"><div class="settings-group" style="grid-column: 1 / -1;"><label class="settings-label">Theme</label><select id="theme-select" class="settings-select"><option value="dark">Dark</option><option value="light">Light</option><option value="nord">Nord</option><option value="dracula">Dracula</option><option value="monokai">Monokai</option><option value="one-dark">One Dark</option><option value="solarized-dark">Solarized Dark</option><option value="solarized-light">Solarized Light</option><option value="gruvbox-dark">Gruvbox Dark</option><option value="synthwave">Synthwave '84</option><option value="cyberpunk">Cyberpunk</option><option value="matrix">Matrix</option><option value="midnight">Midnight</option><option value="high-contrast">High Contrast</option><option value="minimalist">Minimalist</option><option value="slate">Slate</option><option value="ocean">Oceanic</option><option value="forest">Forest</option><option value="emerald">Emerald</option><option value="ruby">Ruby</option><option value="amber">Amber (Retro)</option><option value="sepia">Sepia</option><option value="coffee">Coffee</option><option value="lavender">Lavender</option><option value="pastel">Pastel</option><option value="sakura">Sakura</option></select></div><div class="settings-group" style="grid-column: 1 / -1;"><label class="settings-label">Notification Interval</label><select id="interval-select" class="settings-select"></select></div><div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div></div></div><div class="modal-footer"><span id="settings-version" style="font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-right: auto;">v0.0.0</span><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
 <script src="dist/renderer.js"></script>
 </body></html>

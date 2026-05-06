@@ -28,6 +28,10 @@ const cleanupList  = document.getElementById('cleanup-list') as HTMLElement;
 const cleanupModal = document.getElementById('cleanup-overlay') as HTMLElement;
 const closeCleanup = document.getElementById('close-cleanup') as HTMLElement;
 
+const updateBanner      = document.getElementById('update-banner') as HTMLElement;
+const installUpdateBtn  = document.getElementById('install-update-btn') as HTMLElement;
+const closeUpdateBanner = document.getElementById('close-update-banner') as HTMLElement;
+
 const recycleBinOverlay = document.getElementById('recycle-bin-overlay') as HTMLElement;
 const recycleBinList    = document.getElementById('recycle-bin-list') as HTMLElement;
 const openRecycleBin    = document.getElementById('open-recycle-bin') as HTMLElement;
@@ -49,6 +53,11 @@ async function init() {
       document.title = appInfo.name;
       const logo = document.querySelector('.logo');
       if (logo) logo.textContent = appInfo.name;
+      
+      const v1 = document.getElementById('app-version');
+      const v2 = document.getElementById('settings-version');
+      if (v1) v1.textContent = `v${appInfo.version}`;
+      if (v2) v2.textContent = `v${appInfo.version}`;
     }
 
     setupEventListeners();
@@ -624,6 +633,18 @@ function setupEventListeners() {
 
   openSettings?.addEventListener('click',  () => settingsOverlay.classList.add('show'));
   closeSettings?.addEventListener('click', () => settingsOverlay.classList.remove('show'));
+
+  window.planner.onUpdateDownloaded(() => {
+    updateBanner.classList.add('show');
+  });
+
+  installUpdateBtn?.addEventListener('click', () => {
+    window.planner.installUpdate();
+  });
+
+  closeUpdateBanner?.addEventListener('click', () => {
+    updateBanner.classList.remove('show');
+  });
 
   intervalSelect?.addEventListener('change', async (e: Event) => {
     await window.planner.setSetting('notificationInterval' as any, parseInt((e.target as HTMLSelectElement).value, 10));

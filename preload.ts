@@ -26,4 +26,6 @@ contextBridge.exposeInMainWorld('planner', {
   restoreFromRecycleBin: (index: number) => ipcRenderer.invoke('restore-from-recycle-bin', index),
   clearRecycleBin:      ()      => ipcRenderer.invoke('clear-recycle-bin'),
   getPreviousWeekKey: (key: string) => ipcRenderer.invoke('get-previous-week-key', key),
+  onUpdateDownloaded: (cb: () => void) => ipcRenderer.on('update-downloaded', () => cb()),
+  installUpdate: () => ipcRenderer.invoke('install-update'),
 });

@@ -1,7 +1,7 @@
 'use strict';
 
 import { autoUpdater } from 'electron-updater';
-import { app } from 'electron';
+import { app, BrowserWindow } from 'electron';
 
 /**
  * Initializes the auto-updater to check for and notify about updates.
@@ -19,14 +19,17 @@ export function initUpdater(): void {
 
   autoUpdater.on('update-downloaded', () => {
     console.log('Update downloaded; will install now or on next restart.');
+    BrowserWindow.getAllWindows().forEach(win => {
+      win.webContents.send('update-downloaded');
+    });
   });
 
   autoUpdater.on('error', (err) => {
     console.error('Error in auto-updater:', err);
   });
 
-  // Check for updates and notify the user via system notification
-  autoUpdater.checkForUpdatesAndNotify();
+  // Check for updates (no system notification)
+  autoUpdater.checkForUpdates();
 }
 
 /**
@@ -37,5 +40,5 @@ export function checkForUpdates(): void {
     console.log('Update check skipped: App not packaged.');
     return;
   }
-  autoUpdater.checkForUpdatesAndNotify();
+  autoUpdater.checkForUpdates();
 }

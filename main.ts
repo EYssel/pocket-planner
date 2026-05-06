@@ -48,6 +48,16 @@ app.whenReady().then(() => {
   createWindow('planner');
   reschedule();
   initUpdater();
+
+  // TEMPORARY: Simulate an update download after 5 seconds for UI testing
+  if (!app.isPackaged) {
+    setTimeout(() => {
+      const { BrowserWindow } = require('electron');
+      BrowserWindow.getAllWindows().forEach((win: any) => {
+        win.webContents.send('update-downloaded');
+      });
+    }, 5000);
+  }
 });
 
 app.on('window-all-closed', (e: Electron.IpcMainEvent | any) => {
