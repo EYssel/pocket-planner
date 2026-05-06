@@ -403,7 +403,8 @@ function buildTaskItem(dayKey: string, task: any, index: number) {
   item.addEventListener('dragstart', (e: DragEvent) => {
     item.classList.add('dragging');
     document.body.classList.add('dragging-active');
-    e.dataTransfer?.setData('text/plain', JSON.stringify({ dayKey, index }));
+    const currentDayKey = item.dataset.dayKey || dayKey;
+    e.dataTransfer?.setData('text/plain', JSON.stringify({ dayKey: currentDayKey, index }));
     if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
   });
 
