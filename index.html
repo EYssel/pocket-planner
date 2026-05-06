@@ -475,8 +475,20 @@
       padding: 8px;
     }
 
-    body.dragging-active .done-section {
-      display: block !important;
+    .done-tasks {
+      max-height: 120px;
+      overflow-y: auto;
+      margin-top: 4px;
+      padding-right: 4px;
+    }
+
+    .done-tasks::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .done-tasks::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
     }
 
     .check-btn {
