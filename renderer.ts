@@ -301,7 +301,7 @@ function createDaySection(day: any) {
       <div class="day-month">${day.month}</div>
     </div>
     <div class="day-tasks active-tasks" id="tasks-${day.key}"></div>
-    <div class="done-section" id="done-section-${day.key}" style="display: none;">
+    <div class="done-section" id="done-section-${day.key}">
       <div class="done-header">Done Tasks</div>
       <div class="day-tasks done-tasks" id="done-tasks-${day.key}"></div>
     </div>
@@ -338,7 +338,7 @@ function createDaySection(day: any) {
   tasksEl.appendChild(addBtn);
 
   if (hasDoneTasks) {
-    doneSectionEl.style.display = 'flex';
+    doneSectionEl.classList.add('visible');
   }
 
   updatePips(day.key, day.plans);
@@ -495,7 +495,7 @@ function setupDropTarget(tasksEl: HTMLElement, dayKey: string) {
       const doneSectionEl = document.getElementById(`done-section-${dk}`);
       const doneTasksEl = document.getElementById(`done-tasks-${dk}`);
       if (doneSectionEl && doneTasksEl) {
-        doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'flex' : 'none';
+        doneSectionEl.classList.toggle('visible', doneTasksEl.children.length > 0);
       }
     });
   });
@@ -564,7 +564,7 @@ function setupEventListeners() {
         }
 
         if (doneSectionEl && doneTasksEl) {
-          doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'flex' : 'none';
+          doneSectionEl.classList.toggle('visible', doneTasksEl.children.length > 0);
         }
 
         saveDay(dayKey);
@@ -579,7 +579,7 @@ function setupEventListeners() {
         const doneTasksEl = document.getElementById(`done-tasks-${dayKey}`);
         const doneSectionEl = document.getElementById(`done-section-${dayKey}`);
         if (doneSectionEl && doneTasksEl) {
-          doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'flex' : 'none';
+          doneSectionEl.classList.toggle('visible', doneTasksEl.children.length > 0);
         }
 
         await window.planner.addToRecycleBin({ text, done: isDone, dayKey });
