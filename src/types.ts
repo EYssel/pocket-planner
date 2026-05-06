@@ -8,7 +8,7 @@ export interface Task {
 export interface Day {
   key: string;
   dayName: string;
-  date: number;
+  date: number | string;
   month: string;
   isToday: boolean;
   isWeekend: boolean;
