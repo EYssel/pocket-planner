@@ -1,6 +1,7 @@
 'use strict';
 
-import { ipcMain } from 'electron';
+import { ipcMain, app } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import * as store from '../src/store';
 import * as weekUtils from '../src/weekUtils';
 import { registerHandlers } from '../src/ipc';
@@ -8,6 +9,19 @@ import { registerHandlers } from '../src/ipc';
 jest.mock('electron', () => ({
   ipcMain: {
     handle: jest.fn(),
+    on: jest.fn(),
+  },
+  app: {
+    getName: jest.fn().mockReturnValue('Weekly Planner'),
+    getVersion: jest.fn().mockReturnValue('1.0.0'),
+    getPath: jest.fn().mockReturnValue(''),
+    isPackaged: true,
+  }
+}));
+
+jest.mock('electron-updater', () => ({
+  autoUpdater: {
+    quitAndInstall: jest.fn(),
   },
 }));
 
@@ -31,11 +45,13 @@ describe('ipc', () => {
   test('registerHandlers should register all expected handlers', () => {
     registerHandlers();
     const expectedHandlers = [
-      'get-setting', 'set-setting', 
+      'get-app-info', 'get-setting', 'set-setting', 
       'get-current-week-key', 'get-offset-week-key', 
       'get-current-day-key', 'get-week-key-from-day-key',
       'get-week', 'save-plans', 'add-to-recycle-bin',
-      'get-recycle-bin', 'get-previous-week-key'
+      'get-recycle-bin', 'restore-from-recycle-bin',
+      'clear-recycle-bin', 'get-previous-week-key',
+      'install-update'
     ];
     expectedHandlers.forEach(name => {
       expect(ipcMain.handle).toHaveBeenCalledWith(name, expect.any(Function));
@@ -45,6 +61,16 @@ describe('ipc', () => {
   describe('Handlers', () => {
     beforeEach(() => {
       registerHandlers();
+    });
+
+    test('get-app-info should return app name and version', async () => {
+      const result = await handlers['get-app-info']({});
+      expect(result).toEqual({ name: 'Weekly Planner', version: '1.0.0' });
+    });
+
+    test('install-update should call autoUpdater.quitAndInstall', async () => {
+      await handlers['install-update']({});
+      expect(autoUpdater.quitAndInstall).toHaveBeenCalled();
     });
 
     test('get-setting should call store.getSetting', async () => {

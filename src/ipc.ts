@@ -1,6 +1,7 @@
 'use strict';
 
 import { ipcMain, app } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import { 
   getPlans, 
   savePlans, 
@@ -30,6 +31,10 @@ export function registerHandlers(): void {
     name: app.getName(),
     version: app.getVersion(),
   }));
+
+  ipcMain.handle('install-update', () => {
+    autoUpdater.quitAndInstall();
+  });
 
   // Settings handlers
   ipcMain.handle('get-setting', <K extends keyof SettingOptions>(_: any, key: K) => getSetting(key));
