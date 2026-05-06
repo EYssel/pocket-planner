@@ -165,9 +165,9 @@ function renderCleanupList() {
         <div class="stale-task-date">From ${task.dayKey}</div>
       </div>
       <div class="stale-task-actions">
-        <button class="action-btn" data-index="${i}" data-action="carry" title="Carry Forward">➡️</button>
-        <button class="action-btn" data-index="${i}" data-action="done" title="Mark Done">✅</button>
-        <button class="action-btn" data-index="${i}" data-action="discard" title="Discard">🗑️</button>
+        <button class="banner-btn action-btn" data-index="${i}" data-action="carry" title="Carry Forward">➡️</button>
+        <button class="banner-btn action-btn" data-index="${i}" data-action="done" title="Mark Done">✅</button>
+        <button class="banner-btn action-btn" data-index="${i}" data-action="discard" title="Discard">🗑️</button>
       </div>
     `;
     cleanupList.appendChild(item);
@@ -240,6 +240,7 @@ async function renderRecycleBin() {
       <div class="bin-task-actions">
         <button class="action-btn" data-index="${i}" data-action="restore" title="Restore">🔄</button>
       </div>
+
     `;
     recycleBinList.appendChild(item);
   });
