@@ -67,7 +67,7 @@ const ALL_DONE_MESSAGES: Message[] = [
 
 const NO_PROGRESS_MESSAGES: Message[] = [
   { title: '🚀 Ready to start?', body: "Haven't started your {total} tasks yet? Pick one and go!" },
-  { title: '💡 Small steps', body: 'The hardest part is starting. Let\'s check one task off!' },
+  { title: '💡 Small steps', body: 'The hardest part is starting. Let\'s check one of your {total} tasks off!' },
   { title: '🌱 Time to plant', body: 'Your {total} tasks are waiting to grow. Start one now!' },
   { title: '🧊 Break the ice', body: 'The list looks daunting? Just start with the easiest of {total}.' },
   { title: '⚡ Spark needed?', body: 'Let\'s get moving! {total} tasks are waiting for you.' },
@@ -75,7 +75,7 @@ const NO_PROGRESS_MESSAGES: Message[] = [
   { title: '⏱️ The clock is ticking', body: 'The day is moving along. Ready to start your {total} tasks?' },
   { title: '🪁 Take flight', body: 'Get your day off the ground. {total} tasks to tackle.' },
   { title: '🧗 Start the climb', body: 'First step is the most important. {total} tasks ahead.' },
-  { title: '🔑 Unlock progress', body: 'Start your first task to unlock a productive day!' },
+  { title: '🔑 Unlock progress', body: 'Start one of your {total} tasks to unlock a productive day!' },
   { title: '🌊 Catch the wave', body: 'Don\'t let the day pass you by. {total} tasks waiting.' },
   { title: '🏁 Starting line', body: 'The race has begun! Ready to jump into your {total} tasks?' },
 ];

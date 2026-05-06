@@ -99,11 +99,11 @@ describe('weekUtils', () => {
   });
 
   describe('weekDayKeys', () => {
-    test('should return 7 days for a week', () => {
+    test('should return 6 keys for a week (5 weekdays + 1 merged weekend)', () => {
       const days = weekDayKeys('2026-W19');
-      expect(days).toHaveLength(7);
+      expect(days).toHaveLength(6);
       expect(days[0]).toBe('2026-05-04'); // Monday
-      expect(days[6]).toBe('2026-05-10'); // Sunday
+      expect(days[5]).toBe('2026-W19-WE'); // Weekend
     });
   });
 
@@ -117,8 +117,9 @@ describe('weekUtils', () => {
     });
 
     test('should return info for a weekend', () => {
-      const info = dayInfoFromKey('2026-05-10');
-      expect(info.dayName).toBe('Sun');
+      const info = dayInfoFromKey('2026-W19-WE');
+      expect(info.dayName).toBe('Weekend');
+      expect(info.date).toBe('9-10');
       expect(info.isWeekend).toBe(true);
     });
   });

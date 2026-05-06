@@ -20,9 +20,9 @@ export function createWindow(mode: string = 'planner'): void {
 
   mainWindow = new BrowserWindow({
     width: 1000,
-    height: 620,
+    height: 650,
     minWidth: 800,
-    minHeight: 500,
+    minHeight: 650,
     icon: path.join(__dirname, '..', 'icon.ico'),
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {

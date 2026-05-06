@@ -2,6 +2,7 @@
   "name": "weekly-planner",
   "version": "1.0.16",
   "description": "A simple weekly planning desktop app",
+  "author": "Estian Yssel",
   "main": "dist/main.js",
   "scripts": {
     "build:ts": "node build.mjs",
@@ -33,7 +34,7 @@
     "typescript": "^6.0.3"
   },
   "build": {
-    "appId": "com.yourname.weekly-planner",
+    "appId": "com.estianyssel.weekly-planner",
     "productName": "Weekly Planner",
     "publish": {
       "provider": "github"

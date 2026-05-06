@@ -19,7 +19,6 @@ const prevBtn     = document.getElementById('prev-week') as HTMLButtonElement;
 const nextBtn     = document.getElementById('next-week') as HTMLButtonElement;
 const todayBtn    = document.getElementById('today-btn') as HTMLButtonElement;
 const themeSelect = document.getElementById('theme-select') as HTMLSelectElement;
-const flash       = document.getElementById('saved-flash') as HTMLElement;
 
 const staleBanner  = document.getElementById('stale-banner') as HTMLElement;
 const staleCount   = document.getElementById('stale-count') as HTMLElement;
@@ -266,13 +265,9 @@ function renderGrid() {
   if (!grid) return;
   grid.innerHTML = '';
   if (weekData && weekData.days) {
-    // Mon - Fri
-    for (let i = 0; i < 5; i++) {
-      grid.appendChild(buildDayCol(weekData.days[i]));
-    }
-    // Weekend
-    if (weekData.days.length >= 7) {
-      grid.appendChild(buildWeekendCol(weekData.days[5], weekData.days[6]));
+    // Render all 6 columns (Mon-Fri + Weekend)
+    for (const day of weekData.days) {
+      grid.appendChild(buildDayCol(day));
     }
   }
 }
@@ -282,14 +277,6 @@ function buildDayCol(day: any) {
   col.className = 'day-col' + (day.isToday ? ' today' : '');
   col.dataset.dayKey = day.key;
   col.appendChild(createDaySection(day));
-  return col;
-}
-
-function buildWeekendCol(sat: any, sun: any) {
-  const col = document.createElement('div');
-  col.className = 'day-col weekend-col';
-  col.appendChild(createDaySection(sat));
-  col.appendChild(createDaySection(sun));
   return col;
 }
 
@@ -360,12 +347,33 @@ function buildTaskItem(dayKey: string, task: any, index: number) {
 
   item.innerHTML = `
     <button class="check-btn" title="Toggle">${task.done ? '✓' : ''}</button>
-    <textarea class="task-text" placeholder="Task…" rows="1">${escapeHtml(task.text)}</textarea>
+    <div class="task-text-container">
+      <div class="task-display" title="${escapeHtml(task.text)}">${escapeHtml(task.text)}</div>
+      <textarea class="task-edit" placeholder="Task…" rows="1">${escapeHtml(task.text)}</textarea>
+    </div>
     <button class="del-btn" title="Delete">×</button>
   `;
 
-  const ta = item.querySelector('.task-text') as HTMLTextAreaElement;
-  requestAnimationFrame(() => autoResize(ta));
+  const display = item.querySelector('.task-display') as HTMLElement;
+  const edit    = item.querySelector('.task-edit') as HTMLTextAreaElement;
+
+  // Toggle edit mode
+  display.addEventListener('click', () => {
+    item.classList.add('editing');
+    edit.focus();
+    autoResize(edit);
+  });
+
+  edit.addEventListener('blur', () => {
+    item.classList.remove('editing');
+    display.textContent = edit.value;
+    display.title = edit.value;
+    saveDay(dayKey);
+  });
+
+  edit.addEventListener('input', () => {
+    autoResize(edit);
+  });
 
   item.addEventListener('dragstart', (e: DragEvent) => {
     item.classList.add('dragging');
@@ -402,7 +410,7 @@ function escapeHtml(str: string) {
 function getPlansFromDOM(dayKey: string): any[] {
   const items = grid.querySelectorAll(`.task-item[data-day-key="${dayKey}"]`);
   return Array.from(items).map(item => ({
-    text: (item.querySelector('.task-text') as HTMLTextAreaElement).value,
+    text: (item.querySelector('.task-edit') as HTMLTextAreaElement).value,
     done: item.classList.contains('done'),
   }));
 }
@@ -450,14 +458,6 @@ async function saveDay(dayKey: string) {
   const plans = getPlansFromDOM(dayKey).filter(p => p.text.trim() !== '');
   await window.planner.savePlans(dayKey, plans);
   updatePips(dayKey, plans);
-  flashSaved();
-}
-
-function flashSaved() {
-  if (!flash) return;
-  flash.classList.add('show');
-  clearTimeout((flashSaved as any)._t);
-  (flashSaved as any)._t = setTimeout(() => flash.classList.remove('show'), 1600);
 }
 
 // ── Event Listeners ───────────────────────────────────────────────────────────
@@ -507,7 +507,7 @@ function setupEventListeners() {
 
         saveDay(dayKey);
       } else if (delBtn) {
-        const text = (item.querySelector('.task-text') as HTMLTextAreaElement).value;
+        const text = (item.querySelector('.task-edit') as HTMLTextAreaElement).value;
         const isDone = item.classList.contains('done');
         // Remove from DOM immediately for snappy UI and to avoid race conditions in tests
         item.remove();
@@ -521,7 +521,11 @@ function setupEventListeners() {
         const tasksEl = document.getElementById(`tasks-${dayKey}`) as HTMLElement;
         const newItem = buildTaskItem(dayKey, { text: '', done: false }, 0);
         tasksEl.appendChild(newItem);
-        (newItem.querySelector('.task-text') as HTMLTextAreaElement).focus();
+        
+        // Enter edit mode immediately
+        newItem.classList.add('editing');
+        const edit = newItem.querySelector('.task-edit') as HTMLTextAreaElement;
+        edit.focus();
       }
     }
   });
@@ -563,18 +567,18 @@ function setupEventListeners() {
   });
 
   grid?.addEventListener('focusout', (e: FocusEvent) => {
-    if ((e.target as HTMLElement).classList.contains('task-text')) {
+    if ((e.target as HTMLElement).classList.contains('task-edit')) {
       const dayKey = (e.target as HTMLElement).closest('.task-item')?.getAttribute('data-day-key');
       if (dayKey) saveDay(dayKey);
     }
   }, true);
 
   grid?.addEventListener('input', (e: Event) => {
-    if ((e.target as HTMLElement).classList.contains('task-text')) autoResize(e.target as HTMLTextAreaElement);
+    if ((e.target as HTMLElement).classList.contains('task-edit')) autoResize(e.target as HTMLTextAreaElement);
   });
 
   grid?.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (!(e.target as HTMLElement).classList.contains('task-text')) return;
+    if (!(e.target as HTMLElement).classList.contains('task-edit')) return;
     const item = (e.target as HTMLElement).closest('.task-item') as HTMLElement;
     const dayKey = item?.dataset.dayKey!;
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -582,14 +586,22 @@ function setupEventListeners() {
       const tasksEl = document.getElementById(`tasks-${dayKey}`) as HTMLElement;
       const newItem = buildTaskItem(dayKey, { text: '', done: false }, 0);
       tasksEl.appendChild(newItem);
-      (newItem.querySelector('.task-text') as HTMLTextAreaElement).focus();
+
+      // Enter edit mode immediately
+      newItem.classList.add('editing');
+      const edit = newItem.querySelector('.task-edit') as HTMLTextAreaElement;
+      edit.focus();
     }
     if (e.key === 'Backspace' && (e.target as HTMLTextAreaElement).value === '') {
       e.preventDefault();
       const prev = item.previousElementSibling as HTMLElement;
       item.remove();
       saveDay(dayKey);
-      if (prev) (prev.querySelector('.task-text') as HTMLTextAreaElement)?.focus();
+      if (prev) {
+        prev.classList.add('editing');
+        const prevEdit = prev.querySelector('.task-edit') as HTMLTextAreaElement;
+        prevEdit?.focus();
+      }
     }
   });
 
@@ -601,7 +613,7 @@ function setupEventListeners() {
   });
 
   window.addEventListener('resize', () => {
-    document.querySelectorAll('.task-text').forEach(ta => autoResize(ta as HTMLTextAreaElement));
+    document.querySelectorAll('.task-edit').forEach(ta => autoResize(ta as HTMLTextAreaElement));
   });
 }
 
