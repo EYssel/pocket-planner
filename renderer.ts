@@ -57,7 +57,7 @@ async function init() {
 
     // Re-size after fonts are loaded to ensure scrollHeight is correct
     (document as any).fonts.ready.then(() => {
-      document.querySelectorAll('.task-text').forEach(ta => autoResize(ta as HTMLTextAreaElement));
+      document.querySelectorAll('.task-edit').forEach(ta => autoResize(ta as HTMLTextAreaElement));
     });
   } catch (err: any) {
     console.error('Initialization failed:', err);
@@ -295,20 +295,16 @@ function createDaySection(day: any) {
   section.dataset.dayKey = day.key;
 
   section.innerHTML = `
-    <div class="day-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
-      <div>
-        <div class="day-name">${day.dayName}</div>
-        <div style="display: flex; align-items: baseline;">
-          <div class="day-date">${day.date}</div>
-        </div>
-        <div class="day-month">${day.month}</div>
-      </div>
+    <div class="day-header">
+      <div class="day-name">${day.dayName}</div>
+      <div class="day-date">${day.date}</div>
+      <div class="day-month">${day.month}</div>
     </div>
-    <div class="day-tasks active-tasks" id="tasks-${day.key}" style="flex: 1;"></div>
-    <details open class="done-section" id="done-section-${day.key}" style="display: none; margin-top: 16px;">
-      <summary style="cursor: pointer; font-size: 11px; font-weight: 500; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--accent); user-select: none;">Done Tasks</summary>
-      <div class="day-tasks done-tasks" id="done-tasks-${day.key}" style="margin-top: 4px;"></div>
-    </details>
+    <div class="day-tasks active-tasks" id="tasks-${day.key}"></div>
+    <div class="done-section" id="done-section-${day.key}" style="display: none;">
+      <div class="done-header">Done Tasks</div>
+      <div class="day-tasks done-tasks" id="done-tasks-${day.key}"></div>
+    </div>
     <div class="day-footer">
       <div class="progress-pips" id="pips-${day.key}"></div>
     </div>
@@ -320,7 +316,7 @@ function createDaySection(day: any) {
   
   // Resize all tasks in this day if the container width changes (e.g. scrollbar appears)
   const ro = new ResizeObserver(() => {
-    section.querySelectorAll('.task-text').forEach(ta => autoResize(ta as HTMLTextAreaElement));
+    section.querySelectorAll('.task-edit').forEach(ta => autoResize(ta as HTMLTextAreaElement));
   });
   ro.observe(section);
 
@@ -342,7 +338,7 @@ function createDaySection(day: any) {
   tasksEl.appendChild(addBtn);
 
   if (hasDoneTasks) {
-    doneSectionEl.style.display = 'block';
+    doneSectionEl.style.display = 'flex';
   }
 
   updatePips(day.key, day.plans);
@@ -379,6 +375,11 @@ function buildTaskItem(dayKey: string, task: any, index: number) {
   });
 
   edit.addEventListener('blur', () => {
+    if (edit.value.trim() === '') {
+      item.remove();
+      saveDay(dayKey);
+      return;
+    }
     item.classList.remove('editing');
     display.textContent = edit.value;
     display.title = edit.value;
@@ -460,8 +461,13 @@ function setupDropTarget(tasksEl: HTMLElement, dayKey: string) {
     }
 
     const afterElement = getDragAfterElement(tasksEl, e.clientY);
+    const addBtn = tasksEl.querySelector('.add-task-btn');
     if (afterElement == null) {
-      if (tasksEl.lastElementChild !== dragging) tasksEl.appendChild(dragging);
+      if (addBtn) {
+        if (addBtn.previousElementSibling !== dragging) tasksEl.insertBefore(dragging, addBtn);
+      } else {
+        if (tasksEl.lastElementChild !== dragging) tasksEl.appendChild(dragging);
+      }
     } else {
       if (afterElement !== dragging && afterElement.previousElementSibling !== dragging) {
         tasksEl.insertBefore(dragging, afterElement);
@@ -481,18 +487,17 @@ function setupDropTarget(tasksEl: HTMLElement, dayKey: string) {
       dragging.setAttribute('data-day-key', dayKey);
     }
     
-    // Update "Done Tasks" visibility for both source and target days
-    const daysToUpdate = new Set([sourceDayKey, dayKey]);
-    daysToUpdate.forEach(dk => {
+    await saveDay(sourceDayKey);
+    if (sourceDayKey !== dayKey) await saveDay(dayKey);
+
+    // Update visibility of done sections for source and target days
+    [sourceDayKey, dayKey].forEach(dk => {
       const doneSectionEl = document.getElementById(`done-section-${dk}`);
       const doneTasksEl = document.getElementById(`done-tasks-${dk}`);
       if (doneSectionEl && doneTasksEl) {
-        doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'block' : 'none';
+        doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'flex' : 'none';
       }
     });
-
-    await saveDay(sourceDayKey);
-    if (sourceDayKey !== dayKey) await saveDay(dayKey);
   });
 }
 
@@ -550,20 +555,33 @@ function setupEventListeners() {
         if (isDone) {
           doneTasksEl?.appendChild(item);
         } else {
-          tasksEl?.appendChild(item);
+          const addBtn = tasksEl?.querySelector('.add-task-btn');
+          if (addBtn) {
+            tasksEl?.insertBefore(item, addBtn);
+          } else {
+            tasksEl?.appendChild(item);
+          }
         }
 
-        // Toggle visibility of the done section
         if (doneSectionEl && doneTasksEl) {
-          doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'block' : 'none';
+          doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'flex' : 'none';
         }
 
         saveDay(dayKey);
       } else if (delBtn) {
         const text = (item.querySelector('.task-edit') as HTMLTextAreaElement).value;
         const isDone = item.classList.contains('done');
-        // Remove from DOM immediately for snappy UI and to avoid race conditions in tests
+        const dayKey = item.dataset.dayKey!;
+        
+        // Remove from DOM immediately for snappy UI
         item.remove();
+
+        const doneTasksEl = document.getElementById(`done-tasks-${dayKey}`);
+        const doneSectionEl = document.getElementById(`done-section-${dayKey}`);
+        if (doneSectionEl && doneTasksEl) {
+          doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'flex' : 'none';
+        }
+
         await window.planner.addToRecycleBin({ text, done: isDone, dayKey });
         saveDay(dayKey);
       }
@@ -573,7 +591,7 @@ function setupEventListeners() {
         const dayKey = addBtn.dataset.day!;
         const tasksEl = document.getElementById(`tasks-${dayKey}`) as HTMLElement;
         const newItem = buildTaskItem(dayKey, { text: '', done: false }, 0);
-        tasksEl.appendChild(newItem);
+        tasksEl.insertBefore(newItem, addBtn);
         
         // Enter edit mode immediately
         newItem.classList.add('editing');
@@ -637,8 +655,14 @@ function setupEventListeners() {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       const tasksEl = document.getElementById(`tasks-${dayKey}`) as HTMLElement;
+      const addBtn = tasksEl.querySelector('.add-task-btn') as HTMLElement;
       const newItem = buildTaskItem(dayKey, { text: '', done: false }, 0);
-      tasksEl.appendChild(newItem);
+      
+      if (addBtn) {
+        tasksEl.insertBefore(newItem, addBtn);
+      } else {
+        tasksEl.appendChild(newItem);
+      }
 
       // Enter edit mode immediately
       newItem.classList.add('editing');
