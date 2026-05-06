@@ -99,7 +99,7 @@ function applyTheme(theme: string) {
   }
 }
 
-async function loadWeek(key: string) {
+async function loadWeek(key: string, skipStaleCheck = false) {
   currentWeekKey = key;
   weekData = await window.planner.getWeek(key);
   if (!weekData) throw new Error('No week data returned from backend');
@@ -109,11 +109,20 @@ async function loadWeek(key: string) {
   todayBtn.disabled = (key === await window.planner.currentWeekKey());
   
   renderGrid();
+  if (!skipStaleCheck) await checkStaleTasks();
 }
 
 // ── Stale Tasks Detection ─────────────────────────────────────────────────────
 async function checkStaleTasks() {
   if (!currentWeekKey) return;
+  
+  // Only show cleanup banner if we are on the current week
+  const actualCurrentWeekKey = await window.planner.currentWeekKey();
+  if (currentWeekKey !== actualCurrentWeekKey) {
+    staleBanner.classList.remove('show');
+    return;
+  }
+
   const prevKey = await window.planner.getPreviousWeekKey(currentWeekKey);
   const prevWeek = await window.planner.getWeek(prevKey);
   
@@ -181,7 +190,7 @@ async function handleCleanupAction(index: number, action: string) {
       await window.planner.savePlans(todayKey, todayPlans);
       
       const todayWeekKey = await window.planner.weekKeyFromDayKey(todayKey);
-      if (todayWeekKey === currentWeekKey) await loadWeek(currentWeekKey);
+      if (todayWeekKey === currentWeekKey) await loadWeek(currentWeekKey, true);
     } else if (action === 'done') {
       sourceDay.plans.splice(taskIndexInSource, 0, { ...task, done: true });
       await window.planner.savePlans(task.dayKey, sourceDay.plans);
@@ -295,9 +304,7 @@ function createDaySection(day: any) {
         <div class="day-month">${day.month}</div>
       </div>
     </div>
-    <div class="day-tasks active-tasks" id="tasks-${day.key}"></div>
-    <button class="add-task-btn" data-day="${day.key}">+ task</button>
-    <div style="flex: 1; min-height: 0;"></div>
+    <div class="day-tasks active-tasks" id="tasks-${day.key}" style="flex: 1;"></div>
     <details open class="done-section" id="done-section-${day.key}" style="display: none; margin-top: 16px;">
       <summary style="cursor: pointer; font-size: 11px; font-weight: 500; color: var(--muted); padding: 8px 12px; border-top: 1px solid var(--accent); user-select: none;">Done Tasks</summary>
       <div class="day-tasks done-tasks" id="done-tasks-${day.key}" style="margin-top: 4px;"></div>
@@ -326,6 +333,13 @@ function createDaySection(day: any) {
       tasksEl.appendChild(buildTaskItem(day.key, task, i));
     }
   });
+
+  // Add the "+ task" button to the end of the active tasks list
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-task-btn';
+  addBtn.dataset.day = day.key;
+  addBtn.textContent = '+ task';
+  tasksEl.appendChild(addBtn);
 
   if (hasDoneTasks) {
     doneSectionEl.style.display = 'block';
@@ -377,12 +391,14 @@ function buildTaskItem(dayKey: string, task: any, index: number) {
 
   item.addEventListener('dragstart', (e: DragEvent) => {
     item.classList.add('dragging');
+    document.body.classList.add('dragging-active');
     e.dataTransfer?.setData('text/plain', JSON.stringify({ dayKey, index }));
     if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
   });
 
   item.addEventListener('dragend', () => {
     item.classList.remove('dragging');
+    document.body.classList.remove('dragging-active');
   });
 
   return item;
@@ -408,10 +424,16 @@ function escapeHtml(str: string) {
 }
 
 function getPlansFromDOM(dayKey: string): any[] {
-  const items = grid.querySelectorAll(`.task-item[data-day-key="${dayKey}"]`);
-  return Array.from(items).map(item => ({
+  const tasksEl = document.getElementById(`tasks-${dayKey}`);
+  const doneTasksEl = document.getElementById(`done-tasks-${dayKey}`);
+  const items: HTMLElement[] = [];
+  
+  if (tasksEl) items.push(...Array.from(tasksEl.querySelectorAll('.task-item')) as HTMLElement[]);
+  if (doneTasksEl) items.push(...Array.from(doneTasksEl.querySelectorAll('.task-item')) as HTMLElement[]);
+
+  return items.map(item => ({
     text: (item.querySelector('.task-edit') as HTMLTextAreaElement).value,
-    done: item.classList.contains('done'),
+    done: item.parentElement?.classList.contains('done-tasks') || item.classList.contains('done'),
   }));
 }
 
@@ -422,6 +444,20 @@ function setupDropTarget(tasksEl: HTMLElement, dayKey: string) {
     if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
     const dragging = document.querySelector('.dragging') as HTMLElement;
     if (!dragging) return;
+
+    // Update dragging item state based on current target
+    const isDoneContainer = tasksEl.classList.contains('done-tasks');
+    dragging.dataset.dayKey = dayKey;
+    dragging.setAttribute('data-day-key', dayKey);
+    if (isDoneContainer) {
+      dragging.classList.add('done');
+      const checkBtn = dragging.querySelector('.check-btn');
+      if (checkBtn) checkBtn.textContent = '✓';
+    } else {
+      dragging.classList.remove('done');
+      const checkBtn = dragging.querySelector('.check-btn');
+      if (checkBtn) checkBtn.textContent = '';
+    }
 
     const afterElement = getDragAfterElement(tasksEl, e.clientY);
     if (afterElement == null) {
@@ -438,6 +474,23 @@ function setupDropTarget(tasksEl: HTMLElement, dayKey: string) {
     const dataTransferText = e.dataTransfer?.getData('text/plain');
     if (!dataTransferText) return;
     const { dayKey: sourceDayKey } = JSON.parse(dataTransferText);
+
+    const dragging = document.querySelector('.dragging') as HTMLElement;
+    if (dragging) {
+      dragging.dataset.dayKey = dayKey;
+      dragging.setAttribute('data-day-key', dayKey);
+    }
+    
+    // Update "Done Tasks" visibility for both source and target days
+    const daysToUpdate = new Set([sourceDayKey, dayKey]);
+    daysToUpdate.forEach(dk => {
+      const doneSectionEl = document.getElementById(`done-section-${dk}`);
+      const doneTasksEl = document.getElementById(`done-tasks-${dk}`);
+      if (doneSectionEl && doneTasksEl) {
+        doneSectionEl.style.display = doneTasksEl.children.length > 0 ? 'block' : 'none';
+      }
+    });
+
     await saveDay(sourceDayKey);
     if (sourceDayKey !== dayKey) await saveDay(dayKey);
   });
