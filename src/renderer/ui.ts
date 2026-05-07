@@ -200,7 +200,8 @@ export function updatePips(dayKey: string, plans: Plan[], container?: HTMLElemen
     : document.getElementById(`pips-${dayKey}`);
     
   if (!pipsEl) return;
-  pipsEl.innerHTML = plans
+  pipsEl.innerHTML = [...plans]
+    .sort((a, b) => (a.done === b.done ? 0 : a.done ? 1 : -1))
     .map(p => `<div class="pip${p.done ? ' done' : ''}"></div>`)
     .join('');
 }
