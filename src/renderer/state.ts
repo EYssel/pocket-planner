@@ -8,6 +8,19 @@ export let staleTasks: StaleTask[] = [];
 export let cleanupQueue: Promise<any> = Promise.resolve();
 export let defaultDoneCollapsed = true;
 
+type RenderCallback = (dayKey?: string) => void;
+let renderCallback: RenderCallback | null = null;
+
+export function setRenderCallback(cb: RenderCallback) {
+  renderCallback = cb;
+}
+
+function notifyChange(dayKey?: string) {
+  if (renderCallback) {
+    renderCallback(dayKey);
+  }
+}
+
 export function setCurrentWeekKey(key: string | null) {
   currentWeekKey = key;
 }
@@ -89,9 +102,7 @@ export async function checkStaleTasks(
 export async function getPlansForDay(dayKey: string): Promise<Plan[]> {
   const loadedDay = weekData?.days?.find((d: any) => d.key === dayKey);
   if (loadedDay) {
-    // This will be provided by UI module later, or we can just call it if we import it.
-    // To avoid circular dependency, maybe UI module should provide a way to get this.
-    return (window as any).getPlansFromDOM(dayKey);
+    return loadedDay.plans;
   }
   
   const weekKey = await window.planner.weekKeyFromDayKey(dayKey);
@@ -102,10 +113,67 @@ export async function getPlansForDay(dayKey: string): Promise<Plan[]> {
 
 export async function saveDay(
   dayKey: string, 
-  getPlansFromDOM: (dayKey: string) => Plan[],
-  updatePips: (dayKey: string, plans: Plan[]) => void
+  updatePips?: (dayKey: string, plans: Plan[]) => void
 ) {
-  const plans = getPlansFromDOM(dayKey).filter(p => p.text.trim() !== '');
+  const day = weekData?.days?.find((d: any) => d.key === dayKey);
+  if (!day) return;
+
+  const plans = day.plans.filter(p => p.text.trim() !== '');
   await window.planner.savePlans(dayKey, plans);
-  updatePips(dayKey, plans);
+  if (updatePips) updatePips(dayKey, plans);
+}
+
+export function addTask(dayKey: string): void {
+  const day = weekData?.days?.find(d => d.key === dayKey);
+  if (day) {
+    day.plans.push({ text: '', done: false });
+    notifyChange(dayKey);
+  }
+}
+
+export function updateTask(dayKey: string, index: number, text: string): void {
+  const day = weekData?.days?.find(d => d.key === dayKey);
+  if (day && day.plans[index]) {
+    day.plans[index].text = text;
+  }
+}
+
+export function toggleTask(dayKey: string, index: number): void {
+  const day = weekData?.days?.find(d => d.key === dayKey);
+  if (day && day.plans[index]) {
+    day.plans[index].done = !day.plans[index].done;
+    notifyChange(dayKey);
+  }
+}
+
+export function deleteTask(dayKey: string, index: number): { text: string, done: boolean } | null {
+  const day = weekData?.days?.find(d => d.key === dayKey);
+  if (day && day.plans[index]) {
+    const [deleted] = day.plans.splice(index, 1);
+    notifyChange(dayKey);
+    return deleted;
+  }
+  return null;
+}
+
+export function moveTask(
+  sourceDayKey: string, 
+  sourceIndex: number, 
+  targetDayKey: string, 
+  targetIndex: number, 
+  isDone?: boolean
+): void {
+  const sourceDay = weekData?.days?.find(d => d.key === sourceDayKey);
+  const targetDay = weekData?.days?.find(d => d.key === targetDayKey);
+  
+  if (sourceDay && targetDay && sourceDay.plans[sourceIndex]) {
+    const [task] = sourceDay.plans.splice(sourceIndex, 1);
+    if (isDone !== undefined) task.done = isDone;
+    
+    const actualTargetIndex = Math.min(Math.max(0, targetIndex), targetDay.plans.length);
+    targetDay.plans.splice(actualTargetIndex, 0, task);
+    
+    notifyChange(sourceDayKey);
+    if (sourceDayKey !== targetDayKey) notifyChange(targetDayKey);
+  }
 }

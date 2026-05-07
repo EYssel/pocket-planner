@@ -1,5 +1,7 @@
 'use strict';
 
+import * as state from './state';
+
 export function setupDropTarget(tasksEl: HTMLElement, dayKey: string, callbacks: { saveDay: (dayKey: string) => Promise<void> }) {
   tasksEl.addEventListener('dragover', (e: DragEvent) => {
     e.preventDefault();
@@ -7,10 +9,8 @@ export function setupDropTarget(tasksEl: HTMLElement, dayKey: string, callbacks:
     const dragging = document.querySelector('.dragging') as HTMLElement;
     if (!dragging) return;
 
-    // Update dragging item state based on current target
+    // Update dragging item visual state based on current target
     const isDoneContainer = tasksEl.classList.contains('done-tasks');
-    dragging.dataset.dayKey = dayKey;
-    dragging.setAttribute('data-day-key', dayKey);
     if (isDoneContainer) {
       dragging.classList.add('done');
       const checkBtn = dragging.querySelector('.check-btn');
@@ -40,25 +40,33 @@ export function setupDropTarget(tasksEl: HTMLElement, dayKey: string, callbacks:
     e.preventDefault();
     const dataTransferText = e.dataTransfer?.getData('text/plain');
     if (!dataTransferText) return;
-    const { dayKey: sourceDayKey } = JSON.parse(dataTransferText);
+    const { dayKey: sourceDayKey, index: sourceIndex } = JSON.parse(dataTransferText);
 
-    const dragging = document.querySelector('.dragging') as HTMLElement;
-    if (dragging) {
-      dragging.dataset.dayKey = dayKey;
-      dragging.setAttribute('data-day-key', dayKey);
+    const isDone = tasksEl.classList.contains('done-tasks');
+    const afterElement = getDragAfterElement(tasksEl, e.clientY);
+    
+    let targetIndex = -1;
+    if (afterElement) {
+      targetIndex = parseInt(afterElement.dataset.index!, 10);
+    } else {
+      // If no afterElement, it's at the end of the section.
+      // For state-first, we need the absolute index in state.plans.
+      const day = state.weekData?.days?.find(d => d.key === dayKey);
+      if (day) {
+        if (isDone) {
+          targetIndex = day.plans.length;
+        } else {
+          // End of active tasks
+          targetIndex = day.plans.findIndex(p => p.done);
+          if (targetIndex === -1) targetIndex = day.plans.length;
+        }
+      }
     }
+
+    state.moveTask(sourceDayKey, sourceIndex, dayKey, targetIndex, isDone);
     
     await callbacks.saveDay(sourceDayKey);
     if (sourceDayKey !== dayKey) await callbacks.saveDay(dayKey);
-
-    // Update visibility of done sections for source and target days
-    [sourceDayKey, dayKey].forEach(dk => {
-      const doneSectionEl = document.getElementById(`done-section-${dk}`);
-      const doneTasksEl = document.getElementById(`done-tasks-${dk}`);
-      if (doneSectionEl && doneTasksEl) {
-        doneSectionEl.classList.toggle('visible', doneTasksEl.children.length > 0);
-      }
-    });
   });
 }
 

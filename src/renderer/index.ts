@@ -21,11 +21,17 @@ async function init() {
       if (v2) v2.textContent = `v${appInfo.version}`;
     }
 
-    // Attach buildTaskItem to window so events.ts can use it (to avoid circular dependency if needed)
-    // or we can just import it in events.ts. I already imported it in events.ts via window cast, 
-    // let's make sure it's available.
+    state.setRenderCallback((dayKey?: string) => {
+      if (dayKey) {
+        ui.renderDay(dayKey, state.weekData, state.defaultDoneCollapsed, getCallbacks());
+      } else {
+        ui.renderGrid(state.weekData, state.defaultDoneCollapsed, getCallbacks());
+      }
+    });
+
+    // Attach buildTaskItem to window for global access if needed
     (window as any).buildTaskItem = (dayKey: string, task: Plan, index: number) => 
-      ui.buildTaskItem(dayKey, task, index, { saveDay, setupDropTarget: (el: HTMLElement, dk: string) => setupDropTarget(el, dk, { saveDay }) });
+      ui.buildTaskItem(dayKey, task, index, getCallbacks());
 
     setupEventListeners({
       loadWeek,
@@ -53,12 +59,18 @@ async function init() {
   }
 }
 
+function getCallbacks() {
+  return { 
+    saveDay, 
+    updateTask: state.updateTask,
+    deleteTask: state.deleteTask,
+    setupDropTarget: (el: HTMLElement, dk: string) => setupDropTarget(el, dk, { saveDay }) 
+  };
+}
+
 async function loadWeek(key: string, skipStaleCheck = false) {
   await state.loadWeek(key, skipStaleCheck, {
-    renderGrid: () => ui.renderGrid(state.weekData, state.defaultDoneCollapsed, { 
-      saveDay, 
-      setupDropTarget: (el: HTMLElement, dk: string) => setupDropTarget(el, dk, { saveDay }) 
-    }),
+    renderGrid: () => ui.renderGrid(state.weekData, state.defaultDoneCollapsed, getCallbacks()),
     updateLabels: (data: WeekData, isToday: boolean) => {
       ui.cwLabel.textContent   = data.cwLabel;
       ui.weekLabel.textContent = data.dateRange;
@@ -81,7 +93,7 @@ async function checkStaleTasks() {
 }
 
 async function saveDay(dayKey: string) {
-  await state.saveDay(dayKey, ui.getPlansFromDOM, (dk, plans) => ui.updatePips(dk, plans));
+  await state.saveDay(dayKey, (dk, plans) => ui.updatePips(dk, plans));
 }
 
 // Boot

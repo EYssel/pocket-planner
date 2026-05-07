@@ -50,6 +50,17 @@ export function renderGrid(weekData: WeekData | null, defaultDoneCollapsed: bool
   }
 }
 
+export function renderDay(dayKey: string, weekData: WeekData | null, defaultDoneCollapsed: boolean, callbacks: any) {
+  const day = weekData?.days?.find(d => d.key === dayKey);
+  if (!day) return;
+  
+  const oldCol = document.querySelector(`.day-col[data-day-key="${dayKey}"]`);
+  if (!oldCol) return;
+  
+  const newCol = buildDayCol(day, defaultDoneCollapsed, callbacks);
+  oldCol.replaceWith(newCol);
+}
+
 export function buildDayCol(day: DayData, defaultDoneCollapsed: boolean, callbacks: any) {
   const col = document.createElement('div');
   col.className = 'day-col' + (day.isToday ? ' today' : '');
@@ -144,26 +155,28 @@ export function buildTaskItem(dayKey: string, task: Plan, index: number, callbac
   });
 
   edit.addEventListener('blur', () => {
-    if (edit.value.trim() === '') {
-      item.remove();
+    const newText = edit.value.trim();
+    if (newText === '') {
+      callbacks.deleteTask(dayKey, index);
       callbacks.saveDay(dayKey);
       return;
     }
     item.classList.remove('editing');
-    display.textContent = edit.value;
-    display.title = edit.value;
+    display.textContent = newText;
+    display.title = newText;
+    callbacks.updateTask(dayKey, index, newText);
     callbacks.saveDay(dayKey);
   });
 
   edit.addEventListener('input', () => {
     autoResize(edit);
+    callbacks.updateTask(dayKey, index, edit.value);
   });
 
   item.addEventListener('dragstart', (e: DragEvent) => {
     item.classList.add('dragging');
     document.body.classList.add('dragging-active');
-    const currentDayKey = item.dataset.dayKey || dayKey;
-    e.dataTransfer?.setData('text/plain', JSON.stringify({ dayKey: currentDayKey, index }));
+    e.dataTransfer?.setData('text/plain', JSON.stringify({ dayKey, index }));
     if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
   });
 
@@ -196,20 +209,3 @@ export function escapeHtml(str: string) {
   if (!str) return '';
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-export function getPlansFromDOM(dayKey: string): Plan[] {
-  const tasksEl = document.getElementById(`tasks-${dayKey}`);
-  const doneTasksEl = document.getElementById(`done-tasks-${dayKey}`);
-  const items: HTMLElement[] = [];
-  
-  if (tasksEl) items.push(...Array.from(tasksEl.querySelectorAll('.task-item')) as HTMLElement[]);
-  if (doneTasksEl) items.push(...Array.from(doneTasksEl.querySelectorAll('.task-item')) as HTMLElement[]);
-
-  return items.map(item => ({
-    text: (item.querySelector('.task-edit') as HTMLTextAreaElement).value,
-    done: item.parentElement?.classList.contains('done-tasks') || item.classList.contains('done'),
-  }));
-}
-
-// Attach to window for state.ts to access without circular dependency if needed
-(window as any).getPlansFromDOM = getPlansFromDOM;

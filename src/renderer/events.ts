@@ -38,61 +38,37 @@ export function setupEventListeners(callbacks: {
     const item = target.closest('.task-item') as HTMLElement;
     if (item) {
       const dayKey = item.dataset.dayKey!;
-      const checkBtn = (e.target as HTMLElement).closest('.check-btn');
-      const delBtn = (e.target as HTMLElement).closest('.del-btn');
+      const index = parseInt(item.dataset.index!, 10);
+      const checkBtn = target.closest('.check-btn');
+      const delBtn = target.closest('.del-btn');
 
       if (checkBtn) {
-        item.classList.toggle('done');
-        const isDone = item.classList.contains('done');
-        checkBtn.textContent = isDone ? '✓' : '';
-
-        const tasksEl = document.getElementById(`tasks-${dayKey}`);
-        const doneTasksEl = document.getElementById(`done-tasks-${dayKey}`);
-        const doneSectionEl = document.getElementById(`done-section-${dayKey}`);
-
-        if (isDone) {
-          doneTasksEl?.appendChild(item);
-        } else {
-          const addBtn = tasksEl?.querySelector('.add-task-btn');
-          if (addBtn) {
-            tasksEl?.insertBefore(item, addBtn);
-          } else {
-            tasksEl?.appendChild(item);
-          }
-        }
-
-        if (doneSectionEl && doneTasksEl) {
-          doneSectionEl.classList.toggle('visible', doneTasksEl.children.length > 0);
-        }
-
-        callbacks.saveDay(dayKey);
+        state.toggleTask(dayKey, index);
+        await callbacks.saveDay(dayKey);
       } else if (delBtn) {
-        const text = (item.querySelector('.task-edit') as HTMLTextAreaElement).value;
-        const isDone = item.classList.contains('done');
-        const dayKey = item.dataset.dayKey!;
-        
-        item.remove();
-
-        const doneTasksEl = document.getElementById(`done-tasks-${dayKey}`);
-        const doneSectionEl = document.getElementById(`done-section-${dayKey}`);
-        if (doneSectionEl && doneTasksEl) {
-          doneSectionEl.classList.toggle('visible', doneTasksEl.children.length > 0);
+        const deleted = state.deleteTask(dayKey, index);
+        if (deleted) {
+          await window.planner.addToRecycleBin({ ...deleted, dayKey });
+          await callbacks.saveDay(dayKey);
         }
-
-        await window.planner.addToRecycleBin({ text, done: isDone, dayKey });
-        callbacks.saveDay(dayKey);
       }
     } else {
-      const addBtn = (e.target as HTMLElement).closest('.add-task-btn') as HTMLButtonElement;
+      const addBtn = target.closest('.add-task-btn') as HTMLButtonElement;
       if (addBtn) {
         const dayKey = addBtn.dataset.day!;
-        const tasksEl = document.getElementById(`tasks-${dayKey}`) as HTMLElement;
-        const newItem = (window as any).buildTaskItem(dayKey, { text: '', done: false }, 0);
-        tasksEl.insertBefore(newItem, addBtn);
+        state.addTask(dayKey);
+        await callbacks.saveDay(dayKey);
         
-        newItem.classList.add('editing');
-        const edit = newItem.querySelector('.task-edit') as HTMLTextAreaElement;
-        edit.focus();
+        // Focus the new task
+        const tasksEl = document.getElementById(`tasks-${dayKey}`);
+        if (tasksEl) {
+          const items = tasksEl.querySelectorAll('.task-item');
+          const lastItem = items[items.length - 1] as HTMLElement;
+          if (lastItem) {
+            lastItem.classList.add('editing');
+            lastItem.querySelector<HTMLTextAreaElement>('.task-edit')?.focus();
+          }
+        }
       }
     }
   });
@@ -201,32 +177,34 @@ export function setupEventListeners(callbacks: {
     if ((e.target as HTMLElement).classList.contains('task-edit')) ui.autoResize(e.target as HTMLTextAreaElement);
   });
 
-  ui.grid?.addEventListener('keydown', (e: KeyboardEvent) => {
+  ui.grid?.addEventListener('keydown', async (e: KeyboardEvent) => {
     if (!(e.target as HTMLElement).classList.contains('task-edit')) return;
     const item = (e.target as HTMLElement).closest('.task-item') as HTMLElement;
     const dayKey = item?.dataset.dayKey!;
+    const index = parseInt(item.dataset.index!, 10);
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      const tasksEl = document.getElementById(`tasks-${dayKey}`) as HTMLElement;
-      const addBtn = tasksEl.querySelector('.add-task-btn') as HTMLElement;
-      const newItem = (window as any).buildTaskItem(dayKey, { text: '', done: false }, 0);
+      state.addTask(dayKey);
+      await callbacks.saveDay(dayKey);
       
-      if (addBtn) {
-        tasksEl.insertBefore(newItem, addBtn);
-      } else {
-        tasksEl.appendChild(newItem);
+      const tasksEl = document.getElementById(`tasks-${dayKey}`);
+      if (tasksEl) {
+        const items = tasksEl.querySelectorAll('.task-item');
+        const lastItem = items[items.length - 1] as HTMLElement;
+        if (lastItem) {
+          lastItem.classList.add('editing');
+          lastItem.querySelector<HTMLTextAreaElement>('.task-edit')?.focus();
+        }
       }
-
-      newItem.classList.add('editing');
-      const edit = newItem.querySelector('.task-edit') as HTMLTextAreaElement;
-      edit.focus();
     }
     if (e.key === 'Backspace' && (e.target as HTMLTextAreaElement).value === '') {
       e.preventDefault();
       const prev = item.previousElementSibling as HTMLElement;
-      item.remove();
-      callbacks.saveDay(dayKey);
-      if (prev) {
+      state.deleteTask(dayKey, index);
+      await callbacks.saveDay(dayKey);
+      
+      if (prev && prev.classList.contains('task-item')) {
         prev.classList.add('editing');
         const prevEdit = prev.querySelector('.task-edit') as HTMLTextAreaElement;
         prevEdit?.focus();
