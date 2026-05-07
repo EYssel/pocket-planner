@@ -639,13 +639,33 @@ function setupEventListeners() {
   openSettings?.addEventListener('click',  () => settingsOverlay.classList.add('show'));
   closeSettings?.addEventListener('click', () => settingsOverlay.classList.remove('show'));
 
+  window.planner.onCheckingForUpdates(() => {
+    updateBanner.classList.add('show');
+    updateStatus.innerHTML = '<strong>Checking for updates…</strong>';
+    updateProgressContainer.style.display = 'none';
+    installUpdateBtn.style.display = 'none';
+  });
+
   window.planner.onUpdateAvailable((version: string) => {
     updateBanner.classList.add('show');
     updateStatus.innerHTML = `<strong>Downloading Update</strong> Version ${version} is being prepared…`;
     updateProgressContainer.style.display = 'block';
     updateProgressBar.style.width = '0%';
+    installUpdateBtn.style.display = 'inline-block';
     installUpdateBtn.disabled = true;
     installUpdateBtn.textContent = 'Downloading…';
+  });
+
+  window.planner.onUpdateNotAvailable(() => {
+    updateBanner.classList.add('show');
+    updateStatus.innerHTML = '<strong>App Up to Date</strong> No updates available at this time.';
+    updateProgressContainer.style.display = 'none';
+    installUpdateBtn.style.display = 'none';
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      updateBanner.classList.remove('show');
+    }, 3000);
   });
 
   window.planner.onUpdateProgress((percent: number) => {

@@ -10,6 +10,8 @@ import { initUpdater } from './src/updater';
 import { store } from './src/store';
 import { runMigrations } from './src/migrations';
 
+import { initMenu } from './src/menu';
+
 // Declare global isQuitting (also handled in window.ts, but let's be safe)
 declare global {
   var isQuitting: boolean;
@@ -45,6 +47,7 @@ app.whenReady().then(() => {
 
   registerHandlers();
   createTray();
+  initMenu();
   createWindow('planner');
   reschedule();
   initUpdater();
