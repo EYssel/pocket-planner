@@ -1,6 +1,6 @@
 'use strict';
 
-import { ipcMain, app } from 'electron';
+import { ipcMain, app, clipboard } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { 
   getPlans, 
@@ -21,7 +21,8 @@ import {
   getPreviousWeekKey,
   offsetWeekKey,
   currentDayKey,
-  weekKeyFromDayKey
+  weekKeyFromDayKey,
+  getPreviousWorkingDayKey
 } from './weekUtils';
 import { Task, SettingOptions, WeekData } from './types';
 
@@ -54,6 +55,9 @@ export function registerHandlers(): void {
   ipcMain.handle('get-offset-week-key', (_: any, { key, delta }: { key: string, delta: number }) => offsetWeekKey(key, delta));
   ipcMain.handle('get-current-day-key', () => currentDayKey());
   ipcMain.handle('get-week-key-from-day-key', (_: any, dayKey: string) => weekKeyFromDayKey(dayKey));
+  ipcMain.handle('get-previous-working-day-key', (_: any, dayKey: string) => {
+    return getPreviousWorkingDayKey(dayKey || currentDayKey());
+  });
 
   // Returns week metadata + all 7 days with their tasks in one call
   ipcMain.handle('get-week', (_: any, weekKey: string): WeekData => {
@@ -92,5 +96,10 @@ export function registerHandlers(): void {
 
   ipcMain.handle('get-previous-week-key', (_: any, key: string) => {
     return getPreviousWeekKey(key || currentWeekKey());
+  });
+
+  ipcMain.handle('copy-to-clipboard', (_: any, text: string) => {
+    clipboard.writeText(text);
+    return true;
   });
 }

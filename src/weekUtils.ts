@@ -212,3 +212,37 @@ export function weekKeyFromDayKey(dayKey: string): string {
   const { week, year } = getISOWeek(date);
   return formatWeekKey(year, week);
 }
+
+/**
+ * Returns the previous working day key (Monday-Friday) for a given day key.
+ * If the given day is Monday, returns Friday.
+ * If the given day is Weekend, returns Friday.
+ */
+export function getPreviousWorkingDayKey(dayKey: string): string {
+  let date: Date;
+  if (dayKey.endsWith('-WE')) {
+    const weekKey = dayKey.replace('-WE', '');
+    const { year, week } = parseWeekKey(weekKey);
+    const jan4 = new Date(Date.UTC(year, 0, 4));
+    const jan4Day = jan4.getUTCDay() || 7;
+    const monday = new Date(jan4);
+    monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7);
+    date = new Date(monday);
+    date.setUTCDate(monday.getUTCDate() + 4); // Friday
+  } else {
+    const [y, m, d] = dayKey.split('-').map(Number);
+    date = new Date(Date.UTC(y, m - 1, d));
+    const day = date.getUTCDay();
+
+    if (day === 1) { // Monday
+      date.setUTCDate(date.getUTCDate() - 3); // Friday
+    } else if (day === 0) { // Sunday
+      date.setUTCDate(date.getUTCDate() - 2); // Friday
+    } else if (day === 6) { // Saturday
+      date.setUTCDate(date.getUTCDate() - 1); // Friday
+    } else {
+      date.setUTCDate(date.getUTCDate() - 1);
+    }
+  }
+  return formatDayKey(date);
+}

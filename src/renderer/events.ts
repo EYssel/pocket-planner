@@ -83,6 +83,82 @@ export function setupEventListeners(callbacks: {
 
   ui.openRecycleBin?.addEventListener('click', () => { modals.renderRecycleBin(); ui.recycleBinOverlay.classList.add('show'); });
   ui.closeRecycleBin?.addEventListener('click', () => { ui.recycleBinOverlay.classList.remove('show'); });
+
+  let standupPlainText = '';
+
+  ui.generateStandupBtn?.addEventListener('click', async () => {
+    const todayKey = await window.planner.currentDayKey();
+    const yesterdayKey = await window.planner.getPreviousWorkingDayKey(todayKey);
+
+    const todayPlans = await state.getPlansForDay(todayKey);
+    const yesterdayPlans = await state.getPlansForDay(yesterdayKey);
+
+    const yesterdayDone = yesterdayPlans.filter(p => p.done && p.text.trim()).map(p => p.text.trim());
+    const yesterdayIncomplete = yesterdayPlans.filter(p => !p.done && p.text.trim()).map(p => p.text.trim());
+    const todayTodo = todayPlans.filter(p => p.text.trim()).map(p => p.text.trim());
+
+    // Build HTML for the modal
+    ui.standupContent.innerHTML = `
+      <div class="standup-section">
+        <div class="standup-title">Yesterday (Completed)</div>
+        <div class="standup-list">
+          ${yesterdayDone.length > 0 
+            ? yesterdayDone.map(t => `
+                <div class="standup-item">
+                  <span class="standup-item-bullet">✓</span>
+                  <span>${ui.escapeHtml(t)}</span>
+                </div>`).join('') 
+            : '<div class="standup-empty">None recorded</div>'}
+        </div>
+      </div>
+      <div class="standup-section">
+        <div class="standup-title">Yesterday (Incomplete)</div>
+        <div class="standup-list">
+          ${yesterdayIncomplete.length > 0 
+            ? yesterdayIncomplete.map(t => `
+                <div class="standup-item">
+                  <span class="standup-item-bullet">→</span>
+                  <span>${ui.escapeHtml(t)}</span>
+                </div>`).join('') 
+            : '<div class="standup-empty">None recorded</div>'}
+        </div>
+      </div>
+      <div class="standup-section">
+        <div class="standup-title">Today (Planned)</div>
+        <div class="standup-list">
+          ${todayTodo.length > 0 
+            ? todayTodo.map(t => `
+                <div class="standup-item">
+                  <span class="standup-item-bullet">•</span>
+                  <span>${ui.escapeHtml(t)}</span>
+                </div>`).join('') 
+            : '<div class="standup-empty">No tasks planned yet</div>'}
+        </div>
+      </div>
+    `;
+
+    // Build plain text for clipboard
+    standupPlainText = `**Yesterday:**\n` +
+      (yesterdayDone.length > 0 ? yesterdayDone.map(t => `- [DONE] ${t}`).join('\n') : '- No completed tasks') +
+      `\n\n**Yesterday (Incomplete):**\n` +
+      (yesterdayIncomplete.length > 0 ? yesterdayIncomplete.map(t => `- [STILL PENDING] ${t}`).join('\n') : '- No incomplete tasks') +
+      `\n\n**Today:**\n` +
+      (todayTodo.length > 0 ? todayTodo.map(t => `- ${t}`).join('\n') : '- No tasks planned');
+
+    ui.standupOverlay.classList.add('show');
+  });
+
+  ui.closeStandup?.addEventListener('click', () => ui.standupOverlay.classList.remove('show'));
+
+  ui.copyStandupBtn?.addEventListener('click', async () => {
+    await window.planner.copyToClipboard(standupPlainText);
+    
+    const originalText = ui.copyStandupBtn.textContent;
+    ui.copyStandupBtn.textContent = 'Copied!';
+    setTimeout(() => {
+      ui.copyStandupBtn.textContent = originalText;
+    }, 2000);
+  });
   ui.clearBinBtn?.addEventListener('click', async () => {
     if (confirm('Permanently clear all items in the recycle bin?')) {
       await window.planner.clearRecycleBin();
