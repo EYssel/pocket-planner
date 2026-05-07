@@ -12,15 +12,18 @@ interface Schema {
 
 const isDev = app ? !app.isPackaged : true;
 
+const DEFAULT_SETTINGS: SettingOptions = {
+  notificationInterval: 60,
+  workStart: 8,
+  workEnd: 18,
+  theme: 'dark',
+  doneTasksCollapsed: true,
+};
+
 export const store = new Store<Schema>({
   name: isDev ? 'config-dev' : 'config',
   defaults: {
-    settings: {
-      notificationInterval: 60,
-      workStart: 8,
-      workEnd: 18,
-      theme: 'dark',
-    },
+    settings: DEFAULT_SETTINGS,
     days: {},
     recycleBin: [],
   },
@@ -29,7 +32,9 @@ export const store = new Store<Schema>({
 // ── Settings ──────────────────────────────────────────────────────────────────
 
 export function getSetting<K extends keyof SettingOptions>(key: K): SettingOptions[K] {
-  return store.get(`settings.${key}` as any) as SettingOptions[K];
+  const val = store.get(`settings.${key}` as any);
+  if (val === undefined) return DEFAULT_SETTINGS[key];
+  return val as SettingOptions[K];
 }
 
 export function setSetting<K extends keyof SettingOptions>(key: K, value: SettingOptions[K]): void {

@@ -10,6 +10,7 @@ let currentWeekKey: string | null = null;
 let weekData: any = null; // { cwLabel, dateRange, days: [...] }
 let staleTasks: any[] = [];   // [{ text, dayKey, originalIndex }]
 let cleanupQueue: Promise<any> = Promise.resolve();
+let defaultDoneCollapsed = true;
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const grid        = document.getElementById('week-grid') as HTMLElement;
@@ -45,6 +46,7 @@ const settingsOverlay = document.getElementById('settings-overlay') as HTMLEleme
 const openSettings    = document.getElementById('open-settings') as HTMLElement;
 const closeSettings   = document.getElementById('close-settings') as HTMLElement;
 const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;
+const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
 const workStartInput  = document.getElementById('work-start') as HTMLInputElement;
 const workEndInput    = document.getElementById('work-end') as HTMLInputElement;
 
@@ -52,7 +54,7 @@ const workEndInput    = document.getElementById('work-end') as HTMLInputElement;
 async function init() {
   try {
     const appInfo = await window.planner.getAppInfo();
-    if (appInfo) {
+    if (appInfo && appInfo.name !== 'weekly-planner') {
       document.title = appInfo.name;
       const logo = document.querySelector('.logo');
       if (logo) logo.textContent = appInfo.name;
@@ -94,9 +96,16 @@ async function initSettings() {
     .map(opt => `<option value="${opt.minutes}">${opt.label}</option>`)
     .join('');
 
-  intervalSelect.value = (await window.planner.getSetting('notificationInterval')).toString();
-  workStartInput.value = (await window.planner.getSetting('workStart')).toString();
-  workEndInput.value   = (await window.planner.getSetting('workEnd')).toString();
+  const interval = await window.planner.getSetting('notificationInterval');
+  const collapsedPref = await window.planner.getSetting('doneTasksCollapsed');
+  const workStart = await window.planner.getSetting('workStart');
+  const workEnd = await window.planner.getSetting('workEnd');
+
+  intervalSelect.value = (interval ?? 60).toString();
+  collapseDoneSetting.checked = !!collapsedPref;
+  defaultDoneCollapsed = !!collapsedPref;
+  workStartInput.value = (workStart ?? 8).toString();
+  workEndInput.value   = (workEnd ?? 18).toString();
 
   currentWeekKey = await window.planner.currentWeekKey();
   await loadWeek(currentWeekKey);
@@ -307,6 +316,9 @@ function createDaySection(day: any) {
   section.className = 'day-section' + (day.isToday ? ' today' : '');
   section.dataset.dayKey = day.key;
 
+  const stored = localStorage.getItem(`done-collapsed-${day.key}`);
+  const isCollapsed = stored !== null ? stored === 'true' : defaultDoneCollapsed;
+
   section.innerHTML = `
     <div class="day-header">
       <div class="day-name">${day.dayName}</div>
@@ -314,7 +326,7 @@ function createDaySection(day: any) {
       <div class="day-month">${day.month}</div>
     </div>
     <div class="day-tasks active-tasks" id="tasks-${day.key}"></div>
-    <div class="done-section" id="done-section-${day.key}">
+    <div class="done-section ${isCollapsed ? 'collapsed' : ''}" id="done-section-${day.key}">
       <div class="done-header">Done Tasks</div>
       <div class="day-tasks done-tasks" id="done-tasks-${day.key}"></div>
     </div>
@@ -354,7 +366,7 @@ function createDaySection(day: any) {
     doneSectionEl.classList.add('visible');
   }
 
-  updatePips(day.key, day.plans);
+  updatePips(day.key, day.plans, section);
   setupDropTarget(tasksEl, day.key);
   setupDropTarget(doneTasksEl, day.key);
 
@@ -425,8 +437,11 @@ function autoResize(ta: HTMLTextAreaElement) {
   ta.style.height = ta.scrollHeight + 'px';
 }
 
-function updatePips(dayKey: string, plans: any[]) {
-  const pipsEl = document.getElementById(`pips-${dayKey}`);
+function updatePips(dayKey: string, plans: any[], container?: HTMLElement) {
+  const pipsEl = container 
+    ? container.querySelector(`#pips-${dayKey}`) as HTMLElement
+    : document.getElementById(`pips-${dayKey}`);
+    
   if (!pipsEl) return;
   pipsEl.innerHTML = plans
     .map(p => `<div class="pip${p.done ? ' done' : ''}"></div>`)
@@ -550,7 +565,17 @@ function setupEventListeners() {
   });
 
   grid?.addEventListener('click', async (e: MouseEvent) => {
-    const item = (e.target as HTMLElement).closest('.task-item') as HTMLElement;
+    const target = e.target as HTMLElement;
+    const doneHeader = target.closest('.done-header');
+    if (doneHeader) {
+      const section = doneHeader.closest('.done-section') as HTMLElement;
+      const dayKey = (doneHeader.closest('.day-section') as HTMLElement).dataset.dayKey!;
+      section.classList.toggle('collapsed');
+      localStorage.setItem(`done-collapsed-${dayKey}`, section.classList.contains('collapsed').toString());
+      return;
+    }
+
+    const item = target.closest('.task-item') as HTMLElement;
     if (item) {
       const dayKey = item.dataset.dayKey!;
       const checkBtn = (e.target as HTMLElement).closest('.check-btn');
@@ -701,6 +726,12 @@ function setupEventListeners() {
 
   workEndInput?.addEventListener('change', async (e: Event) => {
     await window.planner.setSetting('workEnd' as any, parseInt((e.target as HTMLInputElement).value, 10));
+  });
+
+  collapseDoneSetting?.addEventListener('change', async (e: Event) => {
+    const newVal = (e.target as HTMLInputElement).checked;
+    defaultDoneCollapsed = newVal;
+    await window.planner.setSetting('doneTasksCollapsed' as any, newVal);
   });
 
   grid?.addEventListener('focusout', (e: FocusEvent) => {

@@ -29,6 +29,7 @@ export interface SettingOptions {
   notificationInterval: number;
   workStart: number;
   workEnd: number;
+  doneTasksCollapsed: boolean;
 }
 
 export interface PlannerAPI {
