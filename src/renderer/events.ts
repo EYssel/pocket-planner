@@ -84,6 +84,8 @@ export function setupEventListeners(callbacks: {
   ui.openRecycleBin?.addEventListener('click', () => { modals.renderRecycleBin(); ui.recycleBinOverlay.classList.add('show'); });
   ui.closeRecycleBin?.addEventListener('click', () => { ui.recycleBinOverlay.classList.remove('show'); });
 
+  let standupPlainText = '';
+
   ui.generateStandupBtn?.addEventListener('click', async () => {
     const todayKey = await window.planner.currentDayKey();
     const yesterdayKey = await window.planner.getPreviousWorkingDayKey(todayKey);
@@ -91,39 +93,70 @@ export function setupEventListeners(callbacks: {
     const todayPlans = await state.getPlansForDay(todayKey);
     const yesterdayPlans = await state.getPlansForDay(yesterdayKey);
 
-    const yesterdayDone = yesterdayPlans.filter(p => p.done && p.text.trim()).map(p => `- ${p.text.trim()}`);
-    const todayTodo = todayPlans.filter(p => p.text.trim()).map(p => `- ${p.text.trim()}`);
+    const yesterdayDone = yesterdayPlans.filter(p => p.done && p.text.trim()).map(p => p.text.trim());
+    const yesterdayIncomplete = yesterdayPlans.filter(p => !p.done && p.text.trim()).map(p => p.text.trim());
+    const todayTodo = todayPlans.filter(p => p.text.trim()).map(p => p.text.trim());
 
-    const prompt = `Act as a technical project manager helping me prepare for my daily software engineering standup. 
+    // Build HTML for the modal
+    ui.standupContent.innerHTML = `
+      <div class="standup-section">
+        <div class="standup-title">Yesterday (Completed)</div>
+        <div class="standup-list">
+          ${yesterdayDone.length > 0 
+            ? yesterdayDone.map(t => `
+                <div class="standup-item">
+                  <span class="standup-item-bullet">✓</span>
+                  <span>${ui.escapeHtml(t)}</span>
+                </div>`).join('') 
+            : '<div class="standup-empty">None recorded</div>'}
+        </div>
+      </div>
+      <div class="standup-section">
+        <div class="standup-title">Yesterday (Incomplete)</div>
+        <div class="standup-list">
+          ${yesterdayIncomplete.length > 0 
+            ? yesterdayIncomplete.map(t => `
+                <div class="standup-item">
+                  <span class="standup-item-bullet">→</span>
+                  <span>${ui.escapeHtml(t)}</span>
+                </div>`).join('') 
+            : '<div class="standup-empty">None recorded</div>'}
+        </div>
+      </div>
+      <div class="standup-section">
+        <div class="standup-title">Today (Planned)</div>
+        <div class="standup-list">
+          ${todayTodo.length > 0 
+            ? todayTodo.map(t => `
+                <div class="standup-item">
+                  <span class="standup-item-bullet">•</span>
+                  <span>${ui.escapeHtml(t)}</span>
+                </div>`).join('') 
+            : '<div class="standup-empty">No tasks planned yet</div>'}
+        </div>
+      </div>
+    `;
 
-I will provide you with my rough notes, git commits, or scattered thoughts about my work. Please synthesize them into a crisp, professional daily update using the standard standup format.
+    // Build plain text for clipboard
+    standupPlainText = `**Yesterday:**\n` +
+      (yesterdayDone.length > 0 ? yesterdayDone.map(t => `- [DONE] ${t}`).join('\n') : '- No completed tasks') +
+      `\n\n**Yesterday (Incomplete):**\n` +
+      (yesterdayIncomplete.length > 0 ? yesterdayIncomplete.map(t => `- [STILL PENDING] ${t}`).join('\n') : '- No incomplete tasks') +
+      `\n\n**Today:**\n` +
+      (todayTodo.length > 0 ? todayTodo.map(t => `- ${t}`).join('\n') : '- No tasks planned');
 
-Follow these rules:
-1. Keep it concise. Standups should be quick.
-2. Use active voice (e.g., "Implemented the new API endpoint" instead of "The new API endpoint was implemented").
-3. Group related tasks together so it's easy to read.
-4. Output ONLY the formatted update, without any preamble.
+    ui.standupOverlay.classList.add('show');
+  });
 
-Use this structure:
-**Yesterday:**
-${yesterdayDone.length > 0 ? yesterdayDone.join('\n') : '- [No completed tasks recorded]'}
+  ui.closeStandup?.addEventListener('click', () => ui.standupOverlay.classList.remove('show'));
 
-**Today:**
-${todayTodo.length > 0 ? todayTodo.join('\n') : '- [No tasks planned yet]'}
-
-**Blockers / Callouts:**
-- None
-
-Here are my rough notes for today:
-(This prompt was automatically generated from my Weekly Planner tasks)`;
-
-    await window.planner.copyToClipboard(prompt);
+  ui.copyStandupBtn?.addEventListener('click', async () => {
+    await window.planner.copyToClipboard(standupPlainText);
     
-    // Feedback
-    const originalText = ui.generateStandupBtn.textContent;
-    ui.generateStandupBtn.textContent = '✅';
+    const originalText = ui.copyStandupBtn.textContent;
+    ui.copyStandupBtn.textContent = 'Copied!';
     setTimeout(() => {
-      ui.generateStandupBtn.textContent = originalText;
+      ui.copyStandupBtn.textContent = originalText;
     }, 2000);
   });
   ui.clearBinBtn?.addEventListener('click', async () => {

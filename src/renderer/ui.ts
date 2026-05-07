@@ -36,6 +36,12 @@ export const clearBinBtn       = document.getElementById('clear-bin-btn') as HTM
 export const settingsOverlay = document.getElementById('settings-overlay') as HTMLElement;
 export const openSettings    = document.getElementById('open-settings') as HTMLElement;
 export const closeSettings   = document.getElementById('close-settings') as HTMLElement;
+
+export const standupOverlay = document.getElementById('standup-overlay') as HTMLElement;
+export const standupContent = document.getElementById('standup-summary-content') as HTMLElement;
+export const closeStandup   = document.getElementById('close-standup') as HTMLElement;
+export const copyStandupBtn = document.getElementById('copy-standup-btn') as HTMLButtonElement;
+
 export const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;
 export const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
 export const workStartInput  = document.getElementById('work-start') as HTMLInputElement;
