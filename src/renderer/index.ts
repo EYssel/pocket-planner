@@ -10,10 +10,12 @@ import { WeekData, Plan } from './types';
 async function init() {
   try {
     const appInfo = await window.planner.getAppInfo();
-    if (appInfo && appInfo.name !== 'weekly-planner') {
-      document.title = appInfo.name;
-      const logo = document.querySelector('.logo');
-      if (logo) logo.textContent = appInfo.name;
+    if (appInfo) {
+      if (appInfo.name !== 'weekly-planner') {
+        document.title = appInfo.name;
+        const logo = document.querySelector('.logo');
+        if (logo) logo.textContent = appInfo.name;
+      }
       
       const v1 = document.getElementById('app-version');
       const v2 = document.getElementById('settings-version');
