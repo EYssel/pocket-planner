@@ -343,7 +343,12 @@
   </div>
 </header>
 <div class="banner" id="update-banner" style="border-bottom-color: var(--accent2);">
-  <div class="banner-text"><strong>Update Ready</strong> A new version has been downloaded.</div>
+  <div class="banner-text" id="update-status"><strong>Update Ready</strong> A new version has been downloaded.</div>
+  <div style="flex: 1; margin: 0 20px; display: none;" id="update-progress-container">
+    <div style="height: 4px; background: var(--surface); border-radius: 2px; overflow: hidden; width: 100%;">
+      <div id="update-progress-bar" style="height: 100%; background: var(--accent2); width: 0%; transition: width 0.3s;"></div>
+    </div>
+  </div>
   <div class="banner-btns">
     <button class="banner-btn" id="install-update-btn">Restart to Install</button>
     <button class="banner-btn secondary" id="close-update-banner">Dismiss</button>

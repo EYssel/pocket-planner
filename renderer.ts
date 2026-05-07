@@ -28,9 +28,12 @@ const cleanupList  = document.getElementById('cleanup-list') as HTMLElement;
 const cleanupModal = document.getElementById('cleanup-overlay') as HTMLElement;
 const closeCleanup = document.getElementById('close-cleanup') as HTMLElement;
 
-const updateBanner      = document.getElementById('update-banner') as HTMLElement;
-const installUpdateBtn  = document.getElementById('install-update-btn') as HTMLElement;
-const closeUpdateBanner = document.getElementById('close-update-banner') as HTMLElement;
+const updateBanner           = document.getElementById('update-banner') as HTMLElement;
+const updateStatus           = document.getElementById('update-status') as HTMLElement;
+const updateProgressContainer = document.getElementById('update-progress-container') as HTMLElement;
+const updateProgressBar       = document.getElementById('update-progress-bar') as HTMLElement;
+const installUpdateBtn       = document.getElementById('install-update-btn') as HTMLElement;
+const closeUpdateBanner      = document.getElementById('close-update-banner') as HTMLElement;
 
 const recycleBinOverlay = document.getElementById('recycle-bin-overlay') as HTMLElement;
 const recycleBinList    = document.getElementById('recycle-bin-list') as HTMLElement;
@@ -636,8 +639,28 @@ function setupEventListeners() {
   openSettings?.addEventListener('click',  () => settingsOverlay.classList.add('show'));
   closeSettings?.addEventListener('click', () => settingsOverlay.classList.remove('show'));
 
+  window.planner.onUpdateAvailable((version: string) => {
+    updateBanner.classList.add('show');
+    updateStatus.innerHTML = `<strong>Downloading Update</strong> Version ${version} is being prepared…`;
+    updateProgressContainer.style.display = 'block';
+    updateProgressBar.style.width = '0%';
+    installUpdateBtn.disabled = true;
+    installUpdateBtn.textContent = 'Downloading…';
+  });
+
+  window.planner.onUpdateProgress((percent: number) => {
+    updateBanner.classList.add('show');
+    updateProgressContainer.style.display = 'block';
+    updateProgressBar.style.width = `${percent}%`;
+    updateStatus.innerHTML = `<strong>Downloading Update</strong> Progress: ${percent}%`;
+  });
+
   window.planner.onUpdateDownloaded(() => {
     updateBanner.classList.add('show');
+    updateStatus.innerHTML = '<strong>Update Ready</strong> A new version has been downloaded.';
+    updateProgressContainer.style.display = 'none';
+    installUpdateBtn.disabled = false;
+    installUpdateBtn.textContent = 'Restart to Install';
   });
 
   installUpdateBtn?.addEventListener('click', () => {

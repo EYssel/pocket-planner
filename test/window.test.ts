@@ -74,6 +74,30 @@ describe('window', () => {
         expect(e.preventDefault).toHaveBeenCalled();
       }
     });
+
+    test('should NOT hide on close if quitting', () => {
+      let capturedCloseHandler: any;
+      electron.BrowserWindow.mockImplementationOnce(() => ({
+        isDestroyed: jest.fn().mockReturnValue(false),
+        on: jest.fn((event, cb) => {
+          if (event === 'close') capturedCloseHandler = cb;
+        }),
+        once: jest.fn(),
+        loadFile: jest.fn(),
+        hide: jest.fn(),
+        webContents: { send: jest.fn() }
+      }));
+
+      windowModule.createWindow('planner');
+      
+      const e = { preventDefault: jest.fn() };
+      (global as any).isQuitting = true;
+      
+      if (capturedCloseHandler) {
+        capturedCloseHandler(e);
+        expect(e.preventDefault).not.toHaveBeenCalled();
+      }
+    });
   });
 
   describe('initSingleInstance', () => {

@@ -50,6 +50,10 @@ app.whenReady().then(() => {
   initUpdater();
 });
 
+app.on('before-quit', () => {
+  global.isQuitting = true;
+});
+
 app.on('window-all-closed', (e: Electron.IpcMainEvent | any) => {
   if (!global.isQuitting) {
     e.preventDefault();
