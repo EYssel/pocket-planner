@@ -68,9 +68,11 @@ describe('ipc', () => {
       expect(result).toEqual({ name: 'Weekly Planner', version: '1.0.0' });
     });
 
-    test('install-update should call autoUpdater.quitAndInstall', async () => {
+    test('install-update should call autoUpdater.quitAndInstall and set isQuitting', async () => {
+      (global as any).isQuitting = false;
       await handlers['install-update']({});
       expect(autoUpdater.quitAndInstall).toHaveBeenCalled();
+      expect((global as any).isQuitting).toBe(true);
     });
 
     test('get-setting should call store.getSetting', async () => {

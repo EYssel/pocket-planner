@@ -13,8 +13,19 @@ export function initUpdater(): void {
   }
 
   // Set up update events if needed (optional)
-  autoUpdater.on('update-available', () => {
-    console.log('Update available.');
+  autoUpdater.on('update-available', (info) => {
+    console.log('Update available:', info.version);
+    BrowserWindow.getAllWindows().forEach(win => {
+      win.webContents.send('update-available', info.version);
+    });
+  });
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    const percent = Math.round(progressObj.percent);
+    console.log(`Download progress: ${percent}%`);
+    BrowserWindow.getAllWindows().forEach(win => {
+      win.webContents.send('update-progress', percent);
+    });
   });
 
   autoUpdater.on('update-downloaded', () => {

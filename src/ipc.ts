@@ -33,6 +33,7 @@ export function registerHandlers(): void {
   }));
 
   ipcMain.handle('install-update', () => {
+    global.isQuitting = true;
     autoUpdater.quitAndInstall();
   });
 
