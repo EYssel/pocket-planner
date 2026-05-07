@@ -42,6 +42,7 @@
     "files": [
       "dist/**/*",
       "index.html",
+      "styles.css",
       "icon.ico",
       "node_modules/**/*"
     ],
