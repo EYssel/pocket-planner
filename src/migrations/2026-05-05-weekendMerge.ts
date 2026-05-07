@@ -50,7 +50,8 @@ export function migrateWeekendMerge(store: Store<any>): void {
  * Helper to calculate ISO week for migration logic.
  */
 function getISOWeek(date: Date): { week: number; year: number } {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  // Use UTC methods to ensure consistent calculation regardless of local timezone
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   const day = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - day);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));

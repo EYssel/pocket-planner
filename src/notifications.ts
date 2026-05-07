@@ -51,7 +51,7 @@ export function reschedule(): void {
     const hour = now.getHours();
     const isMonday = now.getDay() === 1;
 
-    const tasks = getPlans(currentDayKey());
+    const tasks = getPlans(currentDayKey()).filter(t => t.text.trim() !== '');
     const totalTasks = tasks.length;
     const doneTasks = tasks.filter(t => t.done).length;
 

@@ -53,14 +53,14 @@ describe('weekUtils', () => {
 
   describe('getISOWeek', () => {
     test('should return correct week for a specific date', () => {
-      const date = new Date(2026, 4, 4); // May 4, 2026
+      const date = new Date(Date.UTC(2026, 4, 4)); // May 4, 2026
       const { week, year } = getISOWeek(date);
       expect(week).toBe(19);
       expect(year).toBe(2026);
     });
 
     test('should handle end of year correctly', () => {
-      const date = new Date(2025, 11, 29); // Dec 29, 2025 (Monday)
+      const date = new Date(Date.UTC(2025, 11, 29)); // Dec 29, 2025 (Monday)
       const { week, year } = getISOWeek(date);
       expect(week).toBe(1);
       expect(year).toBe(2026);

@@ -257,7 +257,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 }
 .task-item.editing .task-display { display: none; }
 .task-item.editing .task-edit { display: block; }
-.task-item.done .task-display { color: var(--accent); opacity: 0.7; }
+.task-item.done .task-display { color: var(--text); }
 .del-btn { background: transparent; border: none; color: transparent; cursor: pointer; font-size: 14px; transition: color 0.1s; }
 .task-item:hover .del-btn { color: var(--muted); }
 .del-btn:hover { color: var(--accent2) !important; }
