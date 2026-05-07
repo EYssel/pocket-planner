@@ -5,7 +5,8 @@
  * Week starts Monday. Jan 4 is always in week 1.
  */
 export function getISOWeek(date: Date): { week: number; year: number } {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  // Use UTC methods to ensure consistent calculation regardless of local timezone
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
   const day = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - day);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
@@ -26,7 +27,10 @@ export function weeksInYear(year: number): number {
  * Returns the ISO week key string for today, e.g. "2026-W17".
  */
 export function currentWeekKey(): string {
-  const { week, year } = getISOWeek(new Date());
+  // getISOWeek now expects a date where we care about its UTC components
+  const now = new Date();
+  const utcNow = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const { week, year } = getISOWeek(utcNow);
   return formatWeekKey(year, week);
 }
 
@@ -107,10 +111,17 @@ export function formatDayKey(date: Date): string {
 }
 
 /**
- * Returns today's day key.
+ * Returns today's day key. 
+ * Maps Saturday/Sunday to the weekend key (-WE).
  */
 export function currentDayKey(): string {
   const now = new Date();
+  const day = now.getDay(); // 0 = Sunday, 6 = Saturday (local)
+  
+  if (day === 0 || day === 6) {
+    return `${currentWeekKey()}-WE`;
+  }
+  
   return formatDayKey(new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())));
 }
 
@@ -163,7 +174,7 @@ export function dayInfoFromKey(dayKey: string): DayInfo {
     
     const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const todayKey = currentDayKey();
-    const isToday = formatDayKey(sat) === todayKey || formatDayKey(sun) === todayKey;
+    const isToday = formatDayKey(sat) === todayKey || formatDayKey(sun) === todayKey || dayKey === todayKey;
     
     return {
       key: dayKey,
