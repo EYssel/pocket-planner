@@ -48,6 +48,13 @@ export interface PlannerAPI {
   restoreFromRecycleBin: (index: number) => Promise<void>;
   clearRecycleBin: () => Promise<void>;
   getPreviousWeekKey: (key: string) => Promise<string>;
+  getAppInfo: () => Promise<{ name: string; version: string }>;
+  onCheckingForUpdates: (cb: () => void) => void;
+  onUpdateAvailable: (cb: (version: string) => void) => void;
+  onUpdateNotAvailable: (cb: () => void) => void;
+  onUpdateProgress: (cb: (percent: number) => void) => void;
+  onUpdateDownloaded: (cb: () => void) => void;
+  installUpdate: () => void;
 }
 
 declare global {

@@ -34,7 +34,7 @@ async function build() {
     await esbuild.context({
       ...commonConfig,
       platform: 'browser',
-      entryPoints: ['renderer.ts'],
+      entryPoints: ['src/renderer/index.ts'],
       outfile: 'dist/renderer.js',
       // Renderer doesn't need external node modules
       external: [],

@@ -1,0 +1,438 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Renderer UI Builders buildTaskItem renders a done task correctly 1`] = `
+<div
+  class="task-item done"
+  data-day-key="2026-05-04"
+  data-index="1"
+  draggable="true"
+>
+  
+    
+  <button
+    class="check-btn"
+    title="Toggle"
+  >
+    ✓
+  </button>
+  
+    
+  <div
+    class="task-text-container"
+  >
+    
+      
+    <div
+      class="task-display"
+      title="Done Task"
+    >
+      Done Task
+    </div>
+    
+      
+    <textarea
+      class="task-edit"
+      placeholder="Task…"
+      rows="1"
+    >
+      Done Task
+    </textarea>
+    
+    
+  </div>
+  
+    
+  <button
+    class="del-btn"
+    title="Delete"
+  >
+    ×
+  </button>
+  
+  
+</div>
+`;
+
+exports[`Renderer UI Builders buildTaskItem renders an active task correctly 1`] = `
+<div
+  class="task-item"
+  data-day-key="2026-05-04"
+  data-index="0"
+  draggable="true"
+>
+  
+    
+  <button
+    class="check-btn"
+    title="Toggle"
+  />
+  
+    
+  <div
+    class="task-text-container"
+  >
+    
+      
+    <div
+      class="task-display"
+      title="Test Task"
+    >
+      Test Task
+    </div>
+    
+      
+    <textarea
+      class="task-edit"
+      placeholder="Task…"
+      rows="1"
+    >
+      Test Task
+    </textarea>
+    
+    
+  </div>
+  
+    
+  <button
+    class="del-btn"
+    title="Delete"
+  >
+    ×
+  </button>
+  
+  
+</div>
+`;
+
+exports[`Renderer UI Builders buildTaskItem renders escaped HTML to prevent XSS 1`] = `
+<div
+  class="task-item"
+  data-day-key="2026-05-04"
+  data-index="0"
+  draggable="true"
+>
+  
+    
+  <button
+    class="check-btn"
+    title="Toggle"
+  />
+  
+    
+  <div
+    class="task-text-container"
+  >
+    
+      
+    <div
+      class="task-display"
+      title="<script>alert("xss")</script>"
+    >
+      &lt;script&gt;alert("xss")&lt;/script&gt;
+    </div>
+    
+      
+    <textarea
+      class="task-edit"
+      placeholder="Task…"
+      rows="1"
+    >
+      &lt;script&gt;alert("xss")&lt;/script&gt;
+    </textarea>
+    
+    
+  </div>
+  
+    
+  <button
+    class="del-btn"
+    title="Delete"
+  >
+    ×
+  </button>
+  
+  
+</div>
+`;
+
+exports[`Renderer UI Builders createDaySection renders a full day section with tasks 1`] = `
+<div
+  class="day-section today"
+  data-day-key="2026-05-04"
+>
+  
+    
+  <div
+    class="day-header"
+  >
+    
+      
+    <div
+      class="day-name"
+    >
+      Monday
+    </div>
+    
+      
+    <div
+      class="day-date"
+    >
+      4
+    </div>
+    
+      
+    <div
+      class="day-month"
+    >
+      May
+    </div>
+    
+    
+  </div>
+  
+    
+  <div
+    class="day-tasks active-tasks"
+    id="tasks-2026-05-04"
+  >
+    <div
+      class="task-item"
+      data-day-key="2026-05-04"
+      data-index="0"
+      draggable="true"
+    >
+      
+    
+      <button
+        class="check-btn"
+        title="Toggle"
+      />
+      
+    
+      <div
+        class="task-text-container"
+      >
+        
+      
+        <div
+          class="task-display"
+          title="Active Task"
+        >
+          Active Task
+        </div>
+        
+      
+        <textarea
+          class="task-edit"
+          placeholder="Task…"
+          rows="1"
+        >
+          Active Task
+        </textarea>
+        
+    
+      </div>
+      
+    
+      <button
+        class="del-btn"
+        title="Delete"
+      >
+        ×
+      </button>
+      
+  
+    </div>
+    <button
+      class="add-task-btn"
+      data-day="2026-05-04"
+    >
+      + task
+    </button>
+  </div>
+  
+    
+  <div
+    class="done-section collapsed visible"
+    id="done-section-2026-05-04"
+  >
+    
+      
+    <div
+      class="done-header"
+    >
+      Done Tasks
+    </div>
+    
+      
+    <div
+      class="day-tasks done-tasks"
+      id="done-tasks-2026-05-04"
+    >
+      <div
+        class="task-item done"
+        data-day-key="2026-05-04"
+        data-index="1"
+        draggable="true"
+      >
+        
+    
+        <button
+          class="check-btn"
+          title="Toggle"
+        >
+          ✓
+        </button>
+        
+    
+        <div
+          class="task-text-container"
+        >
+          
+      
+          <div
+            class="task-display"
+            title="Completed Task"
+          >
+            Completed Task
+          </div>
+          
+      
+          <textarea
+            class="task-edit"
+            placeholder="Task…"
+            rows="1"
+          >
+            Completed Task
+          </textarea>
+          
+    
+        </div>
+        
+    
+        <button
+          class="del-btn"
+          title="Delete"
+        >
+          ×
+        </button>
+        
+  
+      </div>
+    </div>
+    
+    
+  </div>
+  
+    
+  <div
+    class="day-footer"
+  >
+    
+      
+    <div
+      class="progress-pips"
+      id="pips-2026-05-04"
+    >
+      <div
+        class="pip"
+      />
+      <div
+        class="pip done"
+      />
+    </div>
+    
+    
+  </div>
+  
+  
+</div>
+`;
+
+exports[`Renderer UI Builders createDaySection renders an empty day correctly 1`] = `
+<div
+  class="day-section"
+  data-day-key="2026-05-05"
+>
+  
+    
+  <div
+    class="day-header"
+  >
+    
+      
+    <div
+      class="day-name"
+    >
+      Tuesday
+    </div>
+    
+      
+    <div
+      class="day-date"
+    >
+      5
+    </div>
+    
+      
+    <div
+      class="day-month"
+    >
+      May
+    </div>
+    
+    
+  </div>
+  
+    
+  <div
+    class="day-tasks active-tasks"
+    id="tasks-2026-05-05"
+  >
+    <button
+      class="add-task-btn"
+      data-day="2026-05-05"
+    >
+      + task
+    </button>
+  </div>
+  
+    
+  <div
+    class="done-section collapsed"
+    id="done-section-2026-05-05"
+  >
+    
+      
+    <div
+      class="done-header"
+    >
+      Done Tasks
+    </div>
+    
+      
+    <div
+      class="day-tasks done-tasks"
+      id="done-tasks-2026-05-05"
+    />
+    
+    
+  </div>
+  
+    
+  <div
+    class="day-footer"
+  >
+    
+      
+    <div
+      class="progress-pips"
+      id="pips-2026-05-05"
+    />
+    
+    
+  </div>
+  
+  
+</div>
+`;
