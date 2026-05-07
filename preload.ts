@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('planner', {
   offsetWeekKey:  (key: string, delta: number) => ipcRenderer.invoke('get-offset-week-key', { key, delta }),
   currentDayKey:  ()           => ipcRenderer.invoke('get-current-day-key'),
   weekKeyFromDayKey: (dayKey: string)  => ipcRenderer.invoke('get-week-key-from-day-key', dayKey),
+  getPreviousWorkingDayKey: (dayKey: string) => ipcRenderer.invoke('get-previous-working-day-key', dayKey),
 
   // Settings methods
   getSetting: (key: string) => ipcRenderer.invoke('get-setting', key),
@@ -32,4 +33,5 @@ contextBridge.exposeInMainWorld('planner', {
   onCheckingForUpdates: (cb: () => void) => ipcRenderer.on('checking-for-updates', () => cb()),
   onUpdateProgress: (cb: (percent: number) => void) => ipcRenderer.on('update-progress', (_: any, percent: number) => cb(percent)),
   installUpdate: () => ipcRenderer.invoke('install-update'),
+  copyToClipboard: (text: string) => ipcRenderer.invoke('copy-to-clipboard', text),
 });

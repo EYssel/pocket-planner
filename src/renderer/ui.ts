@@ -29,6 +29,7 @@ export const closeUpdateBanner      = document.getElementById('close-update-bann
 export const recycleBinOverlay = document.getElementById('recycle-bin-overlay') as HTMLElement;
 export const recycleBinList    = document.getElementById('recycle-bin-list') as HTMLElement;
 export const openRecycleBin    = document.getElementById('open-recycle-bin') as HTMLElement;
+export const generateStandupBtn = document.getElementById('generate-standup') as HTMLButtonElement;
 export const closeRecycleBin   = document.getElementById('close-recycle-bin') as HTMLElement;
 export const clearBinBtn       = document.getElementById('clear-bin-btn') as HTMLElement;
 

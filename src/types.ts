@@ -48,6 +48,7 @@ export interface PlannerAPI {
   restoreFromRecycleBin: (index: number) => Promise<void>;
   clearRecycleBin: () => Promise<void>;
   getPreviousWeekKey: (key: string) => Promise<string>;
+  getPreviousWorkingDayKey: (dayKey: string) => Promise<string>;
   getAppInfo: () => Promise<{ name: string; version: string }>;
   onCheckingForUpdates: (cb: () => void) => void;
   onUpdateAvailable: (cb: (version: string) => void) => void;
@@ -55,6 +56,7 @@ export interface PlannerAPI {
   onUpdateProgress: (cb: (percent: number) => void) => void;
   onUpdateDownloaded: (cb: () => void) => void;
   installUpdate: () => void;
+  copyToClipboard: (text: string) => Promise<void>;
 }
 
 declare global {

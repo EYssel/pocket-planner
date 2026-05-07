@@ -83,6 +83,49 @@ export function setupEventListeners(callbacks: {
 
   ui.openRecycleBin?.addEventListener('click', () => { modals.renderRecycleBin(); ui.recycleBinOverlay.classList.add('show'); });
   ui.closeRecycleBin?.addEventListener('click', () => { ui.recycleBinOverlay.classList.remove('show'); });
+
+  ui.generateStandupBtn?.addEventListener('click', async () => {
+    const todayKey = await window.planner.currentDayKey();
+    const yesterdayKey = await window.planner.getPreviousWorkingDayKey(todayKey);
+
+    const todayPlans = await state.getPlansForDay(todayKey);
+    const yesterdayPlans = await state.getPlansForDay(yesterdayKey);
+
+    const yesterdayDone = yesterdayPlans.filter(p => p.done && p.text.trim()).map(p => `- ${p.text.trim()}`);
+    const todayTodo = todayPlans.filter(p => p.text.trim()).map(p => `- ${p.text.trim()}`);
+
+    const prompt = `Act as a technical project manager helping me prepare for my daily software engineering standup. 
+
+I will provide you with my rough notes, git commits, or scattered thoughts about my work. Please synthesize them into a crisp, professional daily update using the standard standup format.
+
+Follow these rules:
+1. Keep it concise. Standups should be quick.
+2. Use active voice (e.g., "Implemented the new API endpoint" instead of "The new API endpoint was implemented").
+3. Group related tasks together so it's easy to read.
+4. Output ONLY the formatted update, without any preamble.
+
+Use this structure:
+**Yesterday:**
+${yesterdayDone.length > 0 ? yesterdayDone.join('\n') : '- [No completed tasks recorded]'}
+
+**Today:**
+${todayTodo.length > 0 ? todayTodo.join('\n') : '- [No tasks planned yet]'}
+
+**Blockers / Callouts:**
+- None
+
+Here are my rough notes for today:
+(This prompt was automatically generated from my Weekly Planner tasks)`;
+
+    await window.planner.copyToClipboard(prompt);
+    
+    // Feedback
+    const originalText = ui.generateStandupBtn.textContent;
+    ui.generateStandupBtn.textContent = '✅';
+    setTimeout(() => {
+      ui.generateStandupBtn.textContent = originalText;
+    }, 2000);
+  });
   ui.clearBinBtn?.addEventListener('click', async () => {
     if (confirm('Permanently clear all items in the recycle bin?')) {
       await window.planner.clearRecycleBin();
