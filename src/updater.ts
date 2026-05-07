@@ -20,6 +20,20 @@ export function initUpdater(): void {
     });
   });
 
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('Update not available:', info.version);
+    BrowserWindow.getAllWindows().forEach(win => {
+      win.webContents.send('update-not-available', info.version);
+    });
+  });
+
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for updates...');
+    BrowserWindow.getAllWindows().forEach(win => {
+      win.webContents.send('checking-for-updates');
+    });
+  });
+
   autoUpdater.on('download-progress', (progressObj) => {
     const percent = Math.round(progressObj.percent);
     console.log(`Download progress: ${percent}%`);
