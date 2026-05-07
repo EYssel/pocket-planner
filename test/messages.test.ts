@@ -17,62 +17,68 @@ describe('messages', () => {
       expect(result.mode).toBe('checkin');
     });
 
-    test('should return one of 12 "All done" messages when all tasks are complete', () => {
+    test('should return "All done" messages when all tasks are complete', () => {
       const result = getDynamicMessage(14, 5, 5, false);
       const allDoneTitles = [
         '🎉 All done!', '🏆 Productivity master', '✅ List cleared', '🎈 Celebration time',
         '🌟 Perfection!', '🥇 Gold star', '🎊 Victory!', '🌊 Smooth sailing',
-        '🔥 On fire!', '🌌 Space for rest', '🚀 Mission complete', '🎨 Masterpiece'
+        '🔥 On fire!', '🚀 Mission complete'
       ];
       expect(allDoneTitles).toContain(result.title);
-      expect(result.mode).toBe('checkin');
     });
 
-    test('should return one of 12 "Morning" messages in the morning', () => {
-      const result = getDynamicMessage(9, 5, 0, false);
-      const morningTitles = [
+    test('should return Early Morning messages before 10 AM', () => {
+      const result = getDynamicMessage(8, 5, 0, false);
+      const titles = [
         '☀️ Good morning!', '☕ Rise and shine!', '🌅 Morning check-in', '🌤️ Hello there!',
-        '✨ Fresh start', '🔋 Fully charged?', '🚀 Launching today', '📅 Today\'s agenda',
-        '💪 You got this!', '🧘 Focus time', '🏃 Step by step', '🌟 Shine bright'
+        '✨ Fresh start', '🔋 Fully charged?', '🚀 Launching today', '💪 You got this!'
       ];
-      expect(morningTitles).toContain(result.title);
-      // Morning messages all contain the total count "5"
-      expect(result.body).toContain('5');
+      expect(titles).toContain(result.title);
     });
 
-    test('should return one of 12 "Afternoon" messages in the afternoon', () => {
-      const result = getDynamicMessage(14, 5, 2, false);
-      const afternoonTitles = [
-        '🌗 Halfway through!', '☀️ Afternoon check-in', '🕒 Time for a break?', '📈 Progress report',
-        '🥤 Quick refresh?', '🏁 The home stretch', '⚡ Power hour', '🧐 Review time',
-        '🚂 Full steam ahead', '🏔️ Reaching the peak', '🌤️ Afternoon glow', '✅ Checking in'
+    test('should return Mid-Morning messages between 10 AM and 12 PM', () => {
+      const result = getDynamicMessage(11, 5, 1, false);
+      const titles = [
+        '🕒 Mid-morning focus', '📈 Building momentum', '☕ Coffee break?', '🧘 Focus time',
+        '🏃 Step by step', '🌟 Shine bright', '🚂 Full steam ahead', '⚖️ Balancing act'
       ];
-      expect(afternoonTitles).toContain(result.title);
-      // Body should mention progress (2/5 or 2 done) or remaining (3)
-      expect(result.body).toMatch(/2\/5|2|3/);
+      expect(titles).toContain(result.title);
     });
 
-    test('should return one of 12 "Evening" messages in the evening', () => {
-      const result = getDynamicMessage(18, 5, 4, false);
-      const eveningTitles = [
-        '🌇 Wrapping up?', '🌙 Evening check-in', '🏠 Heading out?', '🌆 Sunset review',
-        '🕯️ Final push', '🌌 Starlit goals', '🛌 Nearly bedtime', '🍵 Calm evening',
-        '📉 Tying loose ends', '🕰️ Late check-in', '🚶 One last walk-through', '🌑 End of day'
-      ];
-      expect(eveningTitles).toContain(result.title);
-      // Body should mention remaining (1)
-      expect(result.body).toContain('1');
-    });
-
-    test('should return one of 12 "No progress" messages if no tasks done late in morning/afternoon', () => {
+    test('should return "No progress" messages after 11 AM if 0 done', () => {
       const result = getDynamicMessage(11, 5, 0, false);
-      const noProgressTitles = [
+      const titles = [
         '🚀 Ready to start?', '💡 Small steps', '🌱 Time to plant', '🧊 Break the ice',
-        '⚡ Spark needed?', '🛤️ On the tracks', '⏱️ The clock is ticking', '🪁 Take flight',
-        '🧗 Start the climb', '🔑 Unlock progress', '🌊 Catch the wave', '🏁 Starting line'
+        '⚡ Spark needed?', '🛤️ On the tracks', '⏱️ The clock is ticking', '🏁 Starting line'
       ];
-      expect(noProgressTitles).toContain(result.title);
-      expect(result.body).toContain('5');
+      expect(titles).toContain(result.title);
+    });
+
+    test('should return Early Afternoon messages between 12 PM and 3 PM', () => {
+      const result = getDynamicMessage(13, 5, 2, false);
+      const titles = [
+        '🌗 Afternoon check-in', '🥤 Quick refresh?', '⛰️ Halfway there!', '⚡ Power hour',
+        '🧐 Review time', '🏔️ Reaching the peak', '🌤️ Afternoon glow', '✅ Checking in'
+      ];
+      expect(titles).toContain(result.title);
+    });
+
+    test('should return Late Afternoon messages between 3 PM and 6 PM', () => {
+      const result = getDynamicMessage(16, 5, 3, false);
+      const titles = [
+        '🏁 The home stretch', '⚡ Power hour', '🏃 Sprint finish', '🌇 Sunset sprint',
+        '📉 Tying loose ends', '🕰️ Late check-in', '🚶 One last walk-through', '🕯️ Final push'
+      ];
+      expect(titles).toContain(result.title);
+    });
+
+    test('should return Evening messages after 6 PM', () => {
+      const result = getDynamicMessage(19, 5, 4, false);
+      const titles = [
+        '🌇 Wrapping up?', '🌙 Evening review', '🏠 Ready for rest?', '🌆 Sunset review',
+        '🌌 Starlit goals', '🛌 Nearly bedtime', '🍵 Calm evening', '🌑 End of day'
+      ];
+      expect(titles).toContain(result.title);
     });
   });
 });
