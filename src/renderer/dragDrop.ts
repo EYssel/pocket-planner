@@ -10,7 +10,7 @@ export function setupDropTarget(tasksEl: HTMLElement, dayKey: string, callbacks:
     if (!dragging) return;
 
     // Update dragging item visual state based on current target
-    const isDoneContainer = tasksEl.classList.contains('done-tasks');
+    const isDoneContainer = tasksEl.classList.contains('done-tasks') || tasksEl.classList.contains('done-section');
     if (isDoneContainer) {
       dragging.classList.add('done');
       const checkBtn = dragging.querySelector('.check-btn');
@@ -21,17 +21,23 @@ export function setupDropTarget(tasksEl: HTMLElement, dayKey: string, callbacks:
       if (checkBtn) checkBtn.textContent = '';
     }
 
-    const afterElement = getDragAfterElement(tasksEl, e.clientY);
-    const addBtn = tasksEl.querySelector('.add-task-btn');
+    // For done-section, we actually want to drop into its inner .done-tasks
+    let container = tasksEl;
+    if (tasksEl.classList.contains('done-section')) {
+      container = tasksEl.querySelector('.done-tasks') as HTMLElement;
+    }
+
+    const afterElement = getDragAfterElement(container, e.clientY);
+    const addBtn = container.querySelector('.add-task-btn');
     if (afterElement == null) {
       if (addBtn) {
-        if (addBtn.previousElementSibling !== dragging) tasksEl.insertBefore(dragging, addBtn);
+        if (addBtn.previousElementSibling !== dragging) container.insertBefore(dragging, addBtn);
       } else {
-        if (tasksEl.lastElementChild !== dragging) tasksEl.appendChild(dragging);
+        if (container.lastElementChild !== dragging) container.appendChild(dragging);
       }
     } else {
       if (afterElement !== dragging && afterElement.previousElementSibling !== dragging) {
-        tasksEl.insertBefore(dragging, afterElement);
+        container.insertBefore(dragging, afterElement);
       }
     }
   });
@@ -42,8 +48,14 @@ export function setupDropTarget(tasksEl: HTMLElement, dayKey: string, callbacks:
     if (!dataTransferText) return;
     const { dayKey: sourceDayKey, index: sourceIndex } = JSON.parse(dataTransferText);
 
-    const isDone = tasksEl.classList.contains('done-tasks');
-    const afterElement = getDragAfterElement(tasksEl, e.clientY);
+    const isDone = tasksEl.classList.contains('done-tasks') || tasksEl.classList.contains('done-section');
+    
+    let container = tasksEl;
+    if (tasksEl.classList.contains('done-section')) {
+      container = tasksEl.querySelector('.done-tasks') as HTMLElement;
+    }
+
+    const afterElement = getDragAfterElement(container, e.clientY);
     
     let targetIndex = -1;
     if (afterElement) {
