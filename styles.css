@@ -337,12 +337,12 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 .custom-checkbox input:checked + .checkbox-box { background: var(--accent); border-color: var(--accent); color: #000; }
 .custom-checkbox:hover .checkbox-box { border-color: var(--accent); }
 
-/* ── Standup Summary ── */
-.standup-section {
+/* ── Summary ── */
+.summary-section {
   margin-bottom: 24px;
 }
 
-.standup-title {
+.summary-title {
   font-family: 'Space Mono', monospace;
   font-size: 11px;
   text-transform: uppercase;
@@ -353,14 +353,14 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   padding-bottom: 6px;
 }
 
-.standup-list {
+.summary-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding-left: 4px;
 }
 
-.standup-item {
+.summary-item {
   font-size: 14px;
   line-height: 1.6;
   color: var(--text);
@@ -368,19 +368,19 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   gap: 12px;
 }
 
-.standup-item-bullet {
+.summary-item-bullet {
   color: var(--accent);
   flex-shrink: 0;
 }
 
-.standup-empty {
+.summary-empty {
   font-style: italic;
   color: var(--muted);
   font-size: 13px;
   padding-left: 8px;
 }
 
-#standup-summary-content {
+#summary-content {
   max-height: 60vh;
   overflow-y: auto;
   padding: 10px 4px;
