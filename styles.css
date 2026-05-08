@@ -253,7 +253,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;
   margin-top: 2px; transition: all 0.1s; color: transparent; font-size: 9px;
 }
-.task-item.done .check-btn { background: var(--accent); border-color: var(--accent); color: #000; }
+.task-item.done .check-btn { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 
 .task-text-container { position: relative; width: 100%; min-height: 18px; }
 .task-display { font-size: 12px; line-height: 1.4; color: var(--text); word-break: break-word; white-space: pre-wrap; }
@@ -280,7 +280,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 .pip.done { background: var(--accent); }
 
 .banner-btn {
-  background: var(--accent); color: #000; border: none; padding: 4px 12px;
+  background: var(--accent); color: var(--bg); border: none; padding: 4px 12px;
   font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
   border-radius: var(--radius); cursor: pointer; text-transform: uppercase; transition: opacity 0.15s;
 }
@@ -288,7 +288,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 .banner-btn.secondary, .banner-btn.primary { /* Maintain primary/secondary logic but consistent with 1.0.16 size */ }
 .banner-btn.secondary { background: transparent; border: 1px solid var(--border); color: var(--muted); }
 .banner-btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
-.banner-btn.primary { background: var(--accent); color: #000; border: none; }
+.banner-btn.primary { background: var(--accent); color: var(--bg); border: none; }
 
 .banner-text { font-size: 12px; color: var(--text); }
 .banner-text strong { color: var(--accent); }
@@ -334,7 +334,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   display: flex; align-items: center; justify-content: center;
   transition: all 0.15s; color: transparent; font-size: 10px; flex-shrink: 0;
 }
-.custom-checkbox input:checked + .checkbox-box { background: var(--accent); border-color: var(--accent); color: #000; }
+.custom-checkbox input:checked + .checkbox-box { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 .custom-checkbox:hover .checkbox-box { border-color: var(--accent); }
 
 /* ── Summary ── */
