@@ -29,8 +29,9 @@ export function rebuild(): void {
 export function createTray(): void {
   if (!_openWindow) return;
 
-  // app.getAppPath() is usually the project root in dev or the resources/app[.asar] in production
-  const iconPath = path.join(app.getAppPath(), 'icon.ico');
+  // macOS prefers a 'Template' image for the tray icon to handle dark/light mode
+  const iconName = process.platform === 'win32' ? 'icon.ico' : 'icon.png';
+  const iconPath = path.join(app.getAppPath(), iconName);
   const icon = nativeImage.createFromPath(iconPath);
   
   if (icon.isEmpty()) {

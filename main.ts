@@ -25,9 +25,13 @@ if (!app.isPackaged) {
   app.setName(devName);
   const userDataPath = path.join(app.getPath('appData'), devName);
   app.setPath('userData', userDataPath);
-  app.setAppUserModelId(devName);
+  if (process.platform === 'win32') {
+    app.setAppUserModelId(devName);
+  }
 } else {
-  app.setAppUserModelId('Weekly Planner');
+  if (process.platform === 'win32') {
+    app.setAppUserModelId('Weekly Planner');
+  }
 }
 
 // Bail out immediately if another instance is already running

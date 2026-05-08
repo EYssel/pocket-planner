@@ -6,12 +6,12 @@ on:
       - master
 
 jobs:
-  release:
+  prepare_release:
     runs-on: windows-latest
-
     permissions:
       contents: write
-
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
       - name: Run Unit Tests
         run: npm test
 
-      - name: Bump patch version
+      - name: Bump version and push tag
         id: version
         shell: bash
         run: |
@@ -45,10 +45,41 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           git add package.json
           git commit -m "chore: bump version to $VERSION [skip ci]"
-          git push
+          git tag "v$VERSION"
+          git push origin master --tags
 
-      - name: Build & publish
+  build_and_publish:
+    needs: prepare_release
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build & publish (Windows)
+        if: matrix.os == 'windows-latest'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OUTLOOK_CLIENT_ID: ${{ secrets.OUTLOOK_CLIENT_ID }}
         run: npm run build -- --publish always
+
+      - name: Build & publish (Mac)
+        if: matrix.os == 'macos-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build:mac -- --publish always
