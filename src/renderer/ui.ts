@@ -131,7 +131,7 @@ export function createDaySection(day: DayData, defaultDoneCollapsed: boolean, ca
 
   updatePips(day.key, day.plans, section);
   callbacks.setupDropTarget(tasksEl, day.key);
-  callbacks.setupDropTarget(doneTasksEl, day.key);
+  callbacks.setupDropTarget(doneSectionEl, day.key);
 
   return section;
 }
