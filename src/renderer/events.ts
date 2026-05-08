@@ -218,6 +218,8 @@ export function setupEventListeners(callbacks: {
   });
 
   ui.installUpdateBtn?.addEventListener('click', () => {
+    ui.installUpdateBtn.disabled = true;
+    ui.installUpdateBtn.textContent = 'Restarting...';
     window.planner.installUpdate();
   });
 
