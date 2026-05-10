@@ -14,7 +14,8 @@
     "build": "npm.cmd run build:ts && electron-builder --win",
     "seed": "node dist/scripts/seed-test-data.js",
     "clean": "node dist/scripts/clean-dev-data.js",
-    "test": "jest"
+    "test": "jest",
+    "release": "standard-version"
   },
   "dependencies": {
     "electron-store": "^8.1.0",
@@ -30,6 +31,7 @@
     "esbuild": "^0.28.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
+    "standard-version": "^9.5.0",
     "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
