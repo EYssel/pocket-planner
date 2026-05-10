@@ -160,6 +160,19 @@ header {
 .week-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
 .nav-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 18px; width: 28px; height: 28px; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
 .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+body.dragging-active #prev-week,
+body.dragging-active #next-week {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(232, 255, 71, 0.2);
+  color: var(--accent);
+}
+.nav-btn.drag-over { 
+  border-color: var(--accent2) !important; 
+  color: var(--accent2) !important; 
+  background: rgba(255, 107, 53, 0.15) !important; 
+  transform: scale(1.2); 
+  box-shadow: 0 0 15px rgba(255, 107, 53, 0.4) !important;
+}
 .nav-btn:disabled { opacity: 0.2; cursor: default; }
 
 .header-right { display: flex; align-items: center; gap: 12px; }

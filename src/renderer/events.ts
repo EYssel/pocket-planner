@@ -13,6 +13,37 @@ export function setupEventListeners(callbacks: {
   ui.nextBtn?.addEventListener('click', async () => callbacks.loadWeek(await window.planner.offsetWeekKey(state.currentWeekKey!, +1)));
   ui.todayBtn?.addEventListener('click', async () => callbacks.loadWeek(await window.planner.currentWeekKey()));
 
+  [ui.prevBtn, ui.nextBtn].forEach((btn, i) => {
+    const delta = i === 0 ? -1 : 1;
+    btn?.addEventListener('dragover', (e: DragEvent) => {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      btn.classList.add('drag-over');
+    });
+    btn?.addEventListener('dragleave', () => btn.classList.remove('drag-over'));
+    btn?.addEventListener('drop', async (e: DragEvent) => {
+      e.preventDefault();
+      btn.classList.remove('drag-over');
+      const data = e.dataTransfer?.getData('text/plain');
+      if (!data) return;
+      const { dayKey: sourceDayKey, index: sourceIndex } = JSON.parse(data);
+      
+      const targetWeekKey = await window.planner.offsetWeekKey(state.currentWeekKey!, delta);
+      const targetDayKey = delta === 1 
+        ? await window.planner.getFirstDayOfWeek(targetWeekKey) 
+        : await window.planner.getLastDayOfWeek(targetWeekKey);
+
+      const task = state.deleteTask(sourceDayKey, sourceIndex);
+      
+      if (task) {
+        const targetPlans = await state.getPlansForDay(targetDayKey);
+        targetPlans.push(task);
+        await window.planner.savePlans(targetDayKey, targetPlans);
+        await callbacks.saveDay(sourceDayKey);
+      }
+    });
+  });
+
   ui.themeSelect?.addEventListener('change', async (e: Event) => {
     const newTheme = (e.target as HTMLSelectElement).value;
     modals.applyTheme(newTheme);

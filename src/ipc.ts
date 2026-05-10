@@ -22,7 +22,10 @@ import {
   offsetWeekKey,
   currentDayKey,
   weekKeyFromDayKey,
-  getPreviousWorkingDayKey
+  getPreviousWorkingDayKey,
+  offsetDayKeyByWeeks,
+  getFirstDayOfWeek,
+  getLastDayOfWeek
 } from './weekUtils';
 import { Task, SettingOptions, WeekData } from './types';
 
@@ -58,6 +61,11 @@ export function registerHandlers(): void {
   ipcMain.handle('get-previous-working-day-key', (_: any, dayKey: string) => {
     return getPreviousWorkingDayKey(dayKey || currentDayKey());
   });
+  ipcMain.handle('offset-day-key-by-weeks', (_: any, { dayKey, delta }: { dayKey: string, delta: number }) => {
+    return offsetDayKeyByWeeks(dayKey, delta);
+  });
+  ipcMain.handle('get-first-day-of-week', (_: any, weekKey: string) => getFirstDayOfWeek(weekKey));
+  ipcMain.handle('get-last-day-of-week', (_: any, weekKey: string) => getLastDayOfWeek(weekKey));
 
   // Returns week metadata + all 7 days with their tasks in one call
   ipcMain.handle('get-week', (_: any, weekKey: string): WeekData => {
