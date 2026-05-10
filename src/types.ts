@@ -49,6 +49,9 @@ export interface PlannerAPI {
   clearRecycleBin: () => Promise<void>;
   getPreviousWeekKey: (key: string) => Promise<string>;
   getPreviousWorkingDayKey: (dayKey: string) => Promise<string>;
+  offsetDayKeyByWeeks: (dayKey: string, delta: number) => Promise<string>;
+  getFirstDayOfWeek: (weekKey: string) => Promise<string>;
+  getLastDayOfWeek: (weekKey: string) => Promise<string>;
   getAppInfo: () => Promise<{ name: string; version: string }>;
   onCheckingForUpdates: (cb: () => void) => void;
   onUpdateAvailable: (cb: (version: string) => void) => void;

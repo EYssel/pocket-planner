@@ -246,3 +246,43 @@ export function getPreviousWorkingDayKey(dayKey: string): string {
   }
   return formatDayKey(date);
 }
+
+/**
+ * Returns a day key offset by a number of weeks.
+ * Maintains the same day of the week.
+ */
+export function offsetDayKeyByWeeks(dayKey: string, delta: number): string {
+  if (dayKey.endsWith('-WE')) {
+    const weekKey = dayKey.replace('-WE', '');
+    const newWeekKey = offsetWeekKey(weekKey, delta);
+    return `${newWeekKey}-WE`;
+  }
+  const [y, m, d] = dayKey.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  date.setUTCDate(date.getUTCDate() + (delta * 7));
+  return formatDayKey(date);
+}
+
+/**
+ * Returns the Monday of the given week key.
+ */
+export function getFirstDayOfWeek(weekKey: string): string {
+  const { year, week } = parseWeekKey(weekKey);
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const jan4Day = jan4.getUTCDay() || 7;
+  const monday = new Date(jan4);
+  monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7);
+  return formatDayKey(monday);
+}
+
+/**
+ * Returns the Friday of the given week key.
+ */
+export function getLastDayOfWeek(weekKey: string): string {
+  const { year, week } = parseWeekKey(weekKey);
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const jan4Day = jan4.getUTCDay() || 7;
+  const friday = new Date(jan4);
+  friday.setUTCDate(jan4.getUTCDate() - jan4Day + 5 + (week - 1) * 7);
+  return formatDayKey(friday);
+}
