@@ -30,6 +30,7 @@ export interface SettingOptions {
   workStart: number;
   workEnd: number;
   doneTasksCollapsed: boolean;
+  lastRunVersion: string;
 }
 
 export interface PlannerAPI {
@@ -53,6 +54,7 @@ export interface PlannerAPI {
   getFirstDayOfWeek: (weekKey: string) => Promise<string>;
   getLastDayOfWeek: (weekKey: string) => Promise<string>;
   getAppInfo: () => Promise<{ name: string; version: string }>;
+  getReleaseNotes: () => Promise<string>;
   onCheckingForUpdates: (cb: () => void) => void;
   onUpdateAvailable: (cb: (version: string) => void) => void;
   onUpdateNotAvailable: (cb: () => void) => void;

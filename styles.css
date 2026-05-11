@@ -398,3 +398,55 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   overflow-y: auto;
   padding: 10px 4px;
 }
+
+/* ── Release Notes ── */
+#release-notes-content {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#release-notes-content h1, 
+#release-notes-content h2, 
+#release-notes-content h3 {
+  font-family: 'Space Mono', monospace;
+  color: var(--accent);
+  margin: 20px 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+#release-notes-content h3 { font-size: 13px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+
+#release-notes-content ul {
+  list-style: none;
+  margin-bottom: 16px;
+}
+
+#release-notes-content li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 8px;
+}
+
+#release-notes-content li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+#release-notes-content strong {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+#release-notes-content a {
+  color: var(--accent2);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent2);
+}
+
+#release-notes-content a:hover {
+  border-bottom-style: solid;
+}

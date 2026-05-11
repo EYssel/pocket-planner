@@ -46,6 +46,7 @@ async function init() {
       loadWeek,
       checkStaleTasks
     });
+    await modals.initReleaseNotes();
 
     (document as any).fonts.ready.then(() => {
       document.querySelectorAll('.task-edit').forEach(ta => ui.autoResize(ta as HTMLTextAreaElement));

@@ -1,6 +1,7 @@
 'use strict';
 
 import { app } from 'electron';
+import * as path from 'path';
 import Store from 'electron-store';
 import { Task, SettingOptions } from './types';
 
@@ -18,16 +19,29 @@ const DEFAULT_SETTINGS: SettingOptions = {
   workEnd: 18,
   theme: 'dark',
   doneTasksCollapsed: true,
+  lastRunVersion: '0.0.0',
 };
 
-export const store = new Store<Schema>({
-  name: isDev ? 'config-dev' : 'config',
-  defaults: {
-    settings: DEFAULT_SETTINGS,
-    days: {},
-    recycleBin: [],
-  },
-});
+// We explicitly calculate the path to avoid initialization order issues in main.ts
+const getStoreOptions = () => {
+  const options: any = {
+    name: isDev ? 'config-dev' : 'config',
+    defaults: {
+      settings: DEFAULT_SETTINGS,
+      days: {},
+      recycleBin: [],
+    },
+  };
+
+  if (isDev && app) {
+    const userDataPath = path.join(app.getPath('appData'), 'Weekly Planner Dev');
+    options.cwd = userDataPath;
+  }
+
+  return options;
+};
+
+export const store = new Store<Schema>(getStoreOptions());
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 

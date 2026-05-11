@@ -2,24 +2,9 @@
 
 import { app } from 'electron';
 import * as path from 'path';
-import { createWindow, initSingleInstance } from './src/window';
-import { createTray, init as initTray } from './src/tray';
-import { init as initNotifications, reschedule } from './src/notifications';
-import { registerHandlers } from './src/ipc';
-import { initUpdater } from './src/updater';
-import { store } from './src/store';
-import { runMigrations } from './src/migrations';
-
-import { initMenu } from './src/menu';
-
-// Declare global isQuitting (also handled in window.ts, but let's be safe)
-declare global {
-  var isQuitting: boolean;
-}
-
-global.isQuitting = false;
 
 // If in development, isolate the app data and name to allow running alongside production
+// This MUST run before any other project imports that might initialize the store
 if (!app.isPackaged) {
   const devName = 'Weekly Planner Dev';
   app.setName(devName);
@@ -29,6 +14,16 @@ if (!app.isPackaged) {
 } else {
   app.setAppUserModelId('Weekly Planner');
 }
+
+import { createWindow, initSingleInstance } from './src/window';
+import { createTray, init as initTray } from './src/tray';
+import { init as initNotifications, reschedule } from './src/notifications';
+import { registerHandlers } from './src/ipc';
+import { initUpdater } from './src/updater';
+import { store } from './src/store';
+import { runMigrations } from './src/migrations';
+
+import { initMenu } from './src/menu';
 
 // Bail out immediately if another instance is already running
 if (!initSingleInstance()) {

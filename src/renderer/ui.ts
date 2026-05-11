@@ -42,6 +42,10 @@ export const summaryContent = document.getElementById('summary-content') as HTML
 export const closeSummary   = document.getElementById('close-summary') as HTMLElement;
 export const copySummaryBtn = document.getElementById('copy-summary-btn') as HTMLButtonElement;
 
+export const releaseNotesOverlay = document.getElementById('release-notes-overlay') as HTMLElement;
+export const releaseNotesContent = document.getElementById('release-notes-content') as HTMLElement;
+export const closeReleaseNotes   = document.getElementById('close-release-notes') as HTMLElement;
+
 export const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;
 export const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
 export const workStartInput  = document.getElementById('work-start') as HTMLInputElement;

@@ -1,6 +1,8 @@
 'use strict';
 
 import { ipcMain, app, clipboard } from 'electron';
+import * as fs from 'fs';
+import * as path from 'path';
 import { autoUpdater } from 'electron-updater';
 import { 
   getPlans, 
@@ -109,5 +111,36 @@ export function registerHandlers(): void {
   ipcMain.handle('copy-to-clipboard', (_: any, text: string) => {
     clipboard.writeText(text);
     return true;
+  });
+
+  ipcMain.handle('get-release-notes', () => {
+    try {
+      const changelogPath = path.join(app.getAppPath(), 'CHANGELOG.md');
+      if (!fs.existsSync(changelogPath)) return '';
+      
+      const content = fs.readFileSync(changelogPath, 'utf8');
+      const version = app.getVersion();
+      
+      // Look for the header: ### [version] or ### version
+      const escapedVersion = version.replace(/\./g, '\\.');
+      const headerRegex = new RegExp(`### \\[?${escapedVersion}\\]?`, 'i');
+      const match = content.match(headerRegex);
+      
+      if (!match || match.index === undefined) return '';
+      
+      const startIndex = match.index;
+      // Find the next header or end of file
+      const rest = content.slice(startIndex + match[0].length);
+      const nextHeaderMatch = rest.match(/### \[?\d+\.\d+\.\d+\]?/);
+      
+      const notes = nextHeaderMatch 
+        ? rest.slice(0, nextHeaderMatch.index).trim()
+        : rest.trim();
+        
+      return notes;
+    } catch (err) {
+      console.error('Failed to read release notes:', err);
+      return '';
+    }
   });
 }
