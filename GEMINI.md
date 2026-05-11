@@ -9,6 +9,11 @@ A minimal Electron-based desktop application for weekly task planning and daily 
 - **Renderer Process (`src/renderer/`):** Modular ESM-based front-end. `state.ts` is the single source of truth.
 - **Styles (`styles.css`):** Centralized CSS for all themes and layout.
 
+## Naming Conventions
+
+- **System/Data Identifier:** `weekly-planner` (Production) and `weekly-planner-dev` (Development). These are used for package identifiers and application data folders in `%APPDATA%`.
+- **UI Display Name:** `Weekly Planner`. Used for window titles, logos, and user-facing text.
+
 ## Development Mandates
 
 ### 1. State-First Rendering
@@ -31,8 +36,8 @@ A minimal Electron-based desktop application for weekly task planning and daily 
 
 ### Application Data
 The app uses isolated data directories to prevent development from affecting production:
-- **Development:** `%APPDATA%\Weekly Planner Dev\` (File: `config-dev.json`)
-- **Production:** `%APPDATA%\Weekly Planner\` (File: `config.json`)
+- **Development:** `%APPDATA%\weekly-planner-dev\` (File: `config-dev.json`)
+- **Production:** `%APPDATA%\weekly-planner\` (File: `config.json`)
 
 *Note: If running scripts via `ts-node` without an Electron environment, `electron-store` may default to its own project-named folder unless `cwd` is explicitly provided.*
 

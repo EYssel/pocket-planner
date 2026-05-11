@@ -10,7 +10,7 @@ import { currentWeekKey, getPreviousWeekKey, weekDayKeys } from '../src/weekUtil
  */
 
 function getUserDataPath(): string {
-  const appName = 'weekly-planner';
+  const appName = 'weekly-planner-dev';
   const home = process.env.HOME || process.env.USERPROFILE || '';
   
   switch (process.platform) {

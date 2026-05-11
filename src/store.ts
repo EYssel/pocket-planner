@@ -34,7 +34,7 @@ const getStoreOptions = () => {
   };
 
   if (isDev && app) {
-    const userDataPath = path.join(app.getPath('appData'), 'Weekly Planner Dev');
+    const userDataPath = path.join(app.getPath('appData'), 'weekly-planner-dev');
     options.cwd = userDataPath;
   }
 

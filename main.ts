@@ -6,7 +6,7 @@ import * as path from 'path';
 // If in development, isolate the app data and name to allow running alongside production
 // This MUST run before any other project imports that might initialize the store
 if (!app.isPackaged) {
-  const devName = 'Weekly Planner Dev';
+  const devName = 'weekly-planner-dev';
   app.setName(devName);
   const userDataPath = path.join(app.getPath('appData'), devName);
   app.setPath('userData', userDataPath);

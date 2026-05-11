@@ -115,29 +115,57 @@ export function registerHandlers(): void {
 
   ipcMain.handle('get-release-notes', () => {
     try {
-      const changelogPath = path.join(app.getAppPath(), 'CHANGELOG.md');
-      if (!fs.existsSync(changelogPath)) return '';
+      const possiblePaths = [
+        path.join(app.getAppPath(), 'CHANGELOG.md'),
+        path.join(path.dirname(app.getPath('exe')), 'CHANGELOG.md'),
+        path.join(path.dirname(app.getPath('exe')), 'resources', 'CHANGELOG.md'),
+        path.join(path.dirname(app.getPath('exe')), 'resources', 'app', 'CHANGELOG.md'),
+      ];
+
+      let changelogPath = '';
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+          changelogPath = p;
+          break;
+        }
+      }
+
+      if (!changelogPath) return '';
       
       const content = fs.readFileSync(changelogPath, 'utf8');
       const version = app.getVersion();
       
-      // Look for the header: ## [version] or ## version (standard-version uses ##)
+      // Look for the header containing the version
       const escapedVersion = version.replace(/\./g, '\\.');
-      const headerRegex = new RegExp(`^## \\[?${escapedVersion}\\]?`, 'im');
+      const headerRegex = new RegExp(`#+ .*${escapedVersion}.*`, 'i');
       const match = content.match(headerRegex);
       
       if (!match || match.index === undefined) return '';
       
       const startIndex = match.index;
-      // Find the next version header or end of file
       const rest = content.slice(startIndex + match[0].length);
-      const nextHeaderMatch = rest.match(/^## \[?\d+\.\d+\.\d+\]?/m);
+      // Find the next version header
+      const nextHeaderMatch = rest.match(/#+ .*\d+\.\d+\.\d+.*/);
       
       const notes = nextHeaderMatch 
         ? rest.slice(0, nextHeaderMatch.index).trim()
         : rest.trim();
-        
-      return notes;
+      
+      const filteredNotes: string[] = [];
+      
+      // Extract "Features"
+      const featuresMatch = notes.match(/#+ Features([\s\S]*?)(?=#+ |$)/i);
+      if (featuresMatch && featuresMatch[1].trim()) {
+        filteredNotes.push(`### Features\n${featuresMatch[1].trim()}`);
+      }
+
+      // Extract "Bug Fixes"
+      const fixesMatch = notes.match(/#+ Bug Fixes([\s\S]*?)(?=#+ |$)/i);
+      if (fixesMatch && fixesMatch[1].trim()) {
+        filteredNotes.push(`### Bug Fixes\n${fixesMatch[1].trim()}`);
+      }
+      
+      return filteredNotes.join('\n\n');
     } catch (err) {
       console.error('Failed to read release notes:', err);
       return '';
