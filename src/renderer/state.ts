@@ -170,7 +170,12 @@ export function moveTask(
     const [task] = sourceDay.plans.splice(sourceIndex, 1);
     if (isDone !== undefined) task.done = isDone;
     
-    const actualTargetIndex = Math.min(Math.max(0, targetIndex), targetDay.plans.length);
+    let actualTargetIndex = targetIndex;
+    if (sourceDayKey === targetDayKey && sourceIndex < targetIndex) {
+      actualTargetIndex--;
+    }
+
+    actualTargetIndex = Math.min(Math.max(0, actualTargetIndex), targetDay.plans.length);
     targetDay.plans.splice(actualTargetIndex, 0, task);
     
     notifyChange(sourceDayKey);

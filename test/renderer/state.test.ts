@@ -90,6 +90,31 @@ describe('Renderer State Logic', () => {
     expect(state.weekData!.days[1].plans[0]).toEqual({ text: 'Task 1', done: true });
   });
 
+  test('moveTask handles same-day movement correctly (moving forward)', () => {
+    // Initial: [Task 1 (not done), Task 2 (done)]
+    // Move Task 1 (0) before Task 2 (1) -> should stay [Task 1, Task 2]
+    state.moveTask('2026-05-04', 0, '2026-05-04', 1);
+    expect(state.weekData!.days[0].plans[0].text).toBe('Task 1');
+    expect(state.weekData!.days[0].plans[1].text).toBe('Task 2');
+
+    // Add another task: [Task 1, Task 2, Task 3]
+    state.weekData!.days[0].plans.push({ text: 'Task 3', done: false });
+    // Move Task 1 (0) to after Task 2 (1) but before Task 3 (2). 
+    // Target index is 2 (index of Task 3).
+    state.moveTask('2026-05-04', 0, '2026-05-04', 2);
+    expect(state.weekData!.days[0].plans[0].text).toBe('Task 2');
+    expect(state.weekData!.days[0].plans[1].text).toBe('Task 1');
+    expect(state.weekData!.days[0].plans[2].text).toBe('Task 3');
+  });
+
+  test('moveTask handles same-day movement correctly (moving backward)', () => {
+    // Initial: [Task 1, Task 2]
+    // Move Task 2 (1) to before Task 1 (0)
+    state.moveTask('2026-05-04', 1, '2026-05-04', 0);
+    expect(state.weekData!.days[0].plans[0].text).toBe('Task 2');
+    expect(state.weekData!.days[0].plans[1].text).toBe('Task 1');
+  });
+
   test('saveDay sends filtered plans to the backend', async () => {
     state.addTask('2026-05-04'); // Adds an empty task
     await state.saveDay('2026-05-04');

@@ -121,17 +121,17 @@ export function registerHandlers(): void {
       const content = fs.readFileSync(changelogPath, 'utf8');
       const version = app.getVersion();
       
-      // Look for the header: ### [version] or ### version
+      // Look for the header: ## [version] or ## version (standard-version uses ##)
       const escapedVersion = version.replace(/\./g, '\\.');
-      const headerRegex = new RegExp(`### \\[?${escapedVersion}\\]?`, 'i');
+      const headerRegex = new RegExp(`^## \\[?${escapedVersion}\\]?`, 'im');
       const match = content.match(headerRegex);
       
       if (!match || match.index === undefined) return '';
       
       const startIndex = match.index;
-      // Find the next header or end of file
+      // Find the next version header or end of file
       const rest = content.slice(startIndex + match[0].length);
-      const nextHeaderMatch = rest.match(/### \[?\d+\.\d+\.\d+\]?/);
+      const nextHeaderMatch = rest.match(/^## \[?\d+\.\d+\.\d+\]?/m);
       
       const notes = nextHeaderMatch 
         ? rest.slice(0, nextHeaderMatch.index).trim()
