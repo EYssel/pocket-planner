@@ -46,6 +46,12 @@ export const releaseNotesOverlay = document.getElementById('release-notes-overla
 export const releaseNotesContent = document.getElementById('release-notes-content') as HTMLElement;
 export const closeReleaseNotes   = document.getElementById('close-release-notes') as HTMLElement;
 
+export const releaseNotesBanner = document.getElementById('release-notes-banner') as HTMLElement;
+export const bannerVersion      = document.getElementById('banner-version') as HTMLElement;
+export const viewReleaseNotesBtn = document.getElementById('view-release-notes-btn') as HTMLButtonElement;
+export const dismissReleaseNotesBtn = document.getElementById('dismiss-release-notes-btn') as HTMLButtonElement;
+export const settingsVersionBtn = document.getElementById('settings-version-btn') as HTMLButtonElement;
+
 export const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;
 export const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
 export const workStartInput  = document.getElementById('work-start') as HTMLInputElement;

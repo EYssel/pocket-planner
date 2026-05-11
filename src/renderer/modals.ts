@@ -132,14 +132,40 @@ export async function initReleaseNotes() {
   const { version } = await window.planner.getAppInfo();
   const lastVersion = await window.planner.getSetting('lastRunVersion');
 
+  // Setup settings version button as an on-demand link
+  if (ui.settingsVersionBtn) {
+    ui.settingsVersionBtn.textContent = `v${version} — What's New?`;
+    ui.settingsVersionBtn.addEventListener('click', async () => {
+      ui.settingsOverlay.classList.remove('show');
+      const notes = await window.planner.getReleaseNotes();
+      if (notes) {
+        ui.releaseNotesContent.innerHTML = parseMarkdown(notes);
+        ui.releaseNotesOverlay.classList.add('show');
+      }
+    });
+  }
+
+  // Show banner on startup if version has changed
   if (version !== lastVersion) {
+    if (ui.releaseNotesBanner) {
+      ui.bannerVersion.textContent = `v${version}`;
+      ui.releaseNotesBanner.classList.add('show');
+    }
+    await window.planner.setSetting('lastRunVersion', version);
+  }
+
+  ui.viewReleaseNotesBtn.addEventListener('click', async () => {
+    ui.releaseNotesBanner.classList.remove('show');
     const notes = await window.planner.getReleaseNotes();
     if (notes) {
       ui.releaseNotesContent.innerHTML = parseMarkdown(notes);
       ui.releaseNotesOverlay.classList.add('show');
     }
-    await window.planner.setSetting('lastRunVersion', version);
-  }
+  });
+
+  ui.dismissReleaseNotesBtn.addEventListener('click', () => {
+    ui.releaseNotesBanner.classList.remove('show');
+  });
 
   ui.closeReleaseNotes.addEventListener('click', () => {
     ui.releaseNotesOverlay.classList.remove('show');

@@ -48,6 +48,13 @@
     <button class="banner-btn secondary" id="close-banner">Dismiss</button>
   </div>
 </div>
+<div class="banner" id="release-notes-banner">
+  <div class="banner-text"><strong>Update Installed</strong> Weekly Planner is now running <span id="banner-version"></span>.</div>
+  <div class="banner-btns">
+    <button class="banner-btn" id="view-release-notes-btn">What's New</button>
+    <button class="banner-btn secondary" id="dismiss-release-notes-btn">Dismiss</button>
+  </div>
+</div>
 <div class="grid" id="week-grid"></div>
 <div class="modal-overlay" id="cleanup-overlay"><div class="modal"><div class="modal-header"><div class="modal-title">Weekly Cleanup</div></div><div class="modal-body" id="cleanup-list"></div><div class="modal-footer"><button class="banner-btn secondary" id="close-cleanup">Close</button></div></div></div>
 <div class="modal-overlay" id="recycle-bin-overlay"><div class="modal"><div class="modal-header"><div class="modal-title">Recycle Bin</div></div><div class="modal-body" id="recycle-bin-list"></div><div class="modal-footer"><button class="banner-btn secondary" id="clear-bin-btn">Clear All</button><button class="banner-btn secondary" id="close-recycle-bin">Close</button></div></div></div>
@@ -58,7 +65,7 @@
     <span>Collapse Done Tasks by Default</span>
   </label>
 </div>
-<div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div></div></div><div class="modal-footer"><span id="settings-version" style="font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-right: auto;">v0.0.0</span><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
+<div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div></div></div><div class="modal-footer"><button id="settings-version-btn" style="background:none; border:none; padding:0; cursor:pointer; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-right: auto; transition: color 0.15s;" title="View Release Notes" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">v0.0.0</button><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
 
 <div class="modal-overlay" id="summary-overlay">
   <div class="modal">
