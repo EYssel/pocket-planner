@@ -41,6 +41,14 @@ export function setDefaultDoneCollapsed(val: boolean) {
   defaultDoneCollapsed = val;
 }
 
+export function maintainInvariant(day: any) {
+  if (!day || !day.plans) return;
+  day.plans = [
+    ...day.plans.filter((p: Plan) => !p.done),
+    ...day.plans.filter((p: Plan) => p.done)
+  ];
+}
+
 export async function loadWeek(
   key: string, 
   skipStaleCheck = false, 
@@ -53,6 +61,11 @@ export async function loadWeek(
   currentWeekKey = key;
   weekData = await window.planner.getWeek(key);
   if (!weekData) throw new Error('No week data returned from backend');
+
+  // Ensure active tasks are before done tasks on load
+  if (weekData.days) {
+    weekData.days.forEach(d => maintainInvariant(d));
+  }
   
   const isToday = (key === await window.planner.currentWeekKey());
   uiCallbacks.updateLabels(weekData, isToday);
@@ -126,7 +139,22 @@ export async function saveDay(
 export function addTask(dayKey: string): void {
   const day = weekData?.days?.find(d => d.key === dayKey);
   if (day) {
-    day.plans.push({ text: '', done: false });
+    const firstDoneIndex = day.plans.findIndex(p => p.done);
+    const newTask = { text: '', done: false };
+    if (firstDoneIndex === -1) {
+      day.plans.push(newTask);
+    } else {
+      day.plans.splice(firstDoneIndex, 0, newTask);
+    }
+    notifyChange(dayKey);
+  }
+}
+
+export function importTask(dayKey: string, task: Plan): void {
+  const day = weekData?.days?.find(d => d.key === dayKey);
+  if (day) {
+    day.plans.push(task);
+    maintainInvariant(day);
     notifyChange(dayKey);
   }
 }
@@ -135,6 +163,7 @@ export function updateTask(dayKey: string, index: number, text: string): void {
   const day = weekData?.days?.find(d => d.key === dayKey);
   if (day && day.plans[index]) {
     day.plans[index].text = text;
+    // No notifyChange here to avoid re-rendering while typing
   }
 }
 
@@ -142,6 +171,7 @@ export function toggleTask(dayKey: string, index: number): void {
   const day = weekData?.days?.find(d => d.key === dayKey);
   if (day && day.plans[index]) {
     day.plans[index].done = !day.plans[index].done;
+    maintainInvariant(day);
     notifyChange(dayKey);
   }
 }
@@ -178,6 +208,9 @@ export function moveTask(
     actualTargetIndex = Math.min(Math.max(0, actualTargetIndex), targetDay.plans.length);
     targetDay.plans.splice(actualTargetIndex, 0, task);
     
+    maintainInvariant(targetDay);
+    if (sourceDayKey !== targetDayKey) maintainInvariant(sourceDay);
+
     notifyChange(sourceDayKey);
     if (sourceDayKey !== targetDayKey) notifyChange(targetDayKey);
   }

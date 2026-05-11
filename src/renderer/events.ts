@@ -36,9 +36,17 @@ export function setupEventListeners(callbacks: {
       const task = state.deleteTask(sourceDayKey, sourceIndex);
       
       if (task) {
-        const targetPlans = await state.getPlansForDay(targetDayKey);
-        targetPlans.push(task);
-        await window.planner.savePlans(targetDayKey, targetPlans);
+        // If the target is in the currently loaded week, use state.importTask
+        const targetInLoadedWeek = state.weekData?.days?.some(d => d.key === targetDayKey);
+        if (targetInLoadedWeek) {
+          state.importTask(targetDayKey, task);
+        } else {
+          // Otherwise, manual save (load plans, push, save)
+          const targetPlans = await state.getPlansForDay(targetDayKey);
+          targetPlans.push(task);
+          // Note: When that week is eventually loaded, loadWeek will maintainInvariant
+          await window.planner.savePlans(targetDayKey, targetPlans);
+        }
         await callbacks.saveDay(sourceDayKey);
       }
     });
