@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/EYssel/planner-app/compare/v1.2.0...v1.2.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* maintain active-before-done task invariant for reliable reordering ([26a9551](https://github.com/EYssel/planner-app/commit/26a955113e120a0621fb5a9ce9c873b5b8dd04cb))
+
 ## [1.2.0](https://github.com/EYssel/planner-app/compare/v1.1.1...v1.2.0) (2026-05-11)
 
 
