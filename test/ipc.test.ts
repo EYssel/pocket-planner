@@ -128,7 +128,7 @@ describe('ipc', () => {
       expect(store.savePlans).toHaveBeenCalledWith('2026-05-04', []);
     });
 
-    test('get-release-notes should return notes for current version', async () => {
+    test('get-release-notes should return features AND bug fixes for current version', async () => {
       (app.getVersion as jest.Mock).mockReturnValue('1.1.0');
       (fs.existsSync as jest.Mock).mockReturnValue(true);
       (fs.readFileSync as jest.Mock).mockReturnValue(`
@@ -136,16 +136,34 @@ describe('ipc', () => {
 ## [1.1.0] (2026-05-11)
 ### Features
 * new feature
-## [1.0.30]
 ### Bug Fixes
-* old bug
+* bug fix
+### Chores
+* some chore
+## [1.0.30]
       `);
 
       const result = await handlers['get-release-notes']({});
       expect(result).toContain('### Features');
       expect(result).toContain('* new feature');
-      expect(result).not.toContain('## [1.0.30]');
-      expect(result).not.toContain('* old bug');
+      expect(result).toContain('### Bug Fixes');
+      expect(result).toContain('* bug fix');
+      expect(result).not.toContain('### Chores');
+      expect(result).not.toContain('some chore');
+    });
+
+    test('get-release-notes should return empty if neither Features nor Bug Fixes exist', async () => {
+      (app.getVersion as jest.Mock).mockReturnValue('1.1.1');
+      (fs.existsSync as jest.Mock).mockReturnValue(true);
+      (fs.readFileSync as jest.Mock).mockReturnValue(`
+# Changelog
+### [1.1.1] (2026-05-11)
+### Chores
+* technical chore
+      `);
+
+      const result = await handlers['get-release-notes']({});
+      expect(result).toBe('');
     });
 
     test('get-release-notes should return empty if version not found', async () => {

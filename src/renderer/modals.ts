@@ -136,11 +136,17 @@ export async function initReleaseNotes() {
   if (ui.settingsVersionBtn) {
     ui.settingsVersionBtn.textContent = `v${version} — What's New?`;
     ui.settingsVersionBtn.addEventListener('click', async () => {
-      ui.settingsOverlay.classList.remove('show');
-      const notes = await window.planner.getReleaseNotes();
-      if (notes) {
-        ui.releaseNotesContent.innerHTML = parseMarkdown(notes);
+      try {
+        ui.settingsOverlay.classList.remove('show');
+        const notes = await window.planner.getReleaseNotes();
+        
+        ui.releaseNotesContent.innerHTML = notes 
+          ? parseMarkdown(notes) 
+          : '<div style="padding: 20px; text-align: center; color: var(--muted);">No release notes found for this version.</div>';
+        
         ui.releaseNotesOverlay.classList.add('show');
+      } catch (err) {
+        console.error('Failed to open release notes:', err);
       }
     });
   }
@@ -155,11 +161,17 @@ export async function initReleaseNotes() {
   }
 
   ui.viewReleaseNotesBtn.addEventListener('click', async () => {
-    ui.releaseNotesBanner.classList.remove('show');
-    const notes = await window.planner.getReleaseNotes();
-    if (notes) {
-      ui.releaseNotesContent.innerHTML = parseMarkdown(notes);
+    try {
+      ui.releaseNotesBanner.classList.remove('show');
+      const notes = await window.planner.getReleaseNotes();
+      
+      ui.releaseNotesContent.innerHTML = notes 
+        ? parseMarkdown(notes) 
+        : '<div style="padding: 20px; text-align: center; color: var(--muted);">No release notes found for this version.</div>';
+      
       ui.releaseNotesOverlay.classList.add('show');
+    } catch (err) {
+      console.error('Failed to open release notes:', err);
     }
   });
 
