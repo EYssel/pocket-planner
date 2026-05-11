@@ -115,8 +115,22 @@ export function registerHandlers(): void {
 
   ipcMain.handle('get-release-notes', () => {
     try {
-      const changelogPath = path.join(app.getAppPath(), 'CHANGELOG.md');
-      if (!fs.existsSync(changelogPath)) return '';
+      const possiblePaths = [
+        path.join(app.getAppPath(), 'CHANGELOG.md'),
+        path.join(path.dirname(app.getPath('exe')), 'CHANGELOG.md'),
+        path.join(path.dirname(app.getPath('exe')), 'resources', 'CHANGELOG.md'),
+        path.join(path.dirname(app.getPath('exe')), 'resources', 'app', 'CHANGELOG.md'),
+      ];
+
+      let changelogPath = '';
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+          changelogPath = p;
+          break;
+        }
+      }
+
+      if (!changelogPath) return '';
       
       const content = fs.readFileSync(changelogPath, 'utf8');
       const version = app.getVersion();
