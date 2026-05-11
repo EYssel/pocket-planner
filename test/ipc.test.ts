@@ -23,7 +23,10 @@ jest.mock('electron', () => ({
   app: {
     getName: jest.fn().mockReturnValue('Weekly Planner'),
     getVersion: jest.fn().mockReturnValue('1.1.0'),
-    getPath: jest.fn().mockReturnValue(''),
+    getPath: jest.fn().mockImplementation((name) => {
+      if (name === 'exe') return '/mock/app/Weekly Planner.exe';
+      return '';
+    }),
     getAppPath: jest.fn().mockReturnValue('/mock/app/path'),
     isPackaged: true,
   },
