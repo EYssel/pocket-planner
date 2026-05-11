@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/EYssel/planner-app/compare/v1.1.0...v1.1.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* changelog ui rendering ([3c0a302](https://github.com/EYssel/planner-app/commit/3c0a3024edc5aa254e1945e6634b802867eb8ca1))
+* state issue when moving tasks to the bottom of the list ([aaeeeae](https://github.com/EYssel/planner-app/commit/aaeeeaeb755782e611d9a697e8758cd741482b01))
+
+
+### Chores
+
+* remove unneeded test script ([c5af9d5](https://github.com/EYssel/planner-app/commit/c5af9d52bd5f9354ef595b56e6f812d9da853d6a))
+
 ## [1.1.0](https://github.com/EYssel/planner-app/compare/v1.0.30...v1.1.0) (2026-05-11)
 
 
