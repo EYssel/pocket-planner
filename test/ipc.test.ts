@@ -1,11 +1,20 @@
 'use strict';
 
-import { ipcMain, app } from 'electron';
+import { ipcMain, app, clipboard } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import * as fs from 'fs';
+import * as path from 'path';
 import * as store from '../src/store';
 import * as weekUtils from '../src/weekUtils';
 import { registerHandlers } from '../src/ipc';
 
+jest.mock('fs');
+jest.mock('electron-store', () => {
+  return jest.fn().mockImplementation(() => ({
+    get: jest.fn(),
+    set: jest.fn(),
+  }));
+});
 jest.mock('electron', () => ({
   ipcMain: {
     handle: jest.fn(),
@@ -13,9 +22,13 @@ jest.mock('electron', () => ({
   },
   app: {
     getName: jest.fn().mockReturnValue('Weekly Planner'),
-    getVersion: jest.fn().mockReturnValue('1.0.0'),
+    getVersion: jest.fn().mockReturnValue('1.1.0'),
     getPath: jest.fn().mockReturnValue(''),
+    getAppPath: jest.fn().mockReturnValue('/mock/app/path'),
     isPackaged: true,
+  },
+  clipboard: {
+    writeText: jest.fn(),
   }
 }));
 
@@ -65,7 +78,7 @@ describe('ipc', () => {
 
     test('get-app-info should return app name and version', async () => {
       const result = await handlers['get-app-info']({});
-      expect(result).toEqual({ name: 'Weekly Planner', version: '1.0.0' });
+      expect(result).toEqual({ name: 'Weekly Planner', version: '1.1.0' });
     });
 
     test('install-update should call autoUpdater.quitAndInstall and set isQuitting', async () => {
@@ -110,6 +123,41 @@ describe('ipc', () => {
       const result = await handlers['save-plans']({}, { dayKey: '2026-05-04', plans: [] });
       expect(result).toBe(true);
       expect(store.savePlans).toHaveBeenCalledWith('2026-05-04', []);
+    });
+
+    test('get-release-notes should return notes for current version', async () => {
+      (app.getVersion as jest.Mock).mockReturnValue('1.1.0');
+      (fs.existsSync as jest.Mock).mockReturnValue(true);
+      (fs.readFileSync as jest.Mock).mockReturnValue(`
+# Changelog
+## [1.1.0] (2026-05-11)
+### Features
+* new feature
+## [1.0.30]
+### Bug Fixes
+* old bug
+      `);
+
+      const result = await handlers['get-release-notes']({});
+      expect(result).toContain('### Features');
+      expect(result).toContain('* new feature');
+      expect(result).not.toContain('## [1.0.30]');
+      expect(result).not.toContain('* old bug');
+    });
+
+    test('get-release-notes should return empty if version not found', async () => {
+      (app.getVersion as jest.Mock).mockReturnValue('2.0.0');
+      (fs.existsSync as jest.Mock).mockReturnValue(true);
+      (fs.readFileSync as jest.Mock).mockReturnValue('## [1.1.0]');
+
+      const result = await handlers['get-release-notes']({});
+      expect(result).toBe('');
+    });
+
+    test('get-release-notes should return empty if file missing', async () => {
+      (fs.existsSync as jest.Mock).mockReturnValue(false);
+      const result = await handlers['get-release-notes']({});
+      expect(result).toBe('');
     });
   });
 });
