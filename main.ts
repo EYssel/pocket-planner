@@ -3,16 +3,21 @@
 import { app } from 'electron';
 import * as path from 'path';
 
-// If in development, isolate the app data and name to allow running alongside production
-// This MUST run before any other project imports that might initialize the store
+// Configure isolated names, data paths, and AppUserModelIDs
 if (!app.isPackaged) {
-  const devName = 'weekly-planner-dev';
+  const devName = 'Weekly Planner Dev';
+  const devFolder = 'weekly-planner-dev';
   app.setName(devName);
-  const userDataPath = path.join(app.getPath('appData'), devName);
+  const userDataPath = path.join(app.getPath('appData'), devFolder);
   app.setPath('userData', userDataPath);
   app.setAppUserModelId(devName);
 } else {
-  app.setAppUserModelId('Weekly Planner');
+  const prodName = 'Weekly Planner';
+  const prodFolder = 'weekly-planner';
+  app.setName(prodName);
+  const userDataPath = path.join(app.getPath('appData'), prodFolder);
+  app.setPath('userData', userDataPath);
+  app.setAppUserModelId(prodName);
 }
 
 import { createWindow, initSingleInstance } from './src/window';
