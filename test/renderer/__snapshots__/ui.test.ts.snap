@@ -246,6 +246,7 @@ exports[`Renderer UI Builders createDaySection renders a full day section with t
     <button
       class="add-task-btn"
       data-day="2026-05-04"
+      title="Add a new task"
     >
       + task
     </button>
@@ -392,6 +393,7 @@ exports[`Renderer UI Builders createDaySection renders an empty day correctly 1`
     <button
       class="add-task-btn"
       data-day="2026-05-05"
+      title="Add a new task"
     >
       + task
     </button>

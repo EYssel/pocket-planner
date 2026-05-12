@@ -133,6 +133,7 @@ export function createDaySection(day: DayData, defaultDoneCollapsed: boolean, ca
   addBtn.className = 'add-task-btn';
   addBtn.dataset.day = day.key;
   addBtn.textContent = '+ task';
+  addBtn.title = 'Add a new task';
   tasksEl.appendChild(addBtn);
 
   if (hasDoneTasks) {
