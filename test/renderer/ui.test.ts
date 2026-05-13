@@ -29,7 +29,7 @@ describe('Renderer UI Builders', () => {
 
   describe('buildTaskItem', () => {
     test('renders an active task correctly', () => {
-      const task: Plan = { text: 'Test Task', done: false };
+      const task: Plan = { text: 'Test Task', done: false, notes: 'Some note' };
       const item = ui.buildTaskItem('2026-05-04', task, 0, mockCallbacks);
       
       expect(item.className).toBe('task-item');
@@ -37,6 +37,7 @@ describe('Renderer UI Builders', () => {
       expect(item.dataset.index).toBe('0');
       expect(item.querySelector('.task-display')?.textContent).toBe('Test Task');
       expect(item.querySelector('.check-btn')?.textContent).toBe('');
+      expect(item.querySelector('.note-btn')?.classList.contains('has-notes')).toBe(true);
       
       expect(item).toMatchSnapshot();
     });
@@ -47,6 +48,7 @@ describe('Renderer UI Builders', () => {
       
       expect(item.className).toBe('task-item done');
       expect(item.querySelector('.check-btn')?.textContent).toBe('✓');
+      expect(item.querySelector('.note-btn')?.classList.contains('has-notes')).toBe(false);
       
       expect(item).toMatchSnapshot();
     });
@@ -57,6 +59,28 @@ describe('Renderer UI Builders', () => {
       
       expect(item.querySelector('.task-display')?.innerHTML).toContain('&lt;script&gt;');
       expect(item).toMatchSnapshot();
+    });
+  });
+
+  describe('renderMarkdown', () => {
+    test('converts markdown links to clickable anchors', () => {
+      const text = 'Check [Google](https://google.com)';
+      const html = ui.renderMarkdown(text);
+      expect(html).toContain('<a href="#" onclick="window.planner.openExternal(\'https://google.com\'); return false;">Google</a>');
+    });
+
+    test('converts plain URLs to clickable anchors', () => {
+      const text = 'Visit https://google.com for info';
+      const html = ui.renderMarkdown(text);
+      expect(html).toContain('<a href="#" onclick="window.planner.openExternal(\'https://google.com\'); return false;">https://google.com</a>');
+    });
+
+    test('handles mixed content and escaping', () => {
+      const text = '<b>Bold</b> and [Link](https://test.com) and https://auto.com';
+      const html = ui.renderMarkdown(text);
+      expect(html).toContain('&lt;b&gt;Bold&lt;/b&gt;');
+      expect(html).toContain('window.planner.openExternal(\'https://test.com\')');
+      expect(html).toContain('window.planner.openExternal(\'https://auto.com\')');
     });
   });
 

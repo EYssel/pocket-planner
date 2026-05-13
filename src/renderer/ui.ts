@@ -248,15 +248,23 @@ export function renderMarkdown(text: string): string {
   let html = escapeHtml(text);
 
   // Parse markdown links: [label](url)
+  // We use a temporary placeholder for the URL to avoid double-processing by the plain URL regex
+  const links: string[] = [];
   html = html.replace(/\[(.*?)\]\((.*?)\)/g, (match, label, url) => {
-    return `<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${label}</a>`;
+    const index = links.length;
+    links.push(`<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${label}</a>`);
+    return `__LINK_PLACEHOLDER_${index}__`;
   });
 
   // Parse plain URLs that aren't already part of a markdown link
-  // (Basic regex for http/https)
-  const urlRegex = /(?<!href=")(https?:\/\/[^\s<]+)/g;
+  const urlRegex = /(https?:\/\/[^\s<]+)/g;
   html = html.replace(urlRegex, (url) => {
     return `<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${url}</a>`;
+  });
+
+  // Restore placeholders
+  links.forEach((linkHtml, i) => {
+    html = html.replace(`__LINK_PLACEHOLDER_${i}__`, linkHtml);
   });
 
   return html;
