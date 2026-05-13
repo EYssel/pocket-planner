@@ -156,21 +156,13 @@ export function registerHandlers(): void {
         ? rest.slice(0, nextHeaderMatch.index).trim()
         : rest.trim();
       
-      const filteredNotes: string[] = [];
+      // Clean up the notes: remove commit links and redundant "What's New" headers
+      const cleanedNotes = notes
+        .replace(/\s*\(\[([a-f0-9]+)\]\(https:\/\/github\.com\/.*?\)\)/gi, '')
+        .replace(/#+ What's New( in Weekly Planner)?/gi, '')
+        .trim();
       
-      // Extract "Features"
-      const featuresMatch = notes.match(/#+ Features([\s\S]*?)(?=#+ |$)/i);
-      if (featuresMatch && featuresMatch[1].trim()) {
-        filteredNotes.push(`### Features\n${featuresMatch[1].trim()}`);
-      }
-
-      // Extract "Bug Fixes"
-      const fixesMatch = notes.match(/#+ Bug Fixes([\s\S]*?)(?=#+ |$)/i);
-      if (fixesMatch && fixesMatch[1].trim()) {
-        filteredNotes.push(`### Bug Fixes\n${fixesMatch[1].trim()}`);
-      }
-      
-      return filteredNotes.join('\n\n');
+      return cleanedNotes;
     } catch (err) {
       console.error('Failed to read release notes:', err);
       return '';
