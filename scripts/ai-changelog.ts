@@ -5,6 +5,7 @@ import path from 'path';
 
 const CHANGELOG_PATH = path.join(process.cwd(), 'CHANGELOG.md');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 
 async function summarizeChangelog() {
   if (!GEMINI_API_KEY) {
@@ -50,7 +51,7 @@ async function summarizeChangelog() {
     return;
   }
 
-  console.log('Summarizing release notes with Gemini...');
+  console.log(`Summarizing release notes with Gemini (${GEMINI_MODEL})...`);
 
   const prompt = `
 You are a technical writer for a developer tool called "Weekly Planner".
@@ -70,7 +71,7 @@ ${rawReleaseNotes}
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: {
