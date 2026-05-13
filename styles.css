@@ -215,11 +215,21 @@ body.dragging-active #next-week {
 .day-tasks::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
 .task-item {
-  display: grid; grid-template-columns: 20px 1fr 16px; align-items: start;
+  display: grid; grid-template-columns: 20px 1fr 20px 16px; align-items: start;
   gap: 6px; padding: 6px; border-radius: var(--radius); border: 1px solid transparent;
   animation: fadeIn 0.15s ease both; cursor: grab;
 }
 .task-item:active { cursor: grabbing; }
+
+.note-btn {
+  background: transparent; border: none; color: transparent; cursor: pointer;
+  margin-top: 2px; transition: color 0.1s;
+  display: flex; align-items: center; justify-content: center;
+}
+.task-item:hover .note-btn { color: var(--muted); }
+.note-btn.has-notes { color: var(--accent) !important; }
+.note-btn:hover { color: var(--accent) !important; }
+
 .task-item.dragging { opacity: 0.3; background: var(--surface2); border: 1px dashed var(--accent); }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -448,5 +458,25 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 }
 
 #release-notes-content a:hover {
+  border-bottom-style: solid;
+}
+
+.note-text {
+  font-size: 13px;
+  color: var(--text);
+  margin-top: 4px;
+  padding-left: 28px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.note-text a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent);
+}
+
+.note-text a:hover {
   border-bottom-style: solid;
 }

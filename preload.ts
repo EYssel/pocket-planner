@@ -38,4 +38,5 @@ contextBridge.exposeInMainWorld('planner', {
   onUpdateProgress: (cb: (percent: number) => void) => ipcRenderer.on('update-progress', (_: any, percent: number) => cb(percent)),
   installUpdate: () => ipcRenderer.invoke('install-update'),
   copyToClipboard: (text: string) => ipcRenderer.invoke('copy-to-clipboard', text),
+  openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
 });

@@ -42,6 +42,11 @@ export const summaryContent = document.getElementById('summary-content') as HTML
 export const closeSummary   = document.getElementById('close-summary') as HTMLElement;
 export const copySummaryBtn = document.getElementById('copy-summary-btn') as HTMLButtonElement;
 
+export const noteOverlay     = document.getElementById('note-overlay') as HTMLElement;
+export const taskNoteInput   = document.getElementById('task-note-input') as HTMLTextAreaElement;
+export const saveNoteBtn     = document.getElementById('save-note-btn') as HTMLButtonElement;
+export const closeNoteModal  = document.getElementById('close-note-modal') as HTMLButtonElement;
+
 export const releaseNotesOverlay = document.getElementById('release-notes-overlay') as HTMLElement;
 export const releaseNotesContent = document.getElementById('release-notes-content') as HTMLElement;
 export const closeReleaseNotes   = document.getElementById('close-release-notes') as HTMLElement;
@@ -160,6 +165,9 @@ export function buildTaskItem(dayKey: string, task: Plan, index: number, callbac
       <div class="task-display" title="${escapeHtml(task.text)}">${escapeHtml(task.text)}</div>
       <textarea class="task-edit" placeholder="Task…" rows="1">${escapeHtml(task.text)}</textarea>
     </div>
+    <button class="note-btn ${task.notes ? 'has-notes' : ''}" title="Task Notes">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    </button>
     <button class="del-btn" title="Delete">×</button>
   `;
 
@@ -226,5 +234,30 @@ export function updatePips(dayKey: string, plans: Plan[], container?: HTMLElemen
 
 export function escapeHtml(str: string) {
   if (!str) return '';
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return str.replace(/&/g,'&amp;')
+            .replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;')
+            .replace(/'/g,'&#39;');
+}
+
+export function renderMarkdown(text: string): string {
+  if (!text) return '';
+  
+  // First, escape HTML to prevent XSS
+  let html = escapeHtml(text);
+
+  // Parse markdown links: [label](url)
+  html = html.replace(/\[(.*?)\]\((.*?)\)/g, (match, label, url) => {
+    return `<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${label}</a>`;
+  });
+
+  // Parse plain URLs that aren't already part of a markdown link
+  // (Basic regex for http/https)
+  const urlRegex = /(?<!href=")(https?:\/\/[^\s<]+)/g;
+  html = html.replace(urlRegex, (url) => {
+    return `<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${url}</a>`;
+  });
+
+  return html;
 }

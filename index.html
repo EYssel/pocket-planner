@@ -80,14 +80,17 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="release-notes-overlay">
+<div class="modal-overlay" id="note-overlay">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">What's New</div>
+      <div class="modal-title">Task Notes</div>
     </div>
-    <div class="modal-body" id="release-notes-content"></div>
+    <div class="modal-body">
+      <textarea id="task-note-input" class="settings-input" style="height: 200px; resize: vertical;" placeholder="Add details, links, or follow-ups..."></textarea>
+    </div>
     <div class="modal-footer">
-      <button class="banner-btn secondary" id="close-release-notes">Close</button>
+      <button class="banner-btn" id="save-note-btn">Save Notes</button>
+      <button class="banner-btn secondary" id="close-note-modal">Cancel</button>
     </div>
   </div>
 </div>

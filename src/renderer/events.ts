@@ -63,6 +63,9 @@ export function setupEventListeners(callbacks: {
     callbacks.loadWeek(state.currentWeekKey!);
   });
 
+  let activeNoteDayKey: string | null = null;
+  let activeNoteIndex: number | null = null;
+
   ui.grid?.addEventListener('click', async (e: MouseEvent) => {
     const target = e.target as HTMLElement;
     const doneHeader = target.closest('.done-header');
@@ -80,6 +83,7 @@ export function setupEventListeners(callbacks: {
       const index = parseInt(item.dataset.index!, 10);
       const checkBtn = target.closest('.check-btn');
       const delBtn = target.closest('.del-btn');
+      const noteBtn = target.closest('.note-btn');
 
       if (checkBtn) {
         state.toggleTask(dayKey, index);
@@ -89,6 +93,15 @@ export function setupEventListeners(callbacks: {
         if (deleted) {
           await window.planner.addToRecycleBin({ ...deleted, dayKey });
           await callbacks.saveDay(dayKey);
+        }
+      } else if (noteBtn) {
+        const task = state.weekData?.days?.find(d => d.key === dayKey)?.plans[index];
+        if (task) {
+          activeNoteDayKey = dayKey;
+          activeNoteIndex = index;
+          ui.taskNoteInput.value = task.notes || '';
+          ui.noteOverlay.classList.add('show');
+          setTimeout(() => ui.taskNoteInput.focus(), 100);
         }
       }
     } else {
@@ -132,9 +145,19 @@ export function setupEventListeners(callbacks: {
     const todayPlans = await state.getPlansForDay(todayKey);
     const yesterdayPlans = await state.getPlansForDay(yesterdayKey);
 
-    const yesterdayDone = yesterdayPlans.filter(p => p.done && p.text.trim()).map(p => p.text.trim());
-    const yesterdayIncomplete = yesterdayPlans.filter(p => !p.done && p.text.trim()).map(p => p.text.trim());
-    const todayTodo = todayPlans.filter(p => p.text.trim()).map(p => p.text.trim());
+    const yesterdayDone = yesterdayPlans.filter(p => p.done && p.text.trim());
+    const yesterdayIncomplete = yesterdayPlans.filter(p => !p.done && p.text.trim());
+    const todayTodo = todayPlans.filter(p => p.text.trim());
+
+    const formatNotesHtml = (notes?: string) => {
+      if (!notes) return '';
+      return `<div class="note-text">${ui.renderMarkdown(notes)}</div>`;
+    };
+
+    const formatNotesPlain = (notes?: string) => {
+      if (!notes) return '';
+      return notes.split('\n').map(line => `    - ${line}`).join('\n');
+    };
 
     // Build HTML for the modal
     ui.summaryContent.innerHTML = `
@@ -142,10 +165,13 @@ export function setupEventListeners(callbacks: {
         <div class="summary-title">Yesterday (Completed)</div>
         <div class="summary-list">
           ${yesterdayDone.length > 0 
-            ? yesterdayDone.map(t => `
-                <div class="summary-item">
-                  <span class="summary-item-bullet">✓</span>
-                  <span>${ui.escapeHtml(t)}</span>
+            ? yesterdayDone.map(p => `
+                <div class="summary-item" style="flex-direction: column; gap: 0;">
+                  <div style="display: flex; gap: 12px;">
+                    <span class="summary-item-bullet">✓</span>
+                    <span>${ui.escapeHtml(p.text)}</span>
+                  </div>
+                  ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
             : '<div class="summary-empty">None recorded</div>'}
         </div>
@@ -154,10 +180,13 @@ export function setupEventListeners(callbacks: {
         <div class="summary-title">Yesterday (Incomplete)</div>
         <div class="summary-list">
           ${yesterdayIncomplete.length > 0 
-            ? yesterdayIncomplete.map(t => `
-                <div class="summary-item">
-                  <span class="summary-item-bullet">→</span>
-                  <span>${ui.escapeHtml(t)}</span>
+            ? yesterdayIncomplete.map(p => `
+                <div class="summary-item" style="flex-direction: column; gap: 0;">
+                  <div style="display: flex; gap: 12px;">
+                    <span class="summary-item-bullet">→</span>
+                    <span>${ui.escapeHtml(p.text)}</span>
+                  </div>
+                  ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
             : '<div class="summary-empty">None recorded</div>'}
         </div>
@@ -166,10 +195,13 @@ export function setupEventListeners(callbacks: {
         <div class="summary-title">Today (Planned)</div>
         <div class="summary-list">
           ${todayTodo.length > 0 
-            ? todayTodo.map(t => `
-                <div class="summary-item">
-                  <span class="summary-item-bullet">•</span>
-                  <span>${ui.escapeHtml(t)}</span>
+            ? todayTodo.map(p => `
+                <div class="summary-item" style="flex-direction: column; gap: 0;">
+                  <div style="display: flex; gap: 12px;">
+                    <span class="summary-item-bullet">•</span>
+                    <span>${ui.escapeHtml(p.text)}</span>
+                  </div>
+                  ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
             : '<div class="summary-empty">No tasks planned yet</div>'}
         </div>
@@ -178,11 +210,11 @@ export function setupEventListeners(callbacks: {
 
     // Build plain text for clipboard
     summaryPlainText = `**Yesterday:**\n` +
-      (yesterdayDone.length > 0 ? yesterdayDone.map(t => `- [DONE] ${t}`).join('\n') : '- No completed tasks') +
+      (yesterdayDone.length > 0 ? yesterdayDone.map(p => `- [DONE] ${p.text}${p.notes ? '\n' + formatNotesPlain(p.notes) : ''}`).join('\n') : '- No completed tasks') +
       `\n\n**Yesterday (Incomplete):**\n` +
-      (yesterdayIncomplete.length > 0 ? yesterdayIncomplete.map(t => `- [STILL PENDING] ${t}`).join('\n') : '- No incomplete tasks') +
+      (yesterdayIncomplete.length > 0 ? yesterdayIncomplete.map(p => `- [STILL PENDING] ${p.text}${p.notes ? '\n' + formatNotesPlain(p.notes) : ''}`).join('\n') : '- No incomplete tasks') +
       `\n\n**Today:**\n` +
-      (todayTodo.length > 0 ? todayTodo.map(t => `- ${t}`).join('\n') : '- No tasks planned');
+      (todayTodo.length > 0 ? todayTodo.map(p => `- ${p.text}${p.notes ? '\n' + formatNotesPlain(p.notes) : ''}`).join('\n') : '- No tasks planned');
 
     ui.summaryOverlay.classList.add('show');
   });
@@ -208,6 +240,23 @@ export function setupEventListeners(callbacks: {
   ui.recycleBinList?.addEventListener('click', (e: MouseEvent) => {
     const btn = (e.target as HTMLElement).closest('.action-btn') as HTMLButtonElement;
     if (btn) modals.handleBinAction(parseInt(btn.dataset.index!, 10), btn.dataset.action!, { loadWeek: callbacks.loadWeek });
+  });
+
+  ui.saveNoteBtn?.addEventListener('click', async () => {
+    if (activeNoteDayKey !== null && activeNoteIndex !== null) {
+      const newNotes = ui.taskNoteInput.value.trim();
+      state.updateTaskNotes(activeNoteDayKey, activeNoteIndex, newNotes);
+      await callbacks.saveDay(activeNoteDayKey);
+      ui.noteOverlay.classList.remove('show');
+      activeNoteDayKey = null;
+      activeNoteIndex = null;
+    }
+  });
+
+  ui.closeNoteModal?.addEventListener('click', () => {
+    ui.noteOverlay.classList.remove('show');
+    activeNoteDayKey = null;
+    activeNoteIndex = null;
   });
 
   ui.openSettings?.addEventListener('click',  () => ui.settingsOverlay.classList.add('show'));

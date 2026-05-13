@@ -1,6 +1,6 @@
 'use strict';
 
-import { ipcMain, app, clipboard } from 'electron';
+import { ipcMain, app, clipboard, shell } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import { autoUpdater } from 'electron-updater';
@@ -110,6 +110,11 @@ export function registerHandlers(): void {
 
   ipcMain.handle('copy-to-clipboard', (_: any, text: string) => {
     clipboard.writeText(text);
+    return true;
+  });
+
+  ipcMain.handle('open-external', async (_: any, url: string) => {
+    await shell.openExternal(url);
     return true;
   });
 

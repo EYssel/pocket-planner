@@ -41,6 +41,13 @@ The app uses isolated data directories to prevent development from affecting pro
 
 *Note: If running scripts via `ts-node` without an Electron environment, `electron-store` may default to its own project-named folder unless `cwd` is explicitly provided.*
 
+### 4. Task Notes & Persistence
+- **Structure:** Tasks support an optional `notes?: string` field.
+- **UX:** Access via an SVG icon in the task row. 
+    - **Visibility:** Icon is `transparent` by default, becomes visible on `:hover`, and stays visible (`var(--accent)`) if `notes` is non-empty.
+- **Persistence Mandate:** All backend saving logic (e.g., `src/store.ts`) MUST explicitly include the `notes` field during validation. Failure to do so will result in data loss during saves, restores, or cleanup actions.
+- **Summaries:** Notes must be included in the "Today's Summary" export, indented beneath the parent task.
+
 ## Workflows
 
 | Command | Action |
