@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/EYssel/planner-app/compare/v1.2.2...v1.3.0) (2026-05-13)
+
+
+### Features
+
+* ai-generated-changelogs ([4d7c1fa](https://github.com/EYssel/planner-app/commit/4d7c1fae71438c773b9e397e1ffa2cdadfb791bc))
+
 ### [1.2.2](https://github.com/EYssel/planner-app/compare/v1.2.1...v1.2.2) (2026-05-12)
 
 
