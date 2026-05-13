@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/EYssel/planner-app/compare/v1.3.0...v1.4.0) (2026-05-13)
+
+### What's New
+
+#### Features
+*   **macOS Support:** We're excited to announce that Weekly Planner is now available on macOS, bringing all your planning tools to your Mac!
+
 ### [1.3.1](https://github.com/EYssel/planner-app/compare/v1.3.0...v1.3.1) (2026-05-13)
 
 We're constantly working to improve Weekly Planner! This update includes important behind-the-scenes enhancements to boost performance and stability, ensuring a smoother planning experience.
