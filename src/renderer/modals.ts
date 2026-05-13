@@ -44,7 +44,7 @@ export async function handleCleanupAction(index: number, action: string, callbac
     if (action === 'carry') {
       const todayKey = await window.planner.currentDayKey();
       const todayPlans = await state.getPlansForDay(todayKey);
-      todayPlans.push({ text: task.text, done: false });
+      todayPlans.push({ text: task.text, done: false, notes: task.notes });
       await window.planner.savePlans(todayKey, todayPlans);
       
       const todayWeekKey = await window.planner.weekKeyFromDayKey(todayKey);
@@ -160,40 +160,54 @@ export async function initReleaseNotes() {
     await window.planner.setSetting('lastRunVersion', version);
   }
 
-  ui.viewReleaseNotesBtn.addEventListener('click', async () => {
+  ui.viewReleaseNotesBtn?.addEventListener('click', async () => {
     try {
-      ui.releaseNotesBanner.classList.remove('show');
+      ui.releaseNotesBanner?.classList.remove('show');
       const notes = await window.planner.getReleaseNotes();
       
-      ui.releaseNotesContent.innerHTML = notes 
-        ? parseMarkdown(notes) 
-        : '<div style="padding: 20px; text-align: center; color: var(--muted);">No release notes found for this version.</div>';
+      if (ui.releaseNotesContent) {
+        ui.releaseNotesContent.innerHTML = notes 
+          ? parseMarkdown(notes) 
+          : '<div style="padding: 20px; text-align: center; color: var(--muted);">No release notes found for this version.</div>';
+      }
       
-      ui.releaseNotesOverlay.classList.add('show');
+      ui.releaseNotesOverlay?.classList.add('show');
     } catch (err) {
       console.error('Failed to open release notes:', err);
     }
   });
 
-  ui.dismissReleaseNotesBtn.addEventListener('click', () => {
-    ui.releaseNotesBanner.classList.remove('show');
+  ui.dismissReleaseNotesBtn?.addEventListener('click', () => {
+    ui.releaseNotesBanner?.classList.remove('show');
   });
 
-  ui.closeReleaseNotes.addEventListener('click', () => {
-    ui.releaseNotesOverlay.classList.remove('show');
+  ui.closeReleaseNotes?.addEventListener('click', () => {
+    ui.releaseNotesOverlay?.classList.remove('show');
   });
 }
 
 function parseMarkdown(md: string): string {
-  return md
+  let html = ui.escapeHtml(md)
     .replace(/^### (.*$)/gim, '<h3>$1</h3>')
     .replace(/^## (.*$)/gim, '<h2>$1</h2>')
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
     .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
     .replace(/<\/ul>\n<ul>/gim, '')
     .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-    .replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="#" style="color: var(--accent);">$1</a>')
     .replace(/\n/gim, '<br>');
+
+  // Handle links specifically to use openExternal
+  html = html.replace(/\[(.*?)\]\((.*?)\)/gim, (match, label, url) => {
+    return `<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${label}</a>`;
+  });
+
+  // Plain URLs
+  const urlRegex = /(?<!href=")(https?:\/\/[^\s<]+)/g;
+  html = html.replace(urlRegex, (url) => {
+    return `<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${url}</a>`;
+  });
+
+  return html;
 }
 
 export async function initSettings(callbacks: { loadWeek: (key: string) => Promise<void>, checkStaleTasks: () => Promise<void> }) {

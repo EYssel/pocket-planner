@@ -3,6 +3,7 @@
 export interface Task {
   text: string;
   done: boolean;
+  notes?: string;
 }
 
 export interface Day {
@@ -62,6 +63,7 @@ export interface PlannerAPI {
   onUpdateDownloaded: (cb: () => void) => void;
   installUpdate: () => void;
   copyToClipboard: (text: string) => Promise<void>;
+  openExternal: (url: string) => Promise<void>;
 }
 
 declare global {

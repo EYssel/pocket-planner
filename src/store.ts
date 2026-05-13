@@ -66,6 +66,7 @@ export function savePlans(dayKey: string, plans: Task[]): void {
   const validated: Task[] = plans.map(p => ({
     text: typeof p.text === 'string' ? p.text : '',
     done: typeof p.done === 'boolean' ? p.done : false,
+    notes: typeof p.notes === 'string' ? p.notes : undefined,
   }));
   store.set(`days.${dayKey}`, validated);
 }
@@ -90,9 +91,9 @@ export function restoreFromRecycleBin(index: number): void {
   const [task] = bin.splice(index, 1);
   if (!task) return;
 
-  const { dayKey, text, done } = task;
+  const { dayKey, text, done, notes } = task;
   const plans = getPlans(dayKey);
-  plans.push({ text, done });
+  plans.push({ text, done, notes });
   savePlans(dayKey, plans);
   store.set('recycleBin', bin);
 }

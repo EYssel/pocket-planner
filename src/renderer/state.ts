@@ -167,6 +167,14 @@ export function updateTask(dayKey: string, index: number, text: string): void {
   }
 }
 
+export function updateTaskNotes(dayKey: string, index: number, notes: string): void {
+  const day = weekData?.days?.find(d => d.key === dayKey);
+  if (day && day.plans[index]) {
+    day.plans[index].notes = notes;
+    notifyChange(dayKey);
+  }
+}
+
 export function toggleTask(dayKey: string, index: number): void {
   const day = weekData?.days?.find(d => d.key === dayKey);
   if (day && day.plans[index]) {
