@@ -24,7 +24,9 @@ async function summarizeChangelog() {
   let secondVersionIndex = -1;
 
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith('## ') || lines[i].startsWith('### ')) {
+    const line = lines[i];
+    // A version header starts with ## or ### and contains a date in (YYYY-MM-DD) format
+    if ((line.startsWith('## ') || line.startsWith('### ')) && /\(\d{4}-\d{2}-\d{2}\)/.test(line)) {
       if (firstVersionIndex === -1) {
         firstVersionIndex = i;
       } else {
