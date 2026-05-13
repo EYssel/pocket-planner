@@ -8,6 +8,7 @@ const mockStoreInstance = {
 jest.mock('electron', () => ({
   app: {
     isPackaged: false,
+    getPath: jest.fn().mockReturnValue('/mock/app-data'),
   },
 }));
 

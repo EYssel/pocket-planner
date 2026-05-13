@@ -9,6 +9,11 @@ A minimal Electron-based desktop application for weekly task planning and daily 
 - **Renderer Process (`src/renderer/`):** Modular ESM-based front-end. `state.ts` is the single source of truth.
 - **Styles (`styles.css`):** Centralized CSS for all themes and layout.
 
+## Naming Conventions
+
+- **System/Data Identifier:** `weekly-planner` (Production) and `weekly-planner-dev` (Development). These are used for package identifiers and application data folders in `%APPDATA%`.
+- **UI Display Name:** `Weekly Planner`. Used for window titles, logos, and user-facing text.
+
 ## Development Mandates
 
 ### 1. State-First Rendering
@@ -19,12 +24,22 @@ A minimal Electron-based desktop application for weekly task planning and daily 
 ### 2. Testing & Verification
 - **Renderer Logic:** Run `npm test test/renderer/state.test.ts` when modifying data mutations.
 - **UI Consistency:** Run `npm test test/renderer/ui.test.ts` when modifying UI builder functions in `ui.ts`.
+- **Release Notes:** To verify the "What's New" modal, run `npx.cmd ts-node scripts/test-release-notes-ui.ts` before starting the app.
 - **Integrity:** Run `npm run type-check` before concluding any architectural change.
 
 ### 3. Coding Style
 - **Strict Mode:** Always use `'use strict';` at the top of TS files.
 - **Persistence Keys:** Weeks: `YYYY-Www` | Days: `YYYY-MM-DD`.
 - **Environment:** Use PowerShell with `.cmd` wrappers (e.g., `npm.cmd`) for all CLI tools.
+
+## Infrastructure & Storage
+
+### Application Data
+The app uses isolated data directories to prevent development from affecting production:
+- **Development:** `%APPDATA%\weekly-planner-dev\` (File: `config-dev.json`)
+- **Production:** `%APPDATA%\weekly-planner\` (File: `config.json`)
+
+*Note: If running scripts via `ts-node` without an Electron environment, `electron-store` may default to its own project-named folder unless `cwd` is explicitly provided.*
 
 ## Workflows
 

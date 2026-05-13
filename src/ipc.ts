@@ -1,6 +1,8 @@
 'use strict';
 
 import { ipcMain, app, clipboard } from 'electron';
+import * as fs from 'fs';
+import * as path from 'path';
 import { autoUpdater } from 'electron-updater';
 import { 
   getPlans, 
@@ -22,7 +24,10 @@ import {
   offsetWeekKey,
   currentDayKey,
   weekKeyFromDayKey,
-  getPreviousWorkingDayKey
+  getPreviousWorkingDayKey,
+  offsetDayKeyByWeeks,
+  getFirstDayOfWeek,
+  getLastDayOfWeek
 } from './weekUtils';
 import { Task, SettingOptions, WeekData } from './types';
 
@@ -58,6 +63,11 @@ export function registerHandlers(): void {
   ipcMain.handle('get-previous-working-day-key', (_: any, dayKey: string) => {
     return getPreviousWorkingDayKey(dayKey || currentDayKey());
   });
+  ipcMain.handle('offset-day-key-by-weeks', (_: any, { dayKey, delta }: { dayKey: string, delta: number }) => {
+    return offsetDayKeyByWeeks(dayKey, delta);
+  });
+  ipcMain.handle('get-first-day-of-week', (_: any, weekKey: string) => getFirstDayOfWeek(weekKey));
+  ipcMain.handle('get-last-day-of-week', (_: any, weekKey: string) => getLastDayOfWeek(weekKey));
 
   // Returns week metadata + all 7 days with their tasks in one call
   ipcMain.handle('get-week', (_: any, weekKey: string): WeekData => {
@@ -101,5 +111,64 @@ export function registerHandlers(): void {
   ipcMain.handle('copy-to-clipboard', (_: any, text: string) => {
     clipboard.writeText(text);
     return true;
+  });
+
+  ipcMain.handle('get-release-notes', () => {
+    try {
+      const possiblePaths = [
+        path.join(app.getAppPath(), 'CHANGELOG.md'),
+        path.join(path.dirname(app.getPath('exe')), 'CHANGELOG.md'),
+        path.join(path.dirname(app.getPath('exe')), 'resources', 'CHANGELOG.md'),
+        path.join(path.dirname(app.getPath('exe')), 'resources', 'app', 'CHANGELOG.md'),
+      ];
+
+      let changelogPath = '';
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+          changelogPath = p;
+          break;
+        }
+      }
+
+      if (!changelogPath) return '';
+      
+      const content = fs.readFileSync(changelogPath, 'utf8');
+      const version = app.getVersion();
+      
+      // Look for the header containing the version
+      const escapedVersion = version.replace(/\./g, '\\.');
+      const headerRegex = new RegExp(`#+ .*${escapedVersion}.*`, 'i');
+      const match = content.match(headerRegex);
+      
+      if (!match || match.index === undefined) return '';
+      
+      const startIndex = match.index;
+      const rest = content.slice(startIndex + match[0].length);
+      // Find the next version header
+      const nextHeaderMatch = rest.match(/#+ .*\d+\.\d+\.\d+.*/);
+      
+      const notes = nextHeaderMatch 
+        ? rest.slice(0, nextHeaderMatch.index).trim()
+        : rest.trim();
+      
+      const filteredNotes: string[] = [];
+      
+      // Extract "Features"
+      const featuresMatch = notes.match(/#+ Features([\s\S]*?)(?=#+ |$)/i);
+      if (featuresMatch && featuresMatch[1].trim()) {
+        filteredNotes.push(`### Features\n${featuresMatch[1].trim()}`);
+      }
+
+      // Extract "Bug Fixes"
+      const fixesMatch = notes.match(/#+ Bug Fixes([\s\S]*?)(?=#+ |$)/i);
+      if (fixesMatch && fixesMatch[1].trim()) {
+        filteredNotes.push(`### Bug Fixes\n${fixesMatch[1].trim()}`);
+      }
+      
+      return filteredNotes.join('\n\n');
+    } catch (err) {
+      console.error('Failed to read release notes:', err);
+      return '';
+    }
   });
 }

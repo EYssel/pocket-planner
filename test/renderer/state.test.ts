@@ -56,10 +56,12 @@ describe('Renderer State Logic', () => {
     state.setRenderCallback(jest.fn());
   });
 
-  test('addTask adds an empty task to the specified day', () => {
+  test('addTask adds an empty task before done tasks', () => {
     state.addTask('2026-05-04');
     expect(state.weekData!.days[0].plans).toHaveLength(3);
-    expect(state.weekData!.days[0].plans[2]).toEqual({ text: '', done: false });
+    // Initial was [Active, Done]. New should be [Active, NewActive, Done]
+    expect(state.weekData!.days[0].plans[1]).toEqual({ text: '', done: false });
+    expect(state.weekData!.days[0].plans[2].done).toBe(true);
   });
 
   test('updateTask changes the text of a task', () => {
@@ -88,6 +90,33 @@ describe('Renderer State Logic', () => {
     expect(state.weekData!.days[0].plans).toHaveLength(1);
     expect(state.weekData!.days[1].plans).toHaveLength(1);
     expect(state.weekData!.days[1].plans[0]).toEqual({ text: 'Task 1', done: true });
+  });
+
+  test('moveTask handles same-day movement correctly (moving forward)', () => {
+    // Initial: [Task 1 (active), Task 2 (done)]
+    // Move Task 1 (0) before Task 2 (1) -> should stay [Task 1, Task 2]
+    state.moveTask('2026-05-04', 0, '2026-05-04', 1);
+    expect(state.weekData!.days[0].plans[0].text).toBe('Task 1');
+    expect(state.weekData!.days[0].plans[1].text).toBe('Task 2');
+
+    // Add another task. Use addTask to maintain invariant: [Task 1, Task 3, Task 2]
+    state.addTask('2026-05-04');
+    state.updateTask('2026-05-04', 1, 'Task 3');
+    
+    // Move Task 1 (0) after Task 3 (1). Target index is 2 (index of Task 2).
+    state.moveTask('2026-05-04', 0, '2026-05-04', 2);
+    expect(state.weekData!.days[0].plans[0].text).toBe('Task 3');
+    expect(state.weekData!.days[0].plans[1].text).toBe('Task 1');
+    expect(state.weekData!.days[0].plans[2].text).toBe('Task 2');
+  });
+
+  test('moveTask handles same-day movement correctly (moving backward)', () => {
+    // Initial: [Task 1 (active), Task 2 (done)]
+    // Move Task 2 (1) to before Task 1 (0)
+    // The invariant will push it back to the end!
+    state.moveTask('2026-05-04', 1, '2026-05-04', 0);
+    expect(state.weekData!.days[0].plans[0].text).toBe('Task 1');
+    expect(state.weekData!.days[0].plans[1].text).toBe('Task 2');
   });
 
   test('saveDay sends filtered plans to the backend', async () => {

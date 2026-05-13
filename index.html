@@ -15,18 +15,18 @@
     <span id="app-version" style="font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); text-transform: none; letter-spacing: normal;">v0.0.0</span>
   </div>
   <div class="week-nav">
-    <button class="nav-btn" id="prev-week">‹</button>
+    <button class="nav-btn" id="prev-week" title="Previous Week">‹</button>
     <div class="week-info">
       <span class="cw-label" id="cw-label">CW —</span>
       <span class="week-label" id="week-label">Loading…</span>
     </div>
-    <button class="nav-btn" id="next-week">›</button>
-    <button class="nav-btn" id="today-btn">🎯</button>
+    <button class="nav-btn" id="next-week" title="Next Week">›</button>
+    <button class="nav-btn" id="today-btn" title="Go to Today">🎯</button>
   </div>
   <div class="header-right">
-    <button class="icon-btn" id="generate-standup" title="Generate Standup Prompt">📋</button>
-    <button class="icon-btn" id="open-recycle-bin">🗑️</button>
-    <button class="icon-btn" id="open-settings">⚙️</button>
+    <button class="icon-btn" id="generate-summary" title="Today's Summary">📋</button>
+    <button class="icon-btn" id="open-recycle-bin" title="Recycle Bin">🗑️</button>
+    <button class="icon-btn" id="open-settings" title="Settings">⚙️</button>
   </div>
 </header>
 <div class="banner" id="update-banner" style="border-bottom-color: var(--accent2);">
@@ -48,6 +48,13 @@
     <button class="banner-btn secondary" id="close-banner">Dismiss</button>
   </div>
 </div>
+<div class="banner" id="release-notes-banner">
+  <div class="banner-text"><strong>Update Installed</strong> Weekly Planner is now running <span id="banner-version"></span>.</div>
+  <div class="banner-btns">
+    <button class="banner-btn" id="view-release-notes-btn">What's New</button>
+    <button class="banner-btn secondary" id="dismiss-release-notes-btn">Dismiss</button>
+  </div>
+</div>
 <div class="grid" id="week-grid"></div>
 <div class="modal-overlay" id="cleanup-overlay"><div class="modal"><div class="modal-header"><div class="modal-title">Weekly Cleanup</div></div><div class="modal-body" id="cleanup-list"></div><div class="modal-footer"><button class="banner-btn secondary" id="close-cleanup">Close</button></div></div></div>
 <div class="modal-overlay" id="recycle-bin-overlay"><div class="modal"><div class="modal-header"><div class="modal-title">Recycle Bin</div></div><div class="modal-body" id="recycle-bin-list"></div><div class="modal-footer"><button class="banner-btn secondary" id="clear-bin-btn">Clear All</button><button class="banner-btn secondary" id="close-recycle-bin">Close</button></div></div></div>
@@ -58,17 +65,29 @@
     <span>Collapse Done Tasks by Default</span>
   </label>
 </div>
-<div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div></div></div><div class="modal-footer"><span id="settings-version" style="font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-right: auto;">v0.0.0</span><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
+<div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div></div></div><div class="modal-footer"><button id="settings-version-btn" style="background:none; border:none; padding:0; cursor:pointer; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-right: auto; transition: color 0.15s;" title="View Release Notes" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">v0.0.0</button><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
 
-<div class="modal-overlay" id="standup-overlay">
+<div class="modal-overlay" id="summary-overlay">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">Daily Standup Summary</div>
+      <div class="modal-title">Today's Summary</div>
     </div>
-    <div class="modal-body" id="standup-summary-content"></div>
+    <div class="modal-body" id="summary-content"></div>
     <div class="modal-footer">
-      <button class="banner-btn" id="copy-standup-btn">Copy to Clipboard</button>
-      <button class="banner-btn secondary" id="close-standup">Close</button>
+      <button class="banner-btn" id="copy-summary-btn">Copy to Clipboard</button>
+      <button class="banner-btn secondary" id="close-summary">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="release-notes-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">What's New</div>
+    </div>
+    <div class="modal-body" id="release-notes-content"></div>
+    <div class="modal-footer">
+      <button class="banner-btn secondary" id="close-release-notes">Close</button>
     </div>
   </div>
 </div>

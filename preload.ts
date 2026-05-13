@@ -5,11 +5,15 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('planner', {
   // Utility methods (delegated to main process for single source of truth)
   getAppInfo:      ()           => ipcRenderer.invoke('get-app-info'),
+  getReleaseNotes: ()           => ipcRenderer.invoke('get-release-notes'),
   currentWeekKey: ()           => ipcRenderer.invoke('get-current-week-key'),
   offsetWeekKey:  (key: string, delta: number) => ipcRenderer.invoke('get-offset-week-key', { key, delta }),
   currentDayKey:  ()           => ipcRenderer.invoke('get-current-day-key'),
   weekKeyFromDayKey: (dayKey: string)  => ipcRenderer.invoke('get-week-key-from-day-key', dayKey),
   getPreviousWorkingDayKey: (dayKey: string) => ipcRenderer.invoke('get-previous-working-day-key', dayKey),
+  offsetDayKeyByWeeks: (dayKey: string, delta: number) => ipcRenderer.invoke('offset-day-key-by-weeks', { dayKey, delta }),
+  getFirstDayOfWeek: (weekKey: string) => ipcRenderer.invoke('get-first-day-of-week', weekKey),
+  getLastDayOfWeek: (weekKey: string) => ipcRenderer.invoke('get-last-day-of-week', weekKey),
 
   // Settings methods
   getSetting: (key: string) => ipcRenderer.invoke('get-setting', key),

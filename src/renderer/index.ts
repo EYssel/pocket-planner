@@ -11,7 +11,7 @@ async function init() {
   try {
     const appInfo = await window.planner.getAppInfo();
     if (appInfo) {
-      if (appInfo.name !== 'weekly-planner') {
+      if (appInfo.name !== 'Weekly Planner') {
         document.title = appInfo.name;
         const logo = document.querySelector('.logo');
         if (logo) logo.textContent = appInfo.name;
@@ -46,6 +46,7 @@ async function init() {
       loadWeek,
       checkStaleTasks
     });
+    await modals.initReleaseNotes();
 
     (document as any).fonts.ready.then(() => {
       document.querySelectorAll('.task-edit').forEach(ta => ui.autoResize(ta as HTMLTextAreaElement));

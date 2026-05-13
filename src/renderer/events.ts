@@ -13,6 +13,45 @@ export function setupEventListeners(callbacks: {
   ui.nextBtn?.addEventListener('click', async () => callbacks.loadWeek(await window.planner.offsetWeekKey(state.currentWeekKey!, +1)));
   ui.todayBtn?.addEventListener('click', async () => callbacks.loadWeek(await window.planner.currentWeekKey()));
 
+  [ui.prevBtn, ui.nextBtn].forEach((btn, i) => {
+    const delta = i === 0 ? -1 : 1;
+    btn?.addEventListener('dragover', (e: DragEvent) => {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      btn.classList.add('drag-over');
+    });
+    btn?.addEventListener('dragleave', () => btn.classList.remove('drag-over'));
+    btn?.addEventListener('drop', async (e: DragEvent) => {
+      e.preventDefault();
+      btn.classList.remove('drag-over');
+      const data = e.dataTransfer?.getData('text/plain');
+      if (!data) return;
+      const { dayKey: sourceDayKey, index: sourceIndex } = JSON.parse(data);
+      
+      const targetWeekKey = await window.planner.offsetWeekKey(state.currentWeekKey!, delta);
+      const targetDayKey = delta === 1 
+        ? await window.planner.getFirstDayOfWeek(targetWeekKey) 
+        : await window.planner.getLastDayOfWeek(targetWeekKey);
+
+      const task = state.deleteTask(sourceDayKey, sourceIndex);
+      
+      if (task) {
+        // If the target is in the currently loaded week, use state.importTask
+        const targetInLoadedWeek = state.weekData?.days?.some(d => d.key === targetDayKey);
+        if (targetInLoadedWeek) {
+          state.importTask(targetDayKey, task);
+        } else {
+          // Otherwise, manual save (load plans, push, save)
+          const targetPlans = await state.getPlansForDay(targetDayKey);
+          targetPlans.push(task);
+          // Note: When that week is eventually loaded, loadWeek will maintainInvariant
+          await window.planner.savePlans(targetDayKey, targetPlans);
+        }
+        await callbacks.saveDay(sourceDayKey);
+      }
+    });
+  });
+
   ui.themeSelect?.addEventListener('change', async (e: Event) => {
     const newTheme = (e.target as HTMLSelectElement).value;
     modals.applyTheme(newTheme);
@@ -84,9 +123,9 @@ export function setupEventListeners(callbacks: {
   ui.openRecycleBin?.addEventListener('click', () => { modals.renderRecycleBin(); ui.recycleBinOverlay.classList.add('show'); });
   ui.closeRecycleBin?.addEventListener('click', () => { ui.recycleBinOverlay.classList.remove('show'); });
 
-  let standupPlainText = '';
+  let summaryPlainText = '';
 
-  ui.generateStandupBtn?.addEventListener('click', async () => {
+  ui.generateSummaryBtn?.addEventListener('click', async () => {
     const todayKey = await window.planner.currentDayKey();
     const yesterdayKey = await window.planner.getPreviousWorkingDayKey(todayKey);
 
@@ -98,65 +137,66 @@ export function setupEventListeners(callbacks: {
     const todayTodo = todayPlans.filter(p => p.text.trim()).map(p => p.text.trim());
 
     // Build HTML for the modal
-    ui.standupContent.innerHTML = `
-      <div class="standup-section">
-        <div class="standup-title">Yesterday (Completed)</div>
-        <div class="standup-list">
+    ui.summaryContent.innerHTML = `
+      <div class="summary-section">
+        <div class="summary-title">Yesterday (Completed)</div>
+        <div class="summary-list">
           ${yesterdayDone.length > 0 
             ? yesterdayDone.map(t => `
-                <div class="standup-item">
-                  <span class="standup-item-bullet">✓</span>
+                <div class="summary-item">
+                  <span class="summary-item-bullet">✓</span>
                   <span>${ui.escapeHtml(t)}</span>
                 </div>`).join('') 
-            : '<div class="standup-empty">None recorded</div>'}
+            : '<div class="summary-empty">None recorded</div>'}
         </div>
       </div>
-      <div class="standup-section">
-        <div class="standup-title">Yesterday (Incomplete)</div>
-        <div class="standup-list">
+      <div class="summary-section">
+        <div class="summary-title">Yesterday (Incomplete)</div>
+        <div class="summary-list">
           ${yesterdayIncomplete.length > 0 
             ? yesterdayIncomplete.map(t => `
-                <div class="standup-item">
-                  <span class="standup-item-bullet">→</span>
+                <div class="summary-item">
+                  <span class="summary-item-bullet">→</span>
                   <span>${ui.escapeHtml(t)}</span>
                 </div>`).join('') 
-            : '<div class="standup-empty">None recorded</div>'}
+            : '<div class="summary-empty">None recorded</div>'}
         </div>
       </div>
-      <div class="standup-section">
-        <div class="standup-title">Today (Planned)</div>
-        <div class="standup-list">
+      <div class="summary-section">
+        <div class="summary-title">Today (Planned)</div>
+        <div class="summary-list">
           ${todayTodo.length > 0 
             ? todayTodo.map(t => `
-                <div class="standup-item">
-                  <span class="standup-item-bullet">•</span>
+                <div class="summary-item">
+                  <span class="summary-item-bullet">•</span>
                   <span>${ui.escapeHtml(t)}</span>
                 </div>`).join('') 
-            : '<div class="standup-empty">No tasks planned yet</div>'}
+            : '<div class="summary-empty">No tasks planned yet</div>'}
         </div>
       </div>
     `;
 
     // Build plain text for clipboard
-    standupPlainText = `**Yesterday:**\n` +
+    summaryPlainText = `**Yesterday:**\n` +
       (yesterdayDone.length > 0 ? yesterdayDone.map(t => `- [DONE] ${t}`).join('\n') : '- No completed tasks') +
       `\n\n**Yesterday (Incomplete):**\n` +
       (yesterdayIncomplete.length > 0 ? yesterdayIncomplete.map(t => `- [STILL PENDING] ${t}`).join('\n') : '- No incomplete tasks') +
       `\n\n**Today:**\n` +
       (todayTodo.length > 0 ? todayTodo.map(t => `- ${t}`).join('\n') : '- No tasks planned');
 
-    ui.standupOverlay.classList.add('show');
+    ui.summaryOverlay.classList.add('show');
   });
 
-  ui.closeStandup?.addEventListener('click', () => ui.standupOverlay.classList.remove('show'));
+  ui.closeSummary?.addEventListener('click', () => ui.summaryOverlay.classList.remove('show'));
 
-  ui.copyStandupBtn?.addEventListener('click', async () => {
-    await window.planner.copyToClipboard(standupPlainText);
-    
-    const originalText = ui.copyStandupBtn.textContent;
-    ui.copyStandupBtn.textContent = 'Copied!';
+  ui.copySummaryBtn?.addEventListener('click', async () => {
+    await window.planner.copyToClipboard(summaryPlainText);
+
+    const originalText = ui.copySummaryBtn.textContent;
+    ui.copySummaryBtn.textContent = 'Copied!';
+
     setTimeout(() => {
-      ui.copyStandupBtn.textContent = originalText;
+      ui.copySummaryBtn.textContent = originalText;
     }, 2000);
   });
   ui.clearBinBtn?.addEventListener('click', async () => {
@@ -217,6 +257,8 @@ export function setupEventListeners(callbacks: {
   });
 
   ui.installUpdateBtn?.addEventListener('click', () => {
+    ui.installUpdateBtn.disabled = true;
+    ui.installUpdateBtn.textContent = 'Restarting...';
     window.planner.installUpdate();
   });
 

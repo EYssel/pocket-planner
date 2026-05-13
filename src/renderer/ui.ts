@@ -29,7 +29,7 @@ export const closeUpdateBanner      = document.getElementById('close-update-bann
 export const recycleBinOverlay = document.getElementById('recycle-bin-overlay') as HTMLElement;
 export const recycleBinList    = document.getElementById('recycle-bin-list') as HTMLElement;
 export const openRecycleBin    = document.getElementById('open-recycle-bin') as HTMLElement;
-export const generateStandupBtn = document.getElementById('generate-standup') as HTMLButtonElement;
+export const generateSummaryBtn = document.getElementById('generate-summary') as HTMLButtonElement;
 export const closeRecycleBin   = document.getElementById('close-recycle-bin') as HTMLElement;
 export const clearBinBtn       = document.getElementById('clear-bin-btn') as HTMLElement;
 
@@ -37,10 +37,20 @@ export const settingsOverlay = document.getElementById('settings-overlay') as HT
 export const openSettings    = document.getElementById('open-settings') as HTMLElement;
 export const closeSettings   = document.getElementById('close-settings') as HTMLElement;
 
-export const standupOverlay = document.getElementById('standup-overlay') as HTMLElement;
-export const standupContent = document.getElementById('standup-summary-content') as HTMLElement;
-export const closeStandup   = document.getElementById('close-standup') as HTMLElement;
-export const copyStandupBtn = document.getElementById('copy-standup-btn') as HTMLButtonElement;
+export const summaryOverlay = document.getElementById('summary-overlay') as HTMLElement;
+export const summaryContent = document.getElementById('summary-content') as HTMLElement;
+export const closeSummary   = document.getElementById('close-summary') as HTMLElement;
+export const copySummaryBtn = document.getElementById('copy-summary-btn') as HTMLButtonElement;
+
+export const releaseNotesOverlay = document.getElementById('release-notes-overlay') as HTMLElement;
+export const releaseNotesContent = document.getElementById('release-notes-content') as HTMLElement;
+export const closeReleaseNotes   = document.getElementById('close-release-notes') as HTMLElement;
+
+export const releaseNotesBanner = document.getElementById('release-notes-banner') as HTMLElement;
+export const bannerVersion      = document.getElementById('banner-version') as HTMLElement;
+export const viewReleaseNotesBtn = document.getElementById('view-release-notes-btn') as HTMLButtonElement;
+export const dismissReleaseNotesBtn = document.getElementById('dismiss-release-notes-btn') as HTMLButtonElement;
+export const settingsVersionBtn = document.getElementById('settings-version-btn') as HTMLButtonElement;
 
 export const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;
 export const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
@@ -123,6 +133,7 @@ export function createDaySection(day: DayData, defaultDoneCollapsed: boolean, ca
   addBtn.className = 'add-task-btn';
   addBtn.dataset.day = day.key;
   addBtn.textContent = '+ task';
+  addBtn.title = 'Add a new task';
   tasksEl.appendChild(addBtn);
 
   if (hasDoneTasks) {
@@ -131,7 +142,7 @@ export function createDaySection(day: DayData, defaultDoneCollapsed: boolean, ca
 
   updatePips(day.key, day.plans, section);
   callbacks.setupDropTarget(tasksEl, day.key);
-  callbacks.setupDropTarget(doneTasksEl, day.key);
+  callbacks.setupDropTarget(doneSectionEl, day.key);
 
   return section;
 }

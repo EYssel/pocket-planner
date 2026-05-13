@@ -24,7 +24,7 @@ export function createWindow(mode: string = 'planner'): void {
     minWidth: 800,
     minHeight: 650,
     icon: process.platform === 'win32' ? path.join(__dirname, '..', 'icon.ico') : undefined,
-    title: 'Weekly Planner',
+    title: app.getName(),
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
       // preload.js will be in dist/

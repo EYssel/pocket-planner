@@ -128,6 +128,74 @@ export async function initTheme() {
   if (ui.themeSelect) ui.themeSelect.value = theme;
 }
 
+export async function initReleaseNotes() {
+  const { version } = await window.planner.getAppInfo();
+  const lastVersion = await window.planner.getSetting('lastRunVersion');
+
+  // Setup settings version button as an on-demand link
+  if (ui.settingsVersionBtn) {
+    ui.settingsVersionBtn.textContent = `v${version} — What's New?`;
+    ui.settingsVersionBtn.addEventListener('click', async () => {
+      try {
+        ui.settingsOverlay.classList.remove('show');
+        const notes = await window.planner.getReleaseNotes();
+        
+        ui.releaseNotesContent.innerHTML = notes 
+          ? parseMarkdown(notes) 
+          : '<div style="padding: 20px; text-align: center; color: var(--muted);">No release notes found for this version.</div>';
+        
+        ui.releaseNotesOverlay.classList.add('show');
+      } catch (err) {
+        console.error('Failed to open release notes:', err);
+      }
+    });
+  }
+
+  // Show banner on startup if version has changed
+  if (version !== lastVersion) {
+    if (ui.releaseNotesBanner) {
+      ui.bannerVersion.textContent = `v${version}`;
+      ui.releaseNotesBanner.classList.add('show');
+    }
+    await window.planner.setSetting('lastRunVersion', version);
+  }
+
+  ui.viewReleaseNotesBtn.addEventListener('click', async () => {
+    try {
+      ui.releaseNotesBanner.classList.remove('show');
+      const notes = await window.planner.getReleaseNotes();
+      
+      ui.releaseNotesContent.innerHTML = notes 
+        ? parseMarkdown(notes) 
+        : '<div style="padding: 20px; text-align: center; color: var(--muted);">No release notes found for this version.</div>';
+      
+      ui.releaseNotesOverlay.classList.add('show');
+    } catch (err) {
+      console.error('Failed to open release notes:', err);
+    }
+  });
+
+  ui.dismissReleaseNotesBtn.addEventListener('click', () => {
+    ui.releaseNotesBanner.classList.remove('show');
+  });
+
+  ui.closeReleaseNotes.addEventListener('click', () => {
+    ui.releaseNotesOverlay.classList.remove('show');
+  });
+}
+
+function parseMarkdown(md: string): string {
+  return md
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
+    .replace(/<\/ul>\n<ul>/gim, '')
+    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="#" style="color: var(--accent);">$1</a>')
+    .replace(/\n/gim, '<br>');
+}
+
 export async function initSettings(callbacks: { loadWeek: (key: string) => Promise<void>, checkStaleTasks: () => Promise<void> }) {
   const options = await window.planner.getIntervalOptions();
   ui.intervalSelect.innerHTML = options

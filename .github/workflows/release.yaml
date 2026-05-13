@@ -34,19 +34,16 @@ jobs:
       - name: Run Unit Tests
         run: npm test
 
-      - name: Bump version and push tag
+      - name: Release and Bump Version
         id: version
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          npm version patch --no-git-tag-version
+          npm run release
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          git add package.json
-          git commit -m "chore: bump version to $VERSION [skip ci]"
-          git tag "v$VERSION"
-          git push origin master --tags
+          git push --follow-tags origin master
 
   build_and_publish:
     needs: prepare_release
