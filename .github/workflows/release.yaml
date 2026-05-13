@@ -37,12 +37,25 @@ jobs:
       - name: Release and Bump Version
         id: version
         shell: bash
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Generate raw changelog and bump version (skips commit/tag)
           npm run release
+          
+          # AI cleanup of the changelog
+          npx ts-node scripts/ai-changelog.ts
+          
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          # Manually commit, tag and push
+          git add CHANGELOG.md package.json package-lock.json
+          git commit -m "chore(release): $VERSION"
+          git tag "v$VERSION"
           git push --follow-tags origin master
 
       - name: Build & publish
