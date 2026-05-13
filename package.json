@@ -15,7 +15,7 @@
     "seed": "node dist/scripts/seed-test-data.js",
     "clean": "node dist/scripts/clean-dev-data.js",
     "test": "jest",
-    "release": "standard-version"
+    "release": "standard-version --skip.commit --skip.tag"
   },
   "dependencies": {
     "electron-store": "^8.1.0",
