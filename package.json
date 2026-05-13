@@ -12,6 +12,7 @@
     "start:seed": "npm.cmd run build:ts && node dist/scripts/seed-test-data.js && electron .",
     "start:clean": "npm.cmd run build:ts && node dist/scripts/clean-dev-data.js && electron .",
     "build": "npm.cmd run build:ts && electron-builder --win",
+    "build:mac": "node build.mjs && electron-builder --mac",
     "seed": "node dist/scripts/seed-test-data.js",
     "clean": "node dist/scripts/clean-dev-data.js",
     "test": "jest",
@@ -53,6 +54,10 @@
     "win": {
       "target": "nsis",
       "icon": "icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "icon.icns"
     },
     "nsis": {
       "oneClick": true,

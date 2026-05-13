@@ -23,7 +23,7 @@ export function createWindow(mode: string = 'planner'): void {
     height: 650,
     minWidth: 800,
     minHeight: 650,
-    icon: path.join(__dirname, '..', 'icon.ico'),
+    icon: process.platform === 'win32' ? path.join(__dirname, '..', 'icon.ico') : undefined,
     title: app.getName(),
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     webPreferences: {
