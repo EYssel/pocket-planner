@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/EYssel/planner-app/compare/v1.5.0...v1.5.1) (2026-05-14)
+
+### What's New in Weekly Planner
+
+This update focuses on improving your experience:
+
+#### Bug Fixes
+
+*   Fixed a problem that prevented the release notes from displaying properly. Now you can always see the latest improvements and changes!
+
 ## [1.5.0](https://github.com/EYssel/planner-app/compare/v1.4.0...v1.5.0) (2026-05-13)
 
 ### What's New in Weekly Planner
