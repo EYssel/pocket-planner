@@ -141,7 +141,7 @@ export async function initReleaseNotes() {
         const notes = await window.planner.getReleaseNotes();
         
         ui.releaseNotesContent.innerHTML = notes 
-          ? parseMarkdown(notes) 
+          ? await parseMarkdown(notes) 
           : '<div style="padding: 20px; text-align: center; color: var(--muted);">No release notes found for this version.</div>';
         
         ui.releaseNotesOverlay.classList.add('show');
@@ -167,7 +167,7 @@ export async function initReleaseNotes() {
       
       if (ui.releaseNotesContent) {
         ui.releaseNotesContent.innerHTML = notes 
-          ? parseMarkdown(notes) 
+          ? await parseMarkdown(notes) 
           : '<div style="padding: 20px; text-align: center; color: var(--muted);">No release notes found for this version.</div>';
       }
       
@@ -186,29 +186,22 @@ export async function initReleaseNotes() {
   });
 }
 
-function parseMarkdown(md: string): string {
-  let html = ui.escapeHtml(md)
-    .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-    .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
-    .replace(/<\/ul>\n<ul>/gim, '')
-    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-    .replace(/\n/gim, '<br>');
+async function parseMarkdown(md: string): Promise<string> {
+  const { marked } = await import('marked');
+  const renderer = new marked.Renderer();
+  
+  // Ensure all links open in external browser
+  renderer.link = ({ href, title, text }) => {
+    const escapedHref = href.replace(/'/g, "\\'");
+    return `<a href="#" onclick="window.planner.openExternal('${escapedHref}'); return false;" title="${title || ''}">${text}</a>`;
+  };
 
-  // Handle links specifically to use openExternal
-  html = html.replace(/\[(.*?)\]\((.*?)\)/gim, (match, label, url) => {
-    return `<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${label}</a>`;
-  });
-
-  // Plain URLs
-  const urlRegex = /(?<!href=")(https?:\/\/[^\s<]+)/g;
-  html = html.replace(urlRegex, (url) => {
-    return `<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${url}</a>`;
-  });
-
-  return html;
+  // Configure marked for GitHub Flavored Markdown and standard line breaks
+  return marked.parse(md, { 
+    renderer,
+    gfm: true,
+    breaks: true
+  }) as Promise<string> | string;
 }
 
 export async function initSettings(callbacks: { loadWeek: (key: string) => Promise<void>, checkStaleTasks: () => Promise<void> }) {
