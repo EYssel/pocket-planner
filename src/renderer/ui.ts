@@ -57,6 +57,8 @@ export const viewReleaseNotesBtn = document.getElementById('view-release-notes-b
 export const dismissReleaseNotesBtn = document.getElementById('dismiss-release-notes-btn') as HTMLButtonElement;
 export const settingsVersionBtn = document.getElementById('settings-version-btn') as HTMLButtonElement;
 
+export const summaryModalTitle = document.getElementById('summary-modal-title') as HTMLElement;
+
 export const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;
 export const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
 export const workStartInput  = document.getElementById('work-start') as HTMLInputElement;
@@ -104,6 +106,7 @@ export function createDaySection(day: DayData, defaultDoneCollapsed: boolean, ca
       <div class="day-name">${day.dayName}</div>
       <div class="day-date">${day.date}</div>
       <div class="day-month">${day.month}</div>
+      <button class="icon-btn day-summary-btn" data-day-key="${day.key}" title="Summary for ${day.dayName}">📋</button>
     </div>
     <div class="day-tasks active-tasks" id="tasks-${day.key}"></div>
     <div class="done-section ${isCollapsed ? 'collapsed' : ''}" id="done-section-${day.key}">

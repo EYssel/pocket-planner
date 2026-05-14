@@ -316,6 +316,15 @@ exports[`Renderer UI Builders createDaySection renders a full day section with t
       May
     </div>
     
+      
+    <button
+      class="icon-btn day-summary-btn"
+      data-day-key="2026-05-04"
+      title="Summary for Monday"
+    >
+      📋
+    </button>
+    
     
   </div>
   
@@ -596,6 +605,15 @@ exports[`Renderer UI Builders createDaySection renders an empty day correctly 1`
     >
       May
     </div>
+    
+      
+    <button
+      class="icon-btn day-summary-btn"
+      data-day-key="2026-05-05"
+      title="Summary for Tuesday"
+    >
+      📋
+    </button>
     
     
   </div>

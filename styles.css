@@ -200,8 +200,17 @@ body.dragging-active #next-week {
 .day-header {
   padding: 10px 12px 8px; border-bottom: 1px solid var(--border);
   height: 64px; display: flex; flex-direction: column; justify-content: center;
+  position: relative;
 }
 .day-col.today .day-header { border-bottom-color: var(--today-border); }
+
+.day-summary-btn {
+  position: absolute; top: 8px; right: 8px;
+  opacity: 0; pointer-events: none; transition: all 0.15s;
+  background: var(--surface2);
+}
+.day-header:hover .day-summary-btn { opacity: 1; pointer-events: auto; }
+.day-summary-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.1); }
 .day-name { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
 .day-col.today .day-name { color: var(--accent); }
 .day-date { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.1; margin-top: 2px; }
@@ -215,8 +224,8 @@ body.dragging-active #next-week {
 .day-tasks::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
 .task-item {
-  display: grid; grid-template-columns: 20px 1fr 20px 16px; align-items: start;
-  gap: 6px; padding: 6px; border-radius: var(--radius); border: 1px solid transparent;
+  display: grid; grid-template-columns: 16px 1fr auto auto; align-items: start;
+  gap: 4px; padding: 4px 6px; border-radius: var(--radius); border: 1px solid transparent;
   animation: fadeIn 0.15s ease both; cursor: grab;
 }
 .task-item:active { cursor: grabbing; }
@@ -224,10 +233,10 @@ body.dragging-active #next-week {
 .note-btn {
   background: transparent; border: none; color: transparent; cursor: pointer;
   margin-top: 2px; transition: color 0.1s;
-  display: flex; align-items: center; justify-content: center;
+  display: none; align-items: center; justify-content: center;
 }
-.task-item:hover .note-btn { color: var(--muted); }
-.note-btn.has-notes { color: var(--accent) !important; }
+.task-item:hover .note-btn { display: flex; color: var(--muted); }
+.note-btn.has-notes { display: flex; color: var(--accent) !important; }
 .note-btn:hover { color: var(--accent) !important; }
 
 .task-item.dragging { opacity: 0.3; background: var(--surface2); border: 1px dashed var(--accent); }
@@ -287,8 +296,8 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 .task-item.editing .task-display { display: none; }
 .task-item.editing .task-edit { display: block; }
 .task-item.done .task-display { color: var(--text); }
-.del-btn { background: transparent; border: none; color: transparent; cursor: pointer; font-size: 14px; transition: color 0.1s; }
-.task-item:hover .del-btn { color: var(--muted); }
+.del-btn { display: none; background: transparent; border: none; color: transparent; cursor: pointer; font-size: 14px; transition: color 0.1s; }
+.task-item:hover .del-btn { display: block; color: var(--muted); }
 .del-btn:hover { color: var(--accent2) !important; }
 
 .add-task-btn {
