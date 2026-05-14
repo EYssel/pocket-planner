@@ -156,8 +156,18 @@ export function registerHandlers(): void {
         ? rest.slice(0, nextHeaderMatch.index).trim()
         : rest.trim();
       
+      // Filter sections to only include Features and Bug Fixes
+      const sections = notes.split(/(?=### )/);
+      const filteredSections = sections.filter(section => {
+        const trimmed = section.trim();
+        return trimmed.startsWith('### Features') || trimmed.startsWith('### Bug Fixes');
+      });
+      
+      const filteredNotes = filteredSections.join('\n').trim();
+      if (!filteredNotes) return '';
+
       // Clean up the notes: remove commit links and redundant "What's New" headers
-      const cleanedNotes = notes
+      const cleanedNotes = filteredNotes
         .replace(/\s*\(\[([a-f0-9]+)\]\(https:\/\/github\.com\/.*?\)\)/gi, '')
         .replace(/#+ What's New( in Weekly Planner)?/gi, '')
         .trim();
