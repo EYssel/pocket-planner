@@ -138,16 +138,15 @@ export function setupEventListeners(callbacks: {
 
   let summaryPlainText = '';
 
-  ui.generateSummaryBtn?.addEventListener('click', async () => {
-    const todayKey = await window.planner.currentDayKey();
-    const yesterdayKey = await window.planner.getPreviousWorkingDayKey(todayKey);
+  async function generateSummaryForDay(targetDayKey: string) {
+    const prevKey = await window.planner.getPreviousWorkingDayKey(targetDayKey);
 
-    const todayPlans = await state.getPlansForDay(todayKey);
-    const yesterdayPlans = await state.getPlansForDay(yesterdayKey);
+    const targetPlans = await state.getPlansForDay(targetDayKey);
+    const prevPlans = await state.getPlansForDay(prevKey);
 
-    const yesterdayDone = yesterdayPlans.filter(p => p.done && p.text.trim());
-    const yesterdayIncomplete = yesterdayPlans.filter(p => !p.done && p.text.trim());
-    const todayTodo = todayPlans.filter(p => p.text.trim());
+    const prevDone = prevPlans.filter(p => p.done && p.text.trim());
+    const prevIncomplete = prevPlans.filter(p => !p.done && p.text.trim());
+    const targetTodo = targetPlans.filter(p => p.text.trim());
 
     const formatNotesHtml = (notes?: string) => {
       if (!notes) return '';
@@ -159,13 +158,23 @@ export function setupEventListeners(callbacks: {
       return notes.split('\n').map(line => `    - ${line}`).join('\n');
     };
 
+    // Dynamic Labels
+    const todayKey = await window.planner.currentDayKey();
+    const isToday = targetDayKey === todayKey;
+    const targetLabel = isToday ? 'Today' : targetDayKey;
+    const prevLabel = isToday ? 'Yesterday' : 'Previous Day';
+
+    if (ui.summaryModalTitle) {
+      ui.summaryModalTitle.textContent = isToday ? "Today's Summary" : `Summary for ${targetDayKey}`;
+    }
+
     // Build HTML for the modal
     ui.summaryContent.innerHTML = `
       <div class="summary-section">
-        <div class="summary-title">Yesterday (Completed)</div>
+        <div class="summary-title">${prevLabel} (Completed)</div>
         <div class="summary-list">
-          ${yesterdayDone.length > 0 
-            ? yesterdayDone.map(p => `
+          ${prevDone.length > 0 
+            ? prevDone.map(p => `
                 <div class="summary-item" style="flex-direction: column; gap: 0;">
                   <div style="display: flex; gap: 12px;">
                     <span class="summary-item-bullet">✓</span>
@@ -177,10 +186,10 @@ export function setupEventListeners(callbacks: {
         </div>
       </div>
       <div class="summary-section">
-        <div class="summary-title">Yesterday (Incomplete)</div>
+        <div class="summary-title">${prevLabel} (Incomplete)</div>
         <div class="summary-list">
-          ${yesterdayIncomplete.length > 0 
-            ? yesterdayIncomplete.map(p => `
+          ${prevIncomplete.length > 0 
+            ? prevIncomplete.map(p => `
                 <div class="summary-item" style="flex-direction: column; gap: 0;">
                   <div style="display: flex; gap: 12px;">
                     <span class="summary-item-bullet">→</span>
@@ -192,10 +201,10 @@ export function setupEventListeners(callbacks: {
         </div>
       </div>
       <div class="summary-section">
-        <div class="summary-title">Today (Planned)</div>
+        <div class="summary-title">${targetLabel} (Planned)</div>
         <div class="summary-list">
-          ${todayTodo.length > 0 
-            ? todayTodo.map(p => `
+          ${targetTodo.length > 0 
+            ? targetTodo.map(p => `
                 <div class="summary-item" style="flex-direction: column; gap: 0;">
                   <div style="display: flex; gap: 12px;">
                     <span class="summary-item-bullet">•</span>
@@ -203,20 +212,33 @@ export function setupEventListeners(callbacks: {
                   </div>
                   ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
-            : '<div class="summary-empty">No tasks planned yet</div>'}
+            : `<div class="summary-empty">No tasks planned yet</div>`}
         </div>
       </div>
     `;
 
     // Build plain text for clipboard
-    summaryPlainText = `**Yesterday:**\n` +
-      (yesterdayDone.length > 0 ? yesterdayDone.map(p => `- [DONE] ${p.text}${p.notes ? '\n' + formatNotesPlain(p.notes) : ''}`).join('\n') : '- No completed tasks') +
-      `\n\n**Yesterday (Incomplete):**\n` +
-      (yesterdayIncomplete.length > 0 ? yesterdayIncomplete.map(p => `- [STILL PENDING] ${p.text}${p.notes ? '\n' + formatNotesPlain(p.notes) : ''}`).join('\n') : '- No incomplete tasks') +
-      `\n\n**Today:**\n` +
-      (todayTodo.length > 0 ? todayTodo.map(p => `- ${p.text}${p.notes ? '\n' + formatNotesPlain(p.notes) : ''}`).join('\n') : '- No tasks planned');
+    summaryPlainText = `**${prevLabel}:**\n` +
+      (prevDone.length > 0 ? prevDone.map(p => `- [DONE] ${p.text}${p.notes ? '\n' + formatNotesPlain(p.notes) : ''}`).join('\n') : '- No completed tasks') +
+      `\n\n**${prevLabel} (Incomplete):**\n` +
+      (prevIncomplete.length > 0 ? prevIncomplete.map(p => `- [STILL PENDING] ${p.text}${p.notes ? '\n' + formatNotesPlain(p.notes) : ''}`).join('\n') : '- No incomplete tasks') +
+      `\n\n**${targetLabel}:**\n` +
+      (targetTodo.length > 0 ? targetTodo.map(p => `- ${p.text}${p.notes ? '\n' + formatNotesPlain(p.notes) : ''}`).join('\n') : '- No tasks planned');
 
     ui.summaryOverlay.classList.add('show');
+  }
+
+  ui.generateSummaryBtn?.addEventListener('click', async () => {
+    const todayKey = await window.planner.currentDayKey();
+    await generateSummaryForDay(todayKey);
+  });
+
+  // Handle grid clicks for contextual summaries
+  ui.grid.addEventListener('click', async (e: MouseEvent) => {
+    const btn = (e.target as HTMLElement).closest('.day-summary-btn') as HTMLButtonElement;
+    if (btn && btn.dataset.dayKey) {
+      await generateSummaryForDay(btn.dataset.dayKey);
+    }
   });
 
   ui.closeSummary?.addEventListener('click', () => ui.summaryOverlay.classList.remove('show'));

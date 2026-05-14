@@ -200,8 +200,17 @@ body.dragging-active #next-week {
 .day-header {
   padding: 10px 12px 8px; border-bottom: 1px solid var(--border);
   height: 64px; display: flex; flex-direction: column; justify-content: center;
+  position: relative;
 }
 .day-col.today .day-header { border-bottom-color: var(--today-border); }
+
+.day-summary-btn {
+  position: absolute; top: 8px; right: 8px;
+  opacity: 0; pointer-events: none; transition: all 0.15s;
+  background: var(--surface2);
+}
+.day-header:hover .day-summary-btn { opacity: 1; pointer-events: auto; }
+.day-summary-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.1); }
 .day-name { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
 .day-col.today .day-name { color: var(--accent); }
 .day-date { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--text); line-height: 1.1; margin-top: 2px; }
