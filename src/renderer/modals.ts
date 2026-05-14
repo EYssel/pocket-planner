@@ -188,6 +188,7 @@ export async function initReleaseNotes() {
 
 function parseMarkdown(md: string): string {
   let html = ui.escapeHtml(md)
+    .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
     .replace(/^### (.*$)/gim, '<h3>$1</h3>')
     .replace(/^## (.*$)/gim, '<h2>$1</h2>')
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
