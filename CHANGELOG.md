@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/EYssel/planner-app/compare/v1.5.2...v1.6.0) (2026-05-14)
+
+### Features
+*   Added a quick summary feature for each day, accessible by clicking on the day's header.
+*   Improved the layout of tasks by adjusting icon spacing, providing more room for your task text and enhancing readability.
+
+### Bug Fixes
+
 ### [1.5.2](https://github.com/EYssel/planner-app/compare/v1.5.1...v1.5.2) (2026-05-14)
 
 ### Features
