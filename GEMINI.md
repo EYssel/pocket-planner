@@ -60,3 +60,11 @@ The app uses isolated data directories to prevent development from affecting pro
 - [ ] Customizable notification intervals via UI.
 - [ ] Weekend view toggle.
 - [ ] Task priority or tagging.
+- [ ] Global Keyboard Shortcut (Quick Add).
+- [ ] Keyboard-centric/Vim-like navigation (j/k/h/l, x for done).
+- [ ] Recurring tasks (Daily/Weekly).
+- [ ] Global search across historical weeks and notes.
+- [ ] Automatic archival system for old "Done" tasks.
+- [ ] Issue/Ticket auto-linking (e.g., #123, PROJ-456).
+- [ ] Calendar Sync (read-only export link).
+- [ ] Checklists and sub-tasks within Task Notes.
