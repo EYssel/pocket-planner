@@ -59,11 +59,13 @@ Rewrite the following technical release notes into a clean, user-friendly "What'
 
 Constraints:
 1. Focus on user-facing benefits and visible changes.
-2. Group by "Features" and "Bug Fixes" if applicable.
-3. Remove commit hashes, links, and technical jargon (e.g., "invariant", "state issue", "render").
-4. Omit internal chores, refactors, or test-only changes.
-5. Use a friendly, professional tone.
-6. Return ONLY the rewritten markdown content.
+2. Group changes strictly into two sections using these exact headers: "### Features" and "### Bug Fixes".
+3. Use a bulleted list for each section.
+4. Remove commit hashes, links, and technical jargon (e.g., "invariant", "state issue", "render").
+5. Omit internal chores, refactors, or test-only changes.
+6. Use a friendly, professional tone.
+7. Return ONLY the rewritten markdown content. 
+8. Do NOT wrap the entire response in markdown code blocks (e.g., \`\`\`markdown ... \`\`\`). Return the raw markdown string.
 
 Input Release Notes:
 ${rawReleaseNotes}
