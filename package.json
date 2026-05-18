@@ -1,5 +1,5 @@
 {
-  "name": "weekly-planner",
+  "name": "pocket-planner",
   "version": "1.6.0",
   "description": "A simple weekly planning desktop app",
   "author": "Estian Yssel",
@@ -40,8 +40,8 @@
     "typescript": "^6.0.3"
   },
   "build": {
-    "appId": "com.estianyssel.weekly-planner",
-    "productName": "Weekly Planner",
+    "appId": "com.estianyssel.pocket-planner",
+    "productName": "Pocket Planner",
     "publish": {
       "provider": "github"
     },

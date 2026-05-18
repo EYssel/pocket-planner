@@ -21,16 +21,15 @@ jest.mock('electron', () => ({
     on: jest.fn(),
   },
   app: {
-    getName: jest.fn().mockReturnValue('Weekly Planner'),
-    getVersion: jest.fn().mockReturnValue('1.1.0'),
-    getPath: jest.fn().mockImplementation((name) => {
-      if (name === 'exe') return '/mock/app/Weekly Planner.exe';
-      return '';
-    }),
-    getAppPath: jest.fn().mockReturnValue('/mock/app/path'),
-    isPackaged: true,
-  },
-  clipboard: {
+  getName: jest.fn().mockReturnValue('Pocket Planner'),
+  getVersion: jest.fn().mockReturnValue('1.1.0'),
+  getPath: jest.fn().mockImplementation((name) => {
+    if (name === 'exe') return '/mock/app/Pocket Planner.exe';
+    return '';
+  }),
+  getAppPath: jest.fn().mockReturnValue('/mock/app/path'),
+  isPackaged: true,
+  },  clipboard: {
     writeText: jest.fn(),
   }
 }));
@@ -81,7 +80,7 @@ describe('ipc', () => {
 
     test('get-app-info should return app name and version', async () => {
       const result = await handlers['get-app-info']({});
-      expect(result).toEqual({ name: 'Weekly Planner', version: '1.1.0' });
+      expect(result).toEqual({ name: 'Pocket Planner', version: '1.1.0' });
     });
 
     test('install-update should call autoUpdater.quitAndInstall and set isQuitting', async () => {

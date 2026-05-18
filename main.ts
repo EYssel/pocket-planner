@@ -2,18 +2,46 @@
 
 import { app } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
+
+/**
+ * Migration Guard: Ensures old Weekly Planner data is moved to the new Pocket Planner folder.
+ */
+function migrateDataFolder(oldFolder: string, newFolder: string) {
+  const appData = app.getPath('appData');
+  const oldPath = path.join(appData, oldFolder);
+  const newPath = path.join(appData, newFolder);
+
+  if (fs.existsSync(oldPath) && !fs.existsSync(newPath)) {
+    try {
+      console.log(`Migrating data from ${oldPath} to ${newPath}...`);
+      fs.renameSync(oldPath, newPath);
+      console.log('Migration successful.');
+    } catch (err) {
+      console.error('Migration failed:', err);
+    }
+  }
+}
 
 // Configure isolated names, data paths, and AppUserModelIDs
 if (!app.isPackaged) {
-  const devName = 'Weekly Planner Dev';
-  const devFolder = 'weekly-planner-dev';
+  const devName = 'Pocket Planner Dev';
+  const oldFolder = 'weekly-planner-dev';
+  const devFolder = 'pocket-planner-dev';
+  
+  migrateDataFolder(oldFolder, devFolder);
+  
   app.setName(devName);
   const userDataPath = path.join(app.getPath('appData'), devFolder);
   app.setPath('userData', userDataPath);
   app.setAppUserModelId(devName);
 } else {
-  const prodName = 'Weekly Planner';
-  const prodFolder = 'weekly-planner';
+  const prodName = 'Pocket Planner';
+  const oldFolder = 'weekly-planner';
+  const prodFolder = 'pocket-planner';
+  
+  migrateDataFolder(oldFolder, prodFolder);
+
   app.setName(prodName);
   const userDataPath = path.join(app.getPath('appData'), prodFolder);
   app.setPath('userData', userDataPath);
