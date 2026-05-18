@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/EYssel/pocket-planner/compare/v1.6.0...v1.8.0) (2026-05-18)
+
+### Features
+* No new features in this release.
+
+### Bug Fixes
+* We've improved the display of the application's icon, ensuring it looks sharp and clear.
+
 ## [1.7.0](https://github.com/EYssel/pocket-planner/compare/v1.6.0...v1.7.0) (2026-05-18)
 
 ### Features
