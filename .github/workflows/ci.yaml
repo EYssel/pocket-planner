@@ -36,4 +36,4 @@ jobs:
         run: npm.cmd run build:ts
 
       - name: Build Dry Run
-        run: npx.cmd electron-builder --win --dir -c "compression=store"
+        run: npx.cmd electron-builder --win --dir --config.compression=store
