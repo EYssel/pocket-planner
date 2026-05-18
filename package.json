@@ -1,8 +1,12 @@
 {
   "name": "pocket-planner",
-  "version": "1.9.0",
+  "version": "1.6.0",
   "description": "A simple weekly planning desktop app",
   "author": "Estian Yssel",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EYssel/pocket-planner.git"
+  },
   "main": "dist/main.js",
   "scripts": {
     "build:ts": "node build.mjs",
@@ -43,7 +47,9 @@
     "appId": "com.estianyssel.pocket-planner",
     "productName": "Pocket Planner",
     "publish": {
-      "provider": "github"
+      "provider": "github",
+      "owner": "EYssel",
+      "repo": "pocket-planner"
     },
     "files": [
       "dist/**/*",
