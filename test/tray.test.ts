@@ -9,7 +9,7 @@ import { checkForUpdates } from '../src/updater';
 jest.mock('electron', () => ({
   app: { 
     quit: jest.fn(),
-    getName: jest.fn().mockReturnValue('Weekly Planner'),
+    getName: jest.fn().mockReturnValue('Pocket Planner'),
     getAppPath: jest.fn().mockReturnValue('/mock/path'),
   },
   Tray: jest.fn().mockImplementation(() => ({
@@ -53,7 +53,7 @@ describe('tray', () => {
     createTray();
     const mockTrayInstance = (Tray as unknown as jest.Mock).mock.results[0].value;
     expect(Tray).toHaveBeenCalled();
-    expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Weekly Planner');
+    expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Pocket Planner');
     expect(mockTrayInstance.on).toHaveBeenCalledWith('click', expect.any(Function));
   });
 

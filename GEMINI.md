@@ -1,4 +1,4 @@
-# Weekly Planner
+# Pocket Planner
 
 A minimal Electron-based desktop application for weekly task planning and daily check-ins.
 
