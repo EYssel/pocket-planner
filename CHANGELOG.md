@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/EYssel/pocket-planner/compare/v1.6.0...v1.7.0) (2026-05-18)
+
+### Features
+
+*   We've given Weekly Planner a fresh new brand identity!
+*   The default dark mode now features updated styling to perfectly complement the new branding.
+
+### Bug Fixes
+
+*   The application icon now displays correctly and scales smoothly across all devices and resolutions.
+
 ## [1.9.0](https://github.com/EYssel/pocket-planner/compare/v1.6.0...v1.9.0) (2026-05-18)
 
 ### Features
