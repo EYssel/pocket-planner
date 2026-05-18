@@ -49,17 +49,17 @@
       "dist/**/*",
       "index.html",
       "styles.css",
-      "icon.ico",
+      "icon.png",
       "CHANGELOG.md",
       "node_modules/**/*"
     ],
     "win": {
       "target": "nsis",
-      "icon": "icon.ico"
+      "icon": "icon.png"
     },
     "mac": {
       "target": "dmg",
-      "icon": "icon.icns"
+      "icon": "icon.png"
     },
     "nsis": {
       "oneClick": true,
