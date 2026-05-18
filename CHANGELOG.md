@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/EYssel/pocket-planner/compare/v1.6.0...v1.9.0) (2026-05-18)
+
+### Features
+
+*   We've updated our visual branding with a fresh new look.
+*   The default dark mode has been refreshed to perfectly complement our new visual identity.
+
+### Bug Fixes
+
+*   Fixed an issue where the application's icon sometimes appeared with incorrect sizing.
+*   Improved how icons scale, ensuring they remain clear and sharp at various display sizes.
+*   Ensured the main application icon is consistently displayed.
+
 ## [1.8.0](https://github.com/EYssel/pocket-planner/compare/v1.6.0...v1.8.0) (2026-05-18)
 
 ### Features
