@@ -50,6 +50,8 @@
       "index.html",
       "styles.css",
       "icon.png",
+      "icon.ico",
+      "icon.icns",
       "CHANGELOG.md",
       "node_modules/**/*"
     ],
