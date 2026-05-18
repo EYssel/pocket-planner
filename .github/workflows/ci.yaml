@@ -31,3 +31,9 @@ jobs:
 
       - name: Run Unit Tests
         run: npm test
+
+      - name: Compile TypeScript
+        run: npm.cmd run build:ts
+
+      - name: Build Dry Run
+        run: npx.cmd electron-builder --win --dir --config.compression=store
