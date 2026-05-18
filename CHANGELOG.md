@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/EYssel/pocket-planner/compare/v1.6.0...v1.7.0) (2026-05-18)
+
+### Features
+*   We're excited to announce a significant update! Weekly Planner has been rebranded and is now known as Pocket Planner. You'll find the same powerful features under our fresh new identity.
+
+### Bug Fixes
+
 ## [1.6.0](https://github.com/EYssel/planner-app/compare/v1.5.2...v1.6.0) (2026-05-14)
 
 ### Features
