@@ -116,8 +116,9 @@ ${rawReleaseNotes}
     fs.writeFileSync(CHANGELOG_PATH, newContent, 'utf-8');
     console.log('Successfully updated CHANGELOG.md with AI-summarized notes.');
   } catch (error: any) {
-    console.error('Error calling Gemini API:', error.message);
-    process.exit(1);
+    console.warn('\n⚠️  AI Summarization Failed:', error.message);
+    console.warn('Falling back to raw release notes to ensure build continuity.\n');
+    // We do NOT exit with 1 here, so the build can proceed with raw notes.
   }
 }
 

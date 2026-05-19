@@ -2,7 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.7.0](https://github.com/EYssel/pocket-planner/compare/v1.6.0...v1.7.0) (2026-05-18)
+## [1.8.0](https://github.com/EYssel/planner-app/compare/v1.7.0...v1.8.0) (2026-05-19)
+
+### Features
+
+*   Reverted the re-branding back to **Weekly Planner**.
+*   Restored original icons and the neon-green dark theme.
+*   Updated all repository references to `planner-app`.
+
+### Bug Fixes
+
+*   Fixed an issue where the icon resolution was too low for the build process.
+
+## [1.7.0]
+(https://github.com/EYssel/pocket-planner/compare/v1.6.0...v1.7.0) (2026-05-18)
 
 ### Features
 
