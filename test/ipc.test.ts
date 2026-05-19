@@ -46,14 +46,24 @@ jest.mock('../src/notifications', () => ({
   reschedule: jest.fn(),
   INTERVAL_OPTIONS: []
 }));
+jest.mock('../src/tray', () => ({
+  updateTooltip: jest.fn(),
+}));
+jest.mock('../src/window', () => ({
+  updateProgress: jest.fn(),
+}));
 
 describe('ipc', () => {
   const handlers: Record<string, Function> = {};
+  const listeners: Record<string, Function> = {};
 
   beforeEach(() => {
     jest.clearAllMocks();
     (ipcMain.handle as jest.Mock).mockImplementation((name, fn) => {
       handlers[name] = fn;
+    });
+    (ipcMain.on as jest.Mock).mockImplementation((name, fn) => {
+      listeners[name] = fn;
     });
   });
 
@@ -71,6 +81,7 @@ describe('ipc', () => {
     expectedHandlers.forEach(name => {
       expect(ipcMain.handle).toHaveBeenCalledWith(name, expect.any(Function));
     });
+    expect(ipcMain.on).toHaveBeenCalledWith('update-os-state', expect.any(Function));
   });
 
   describe('Handlers', () => {
@@ -81,6 +92,20 @@ describe('ipc', () => {
     test('get-app-info should return app name and version', async () => {
       const result = await handlers['get-app-info']({});
       expect(result).toEqual({ name: 'Weekly Planner', version: '1.1.0' });
+    });
+
+    test('update-os-state should call tray and window update functions', () => {
+      const { updateTooltip } = require('../src/tray');
+      const { updateProgress } = require('../src/window');
+      
+      listeners['update-os-state']({}, { 
+        nextTaskText: 'Next', 
+        doneCount: 1, 
+        totalCount: 2 
+      });
+
+      expect(updateTooltip).toHaveBeenCalledWith('Next', 1, 2);
+      expect(updateProgress).toHaveBeenCalledWith(1, 2, 'Next');
     });
 
     test('install-update should call autoUpdater.quitAndInstall and set isQuitting', async () => {

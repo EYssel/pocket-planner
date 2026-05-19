@@ -61,6 +61,7 @@ export const settingsVersionBtn = document.getElementById('settings-version-btn'
 export const summaryModalTitle = document.getElementById('summary-modal-title') as HTMLElement;
 
 export const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;
+export const testNotificationBtn = document.getElementById('test-notification-btn') as HTMLButtonElement;
 export const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
 export const workStartInput  = document.getElementById('work-start') as HTMLInputElement;
 export const workEndInput    = document.getElementById('work-end') as HTMLInputElement;

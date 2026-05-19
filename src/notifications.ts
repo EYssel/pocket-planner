@@ -4,7 +4,7 @@ import { Notification } from 'electron';
 import * as cron from 'node-cron';
 import { getSetting, getPlans } from './store';
 import { currentDayKey } from './weekUtils';
-import { getDynamicMessage } from './messages';
+import { getDynamicMessage, getTaskPrefix } from './messages';
 
 export const INTERVAL_OPTIONS = [
   { label: 'Every 30 minutes', minutes: 30  },
@@ -55,9 +55,36 @@ export function reschedule(): void {
     const totalTasks = tasks.length;
     const doneTasks = tasks.filter(t => t.done).length;
 
-    const { title, body, mode } = getDynamicMessage(hour, totalTasks, doneTasks, isMonday);
+    let { title, body, mode } = getDynamicMessage(hour, totalTasks, doneTasks, isMonday);
+
+    const nextTask = tasks.find(t => !t.done);
+    if (nextTask) {
+      const prefix = getTaskPrefix(doneTasks, totalTasks);
+      body += `\n${prefix} ${nextTask.text}`;
+    }
+
     sendNotification(title, body, mode);
   });
 
   cronJobs.push(job);
+}
+
+export function triggerManualNotification(): void {
+  const now = new Date();
+  const hour = now.getHours();
+  const isMonday = now.getDay() === 1;
+
+  const tasks = getPlans(currentDayKey()).filter(t => t.text.trim() !== '');
+  const totalTasks = tasks.length;
+  const doneTasks = tasks.filter(t => t.done).length;
+
+  let { title, body, mode } = getDynamicMessage(hour, totalTasks, doneTasks, isMonday);
+
+  const nextTask = tasks.find(t => !t.done);
+  if (nextTask) {
+    const prefix = getTaskPrefix(doneTasks, totalTasks);
+    body += `\n${prefix} ${nextTask.text}`;
+  }
+
+  sendNotification(title, body, mode);
 }

@@ -382,6 +382,10 @@ export function setupEventListeners(callbacks: {
     await window.planner.setSetting('doneTasksCollapsed' as any, newVal);
   });
 
+  ui.testNotificationBtn?.addEventListener('click', async () => {
+    await window.planner.testNotification();
+  });
+
   ui.grid?.addEventListener('focusout', (e: FocusEvent) => {
     if ((e.target as HTMLElement).classList.contains('task-edit')) {
       const dayKey = (e.target as HTMLElement).closest('.task-item')?.getAttribute('data-day-key');

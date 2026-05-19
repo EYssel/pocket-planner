@@ -40,4 +40,6 @@ contextBridge.exposeInMainWorld('planner', {
   openReleasesPage: () => ipcRenderer.invoke('open-releases-page'),
   copyToClipboard: (text: string) => ipcRenderer.invoke('copy-to-clipboard', text),
   openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
+  updateOSState: (stats: { nextTaskText: string | null, doneCount: number, totalCount: number }) => ipcRenderer.send('update-os-state', stats),
+  testNotification: () => ipcRenderer.invoke('test-notification'),
 });
