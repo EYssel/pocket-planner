@@ -3,6 +3,7 @@
 import { app, Tray, Menu, nativeImage } from 'electron';
 import * as path from 'path';
 import { checkForUpdates } from './updater';
+import { getTaskPrefix } from './messages';
 
 let tray: Tray | null = null;
 let _openWindow: ((mode?: string) => void) | null = null;
@@ -42,4 +43,24 @@ export function createTray(): void {
   tray.setToolTip(app.getName());
   tray.on('click', () => _openWindow!('planner'));
   rebuild();
+}
+
+export function updateTooltip(nextTaskText: string | null, doneCount: number, totalCount: number): void {
+  if (!tray) return;
+
+  let tooltip = app.getName();
+  if (nextTaskText) {
+    const prefix = getTaskPrefix(doneCount, totalCount);
+    const cleanTask = nextTaskText.replace(/\r?\n|\r/g, ' ').trim();
+    const truncated = cleanTask.length > 60 ? cleanTask.substring(0, 57) + '...' : cleanTask;
+    tooltip += ` - ${prefix} ${truncated}`;
+  } else {
+    tooltip += ' - All caught up!';
+  }
+  
+  try {
+    tray.setToolTip(tooltip);
+  } catch (err) {
+    console.error('Failed to set tray tooltip:', err);
+  }
 }

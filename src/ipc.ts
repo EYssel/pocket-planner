@@ -14,7 +14,9 @@ import {
   getSetting, 
   setSetting 
 } from './store';
-import { reschedule, INTERVAL_OPTIONS } from './notifications';
+import { reschedule, triggerManualNotification, INTERVAL_OPTIONS } from './notifications';
+import { updateTooltip } from './tray';
+import { updateProgress } from './window';
 import { 
   weekInfoFromKey, 
   currentWeekKey, 
@@ -120,6 +122,16 @@ export function registerHandlers(): void {
 
   ipcMain.handle('open-releases-page', async () => {
     await shell.openExternal('https://github.com/EYssel/planner-app/releases/latest');
+    return true;
+  });
+
+  ipcMain.on('update-os-state', (_: any, { nextTaskText, doneCount, totalCount }: { nextTaskText: string | null, doneCount: number, totalCount: number }) => {
+    updateTooltip(nextTaskText, doneCount, totalCount);
+    updateProgress(doneCount, totalCount, nextTaskText);
+  });
+
+  ipcMain.handle('test-notification', () => {
+    triggerManualNotification();
     return true;
   });
 

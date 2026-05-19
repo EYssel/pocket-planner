@@ -221,6 +221,11 @@ export async function initSettings(callbacks: { loadWeek: (key: string) => Promi
   ui.workStartInput.value = (workStart ?? 8).toString();
   ui.workEndInput.value   = (workEnd ?? 18).toString();
 
+  const { name } = await window.planner.getAppInfo();
+  if (!name.includes('Dev') && ui.testNotificationBtn) {
+    ui.testNotificationBtn.style.display = 'none';
+  }
+
   const currentWeekKey = await window.planner.currentWeekKey();
   await callbacks.loadWeek(currentWeekKey);
   await callbacks.checkStaleTasks();

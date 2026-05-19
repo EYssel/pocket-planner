@@ -9,6 +9,8 @@ const mockPlanner = {
   savePlans: jest.fn(),
   currentWeekKey: jest.fn().mockResolvedValue('2026-W19'),
   getPreviousWeekKey: jest.fn().mockResolvedValue('2026-W18'),
+  currentDayKey: jest.fn().mockResolvedValue('2026-05-04'),
+  updateOSState: jest.fn(),
 };
 
 (global as any).window = {
@@ -128,5 +130,23 @@ describe('Renderer State Logic', () => {
       { text: 'Task 2', done: true }
       // Empty task should be filtered out
     ]);
+  });
+
+  test('notifyChange calls updateOSState with correct stats', async () => {
+    // Current day is 2026-05-04 (Monday).
+    // Initial Monday plans: [{ text: 'Task 1', done: false }, { text: 'Task 2', done: true }]
+    (mockPlanner.currentDayKey as jest.Mock).mockResolvedValue('2026-05-04');
+    
+    state.addTask('2026-05-04');
+    
+    // We expect addTask to trigger notifyChange, which calls updateOSState.
+    // wait a tick for async notifyChange
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(mockPlanner.updateOSState).toHaveBeenCalledWith({
+      nextTaskText: 'Task 1',
+      doneCount: 1,
+      totalCount: 2 // Task 1 and Task 2. The new empty task is filtered out in notifyChange's logic
+    });
   });
 });

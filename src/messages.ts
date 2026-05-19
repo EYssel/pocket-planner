@@ -126,10 +126,45 @@ export function getDynamicMessage(
     msg = getRandom(EVENING_MESSAGES);
   }
 
-  const body = msg.body
-    .replace('{total}', String(totalTasks))
-    .replace('{done}', String(doneTasks))
-    .replace('{remaining}', String(remaining));
+  let body = msg.body;
+
+  if (totalTasks === 1) {
+    body = body.replace(/these {total} tasks/gi, 'this 1 task');
+    body = body.replace(/those {total} tasks/gi, 'that 1 task');
+    body = body.replace(/{total} tasks/gi, '1 task');
+    body = body.replace(/{total} things/gi, '1 thing');
+    body = body.replace(/{total} missions/gi, '1 mission');
+    body = body.replace(/{total} goals/gi, '1 goal');
+  }
+
+  if (remaining === 1) {
+    body = body.replace(/these {remaining} tasks/gi, 'this 1 task');
+    body = body.replace(/those {remaining} tasks/gi, 'that 1 task');
+    body = body.replace(/these last {remaining} items/gi, 'this last 1 item');
+    body = body.replace(/those last {remaining} items/gi, 'that last 1 item');
+    body = body.replace(/{remaining} tasks/gi, '1 task');
+    body = body.replace(/{remaining} remaining tasks/gi, '1 remaining task');
+  }
+
+  if (doneTasks === 1) {
+    body = body.replace(/{done} tasks/gi, '1 task');
+  }
+
+  // Fallback for any leftover tokens and normal counts
+  body = body
+    .replace(/{total}/g, String(totalTasks))
+    .replace(/{done}/g, String(doneTasks))
+    .replace(/{remaining}/g, String(remaining));
 
   return { title: msg.title, body, mode: 'checkin' };
+}
+
+export function getTaskPrefix(doneCount: number, totalCount: number): string {
+  if (totalCount === 1) {
+    return 'Focus:';
+  } else if (totalCount > 1 && totalCount - doneCount === 1) {
+    return 'Last task:';
+  } else {
+    return 'Next:';
+  }
 }

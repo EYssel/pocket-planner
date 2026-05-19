@@ -2,6 +2,7 @@
 
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
+import { getTaskPrefix } from './messages';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -51,6 +52,41 @@ export function createWindow(mode: string = 'planner'): void {
       mainWindow?.hide();
     }
   });
+}
+
+export function updateProgress(doneCount: number, totalCount: number, nextTaskText: string | null): void {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+
+  let ratio = -1; // Default to hidden
+  if (totalCount > 0) {
+    ratio = doneCount / totalCount;
+    // Clamp between 0 and 1
+    ratio = Math.max(0, Math.min(1, ratio));
+  }
+  
+  mainWindow.setProgressBar(ratio);
+
+  // Update window title for better Taskbar/App Switcher integration
+  let title = app.getName();
+  if (nextTaskText) {
+    const prefix = getTaskPrefix(doneCount, totalCount);
+    const cleanTask = nextTaskText.replace(/\r?\n|\r/g, ' ').trim();
+    const truncated = cleanTask.length > 50 ? cleanTask.substring(0, 47) + '...' : cleanTask;
+    title += ` - ${prefix} ${truncated}`;
+  } else if (totalCount > 0 && doneCount === totalCount) {
+    title += ' - All tasks done!';
+  }
+  
+  try {
+    mainWindow.setTitle(title);
+  } catch (err) {
+    // Ignore title update errors
+  }
+
+  if (process.platform === 'darwin') {
+    const remaining = totalCount - doneCount;
+    app.setBadgeCount(remaining > 0 ? remaining : 0);
+  }
 }
 
 export function initSingleInstance(): boolean {

@@ -15,10 +15,38 @@ export function setRenderCallback(cb: RenderCallback) {
   renderCallback = cb;
 }
 
-function notifyChange(dayKey?: string) {
+async function notifyChange(dayKey?: string) {
   if (renderCallback) {
     renderCallback(dayKey);
   }
+  await refreshOSState();
+}
+
+export async function refreshOSState() {
+  // Update OS state (Tray, Taskbar, Dock)
+  const todayKey = await window.planner.currentDayKey();
+  
+  // Try to get from current weekData first
+  let day = weekData?.days?.find(d => d.key === todayKey);
+  let plans: Plan[] = [];
+
+  if (day) {
+    plans = day.plans.filter(p => p.text.trim() !== '');
+  } else {
+    // Today is not in the currently loaded week, fetch it from backend
+    const weekKey = await window.planner.weekKeyFromDayKey(todayKey);
+    const week = await window.planner.getWeek(weekKey);
+    if (week && week.days) {
+      plans = week.days.find((d: any) => d.key === todayKey)?.plans.filter((p: any) => p.text.trim() !== '') || [];
+    }
+  }
+
+  const nextTask = plans.find(p => !p.done);
+  window.planner.updateOSState({
+    nextTaskText: nextTask ? nextTask.text : null,
+    doneCount: plans.filter(p => p.done).length,
+    totalCount: plans.length
+  });
 }
 
 export function setCurrentWeekKey(key: string | null) {
@@ -72,6 +100,7 @@ export async function loadWeek(
   
   uiCallbacks.renderGrid();
   if (!skipStaleCheck) await uiCallbacks.checkStaleTasks();
+  await refreshOSState();
 }
 
 export async function checkStaleTasks(
