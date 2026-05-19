@@ -1,11 +1,11 @@
 {
-  "name": "pocket-planner",
+  "name": "weekly-planner",
   "version": "1.7.0",
   "description": "A simple weekly planning desktop app",
   "author": "Estian Yssel",
   "repository": {
     "type": "git",
-    "url": "https://github.com/EYssel/pocket-planner.git"
+    "url": "https://github.com/EYssel/planner-app.git"
   },
   "main": "dist/main.js",
   "scripts": {
@@ -44,12 +44,12 @@
     "typescript": "^6.0.3"
   },
   "build": {
-    "appId": "com.estianyssel.pocket-planner",
-    "productName": "Pocket Planner",
+    "appId": "com.estianyssel.weekly-planner",
+    "productName": "Weekly Planner",
     "publish": {
       "provider": "github",
       "owner": "EYssel",
-      "repo": "pocket-planner"
+      "repo": "planner-app"
     },
     "files": [
       "dist/**/*",
@@ -63,11 +63,11 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "icon.png"
+      "icon": "icon.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "icon.png"
+      "icon": "icon.icns"
     },
     "nsis": {
       "oneClick": true,

@@ -1,4 +1,4 @@
-# Pocket Planner
+# Weekly Planner
 
 A minimal desktop app for planning your week with daily morning notifications.
 

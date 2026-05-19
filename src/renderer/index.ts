@@ -11,7 +11,7 @@ async function init() {
   try {
     const appInfo = await window.planner.getAppInfo();
     if (appInfo) {
-      if (appInfo.name !== 'Pocket Planner') {
+      if (appInfo.name !== 'Weekly Planner') {
         document.title = appInfo.name;
         const logo = document.querySelector('.logo');
         if (logo) logo.textContent = appInfo.name;

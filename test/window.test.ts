@@ -27,32 +27,32 @@ jest.mock('electron', () => {
 });
 
 describe('Window Creation Title', () => {
-  test('should use Pocket Planner Dev in development mode', () => {
+  test('should use Weekly Planner Dev in development mode', () => {
     jest.isolateModules(() => {
       const { app, BrowserWindow } = require('electron');
       const { createWindow } = require('../src/window');
       
-      app.getName.mockReturnValue('Pocket Planner Dev');
+      app.getName.mockReturnValue('Weekly Planner Dev');
       
       createWindow('planner');
 
       expect(BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
-        title: 'Pocket Planner Dev'
+        title: 'Weekly Planner Dev'
       }));
     });
   });
 
-  test('should use Pocket Planner in production mode', () => {
+  test('should use Weekly Planner in production mode', () => {
     jest.isolateModules(() => {
       const { app, BrowserWindow } = require('electron');
       const { createWindow } = require('../src/window');
       
-      app.getName.mockReturnValue('Pocket Planner');
+      app.getName.mockReturnValue('Weekly Planner');
       
       createWindow('planner');
 
       expect(BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
-        title: 'Pocket Planner'
+        title: 'Weekly Planner'
       }));
     });
   });
