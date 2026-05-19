@@ -291,14 +291,38 @@ export function setupEventListeners(callbacks: {
     ui.installUpdateBtn.style.display = 'none';
   });
 
-  window.planner.onUpdateAvailable((version: string) => {
+  window.planner.onUpdateAvailable((version: string, isMac: boolean) => {
     ui.updateBanner.classList.add('show');
-    ui.updateStatus.innerHTML = `<strong>Downloading Update</strong> Version ${version} is being prepared…`;
-    ui.updateProgressContainer.style.display = 'block';
-    ui.updateProgressBar.style.width = '0%';
-    ui.installUpdateBtn.style.display = 'inline-block';
-    ui.installUpdateBtn.disabled = true;
-    ui.installUpdateBtn.textContent = 'Downloading…';
+    if (isMac) {
+      ui.updateStatus.innerHTML = `<strong>Update Available</strong> Version ${version} is ready to download.`;
+      ui.updateProgressContainer.style.display = 'none';
+      ui.installUpdateBtn.style.display = 'inline-block';
+      ui.installUpdateBtn.disabled = false;
+      ui.installUpdateBtn.textContent = 'Download Update';
+      
+      // Setup macOS specific button
+      ui.copyMacCmdBtn.style.display = 'inline-block';
+      const cmd = `xattr -cr /Applications/*Weekly*Planner*${version}*.dmg`;
+      ui.copyMacCmdBtn.onclick = async () => {
+        await window.planner.copyToClipboard(cmd);
+        const originalText = ui.copyMacCmdBtn.textContent;
+        ui.copyMacCmdBtn.textContent = 'Copied Command!';
+        setTimeout(() => ui.copyMacCmdBtn.textContent = originalText, 2000);
+      };
+      
+      // Override install button to open releases page
+      ui.installUpdateBtn.onclick = () => {
+        window.planner.openReleasesPage();
+      };
+    } else {
+      ui.updateStatus.innerHTML = `<strong>Downloading Update</strong> Version ${version} is being prepared…`;
+      ui.updateProgressContainer.style.display = 'block';
+      ui.updateProgressBar.style.width = '0%';
+      ui.installUpdateBtn.style.display = 'inline-block';
+      ui.installUpdateBtn.disabled = true;
+      ui.installUpdateBtn.textContent = 'Downloading…';
+      ui.copyMacCmdBtn.style.display = 'none';
+    }
   });
 
   window.planner.onUpdateNotAvailable(() => {
@@ -306,6 +330,7 @@ export function setupEventListeners(callbacks: {
     ui.updateStatus.innerHTML = '<strong>App Up to Date</strong> No updates available at this time.';
     ui.updateProgressContainer.style.display = 'none';
     ui.installUpdateBtn.style.display = 'none';
+    ui.copyMacCmdBtn.style.display = 'none';
     
     setTimeout(() => {
       ui.updateBanner.classList.remove('show');
@@ -325,12 +350,14 @@ export function setupEventListeners(callbacks: {
     ui.updateProgressContainer.style.display = 'none';
     ui.installUpdateBtn.disabled = false;
     ui.installUpdateBtn.textContent = 'Restart to Install';
-  });
+    ui.copyMacCmdBtn.style.display = 'none';
 
-  ui.installUpdateBtn?.addEventListener('click', () => {
-    ui.installUpdateBtn.disabled = true;
-    ui.installUpdateBtn.textContent = 'Restarting...';
-    window.planner.installUpdate();
+    // Ensure it's bound to install
+    ui.installUpdateBtn.onclick = () => {
+      ui.installUpdateBtn.disabled = true;
+      ui.installUpdateBtn.textContent = 'Restarting...';
+      window.planner.installUpdate();
+    };
   });
 
   ui.closeUpdateBanner?.addEventListener('click', () => {

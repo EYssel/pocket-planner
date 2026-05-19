@@ -23,12 +23,13 @@ npm start
 
 ### macOS Installation Note
 Because this app is not signed by an identified developer, macOS may say the app is "damaged" or cannot be opened. To fix this:
-1. Drag **Weekly Planner** to your **Applications** folder.
-2. Right-click the app in your Applications folder and select **Open**.
-3. In the dialog that appears, click **Open** again.
-4. *Alternatively*, run this command in your Terminal (update version number):
+1. Open the downloaded `.dmg` file.
+2. Drag **Weekly Planner** to your **Applications** folder.
+3. **Crucial:** Do not open the app directly. Instead, right-click the **Weekly Planner** icon in your **Applications** folder and select **Open**.
+4. In the dialog that appears, click **Open** again.
+5. *Alternatively*, if it still won't open, run this command in your Terminal:
    ```bash
-   xattr -cr /Applications/Weekly-Planner-1.x.x-arm64.dmg;
+   xattr -cr /Applications/*Weekly*Planner*.dmg
    ```
 
 ## Features & Usage
