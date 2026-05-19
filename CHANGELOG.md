@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/EYssel/planner-app/compare/v1.9.0...v1.10.0) (2026-05-19)
+
+### Features
+
+*   Added support for manual updates on macOS.
+*   Enhanced the visual styling of the title bar for macOS users.
+
 ## [1.9.0](https://github.com/EYssel/planner-app/compare/v1.8.0...v1.9.0) (2026-05-19)
 
 
