@@ -3,14 +3,14 @@
   --surface:  #141414;
   --surface2: #1a1a1a;
   --border:   #2a2a2a;
-  --accent:   #2787ed;
+  --accent:   #e8ff47;
   --accent2:  #ff6b35;
   --text:     #f0f0f0;
   --muted:    #555;
   --done:     #2a2a2a;
   --done-text:#444;
-  --today-bg: #0f172a;
-  --today-border: #2787ed;
+  --today-bg: #1c1f0f;
+  --today-border: #e8ff47;
   --radius:   4px;
 }
 
