@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/EYssel/planner-app/compare/v1.8.0...v1.9.0) (2026-05-19)
+
+
+### Features
+
+* revert rebranding ([6a26932](https://github.com/EYssel/planner-app/commit/6a2693241f9f6d466c3501b0f3eb73b9ba401620))
+
+
+### Bug Fixes
+
+* ci for changelog ([0c6c0ed](https://github.com/EYssel/planner-app/commit/0c6c0ed8efe65ab0f1d28f2636a56d10b9f4fc29))
+* use ico and icns files instead of png ([f34a4b8](https://github.com/EYssel/planner-app/commit/f34a4b8fd2b67629687a715f5ddda4c33d0e5745))
+
 ## [1.8.0](https://github.com/EYssel/planner-app/compare/v1.7.0...v1.8.0) (2026-05-19)
 
 ### Features
