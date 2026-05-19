@@ -17,7 +17,7 @@ npm start
 - **Respects Your Workday** — Notifications only fire during your configured **Work Start** and **Work End** hours.
 - **Smart Messaging** — Notifications change dynamically based on the time of day and progress. They now explicitly show your **Next up** task to keep you focused.
 - **Deep Linking** — Clicking a notification opens the app directly to the relevant view.
-- **OS Integration** — 
+- **OS Integration** —
     - **System Tray:** Hover over the tray icon to see your current progress and next task.
     - **Taskbar (Windows):** A progress bar on the app icon reflects your daily completion.
     - **Dock (macOS):** A red badge count shows the number of tasks remaining for today.

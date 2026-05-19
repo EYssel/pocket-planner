@@ -69,7 +69,7 @@ describe('Window Creation Title', () => {
       createWindow();
       const { BrowserWindow } = require('electron');
       const mockWindow = (BrowserWindow as unknown as jest.Mock).mock.results[0].value;
-      
+
       updateProgress(2, 5, 'Next Task');
       expect(mockWindow.setProgressBar).toHaveBeenCalledWith(0.4);
       expect(mockWindow.setTitle).toHaveBeenCalledWith(expect.stringContaining('Next: Next Task'));
@@ -80,7 +80,7 @@ describe('Window Creation Title', () => {
       createWindow();
       const { BrowserWindow } = require('electron');
       const mockWindow = (BrowserWindow as unknown as jest.Mock).mock.results[0].value;
-      
+
       updateProgress(0, 1, 'Only Task');
       expect(mockWindow.setTitle).toHaveBeenCalledWith(expect.stringContaining('Focus: Only Task'));
     });
@@ -90,7 +90,7 @@ describe('Window Creation Title', () => {
       createWindow();
       const { BrowserWindow } = require('electron');
       const mockWindow = (BrowserWindow as unknown as jest.Mock).mock.results[0].value;
-      
+
       updateProgress(2, 3, 'Last Task');
       expect(mockWindow.setTitle).toHaveBeenCalledWith(expect.stringContaining('Last task: Last Task'));
     });
@@ -100,7 +100,7 @@ describe('Window Creation Title', () => {
       createWindow();
       const { BrowserWindow } = require('electron');
       const mockWindow = (BrowserWindow as unknown as jest.Mock).mock.results[0].value;
-      
+
       updateProgress(4, 4, null);
       expect(mockWindow.setProgressBar).toHaveBeenCalledWith(1);
       expect(mockWindow.setTitle).toHaveBeenCalledWith(expect.stringContaining('All tasks done!'));
@@ -111,7 +111,7 @@ describe('Window Creation Title', () => {
       createWindow();
       const { BrowserWindow } = require('electron');
       const mockWindow = (BrowserWindow as unknown as jest.Mock).mock.results[0].value;
-      
+
       updateProgress(0, 0, null);
       expect(mockWindow.setProgressBar).toHaveBeenCalledWith(-1);
     });
@@ -119,16 +119,16 @@ describe('Window Creation Title', () => {
     test('should set badge count on macOS', () => {
       const originalPlatform = process.platform;
       Object.defineProperty(process, 'platform', { value: 'darwin' });
-      
+
       const { app } = require('electron');
       app.setBadgeCount = jest.fn();
-      
+
       const { createWindow, updateProgress } = require('../src/window');
       createWindow();
-      
+
       updateProgress(1, 5, 'Doing work');
       expect(app.setBadgeCount).toHaveBeenCalledWith(4);
-      
+
       Object.defineProperty(process, 'platform', { value: originalPlatform });
     });
   });

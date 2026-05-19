@@ -25,9 +25,9 @@ async function notifyChange(dayKey?: string) {
 export async function refreshOSState() {
   // Update OS state (Tray, Taskbar, Dock)
   const todayKey = await window.planner.currentDayKey();
-  
+
   // Try to get from current weekData first
-  let day = weekData?.days?.find(d => d.key === todayKey);
+  const day = weekData?.days?.find(d => d.key === todayKey);
   let plans: Plan[] = [];
 
   if (day) {

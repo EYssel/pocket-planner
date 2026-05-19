@@ -51,7 +51,7 @@ The app uses isolated data directories to prevent development from affecting pro
 ### 5. OS Integration (Main Process Sync)
 - **Flow:** Renderer (`state.ts`) calculates statistics -> `window.planner.updateOSState` -> Main Process (`ipc.ts`) -> Updates Tray (`tray.ts`) and Taskbar/Dock (`window.ts`).
 - **Stats:** Always include `nextTaskText` (first incomplete task), `doneCount`, and `totalCount` for the current day.
-- **Visuals:** 
+- **Visuals:**
     - **Tray:** Tooltip shows the next task.
     - **Taskbar (Windows):** Progress bar reflects daily completion.
     - **Dock (macOS):** Badge count shows remaining tasks for today.

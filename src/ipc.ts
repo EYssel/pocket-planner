@@ -14,12 +14,15 @@ import {
   getSetting,
   setSetting,
 } from './store';
-import { reschedule, INTERVAL_OPTIONS } from './notifications';
+import { reschedule, triggerManualNotification, INTERVAL_OPTIONS } from "./notifications";
+import { updateTooltip } from "./tray";
+import { updateProgress } from "./window";
 import {
   weekInfoFromKey,
   currentWeekKey,
   weekDayKeys,
   dayInfoFromKey,
+
   getPreviousWeekKey,
   offsetWeekKey,
   currentDayKey,

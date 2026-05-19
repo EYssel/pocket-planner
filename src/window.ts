@@ -63,7 +63,7 @@ export function updateProgress(doneCount: number, totalCount: number, nextTaskTe
     // Clamp between 0 and 1
     ratio = Math.max(0, Math.min(1, ratio));
   }
-  
+
   mainWindow.setProgressBar(ratio);
 
   // Update window title for better Taskbar/App Switcher integration
@@ -76,7 +76,7 @@ export function updateProgress(doneCount: number, totalCount: number, nextTaskTe
   } else if (totalCount > 0 && doneCount === totalCount) {
     title += ' - All tasks done!';
   }
-  
+
   try {
     mainWindow.setTitle(title);
   } catch (err) {

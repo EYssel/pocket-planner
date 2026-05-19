@@ -63,7 +63,7 @@ export function updateTooltip(nextTaskText: string | null, doneCount: number, to
   } else {
     tooltip += ' - All caught up!';
   }
-  
+
   try {
     tray.setToolTip(tooltip);
   } catch (err) {

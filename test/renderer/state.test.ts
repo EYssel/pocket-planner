@@ -136,9 +136,9 @@ describe('Renderer State Logic', () => {
     // Current day is 2026-05-04 (Monday).
     // Initial Monday plans: [{ text: 'Task 1', done: false }, { text: 'Task 2', done: true }]
     (mockPlanner.currentDayKey as jest.Mock).mockResolvedValue('2026-05-04');
-    
+
     state.addTask('2026-05-04');
-    
+
     // We expect addTask to trigger notifyChange, which calls updateOSState.
     // wait a tick for async notifyChange
     await new Promise(resolve => setTimeout(resolve, 0));

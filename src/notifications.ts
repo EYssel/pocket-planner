@@ -55,7 +55,8 @@ export function reschedule(): void {
     const totalTasks = tasks.length;
     const doneTasks = tasks.filter((t) => t.done).length;
 
-    let { title, body, mode } = getDynamicMessage(hour, totalTasks, doneTasks, isMonday);
+    const msg = getDynamicMessage(hour, totalTasks, doneTasks, isMonday);
+    let body = msg.body;
 
     const nextTask = tasks.find(t => !t.done);
     if (nextTask) {
@@ -63,7 +64,7 @@ export function reschedule(): void {
       body += `\n${prefix} ${nextTask.text}`;
     }
 
-    sendNotification(title, body, mode);
+    sendNotification(msg.title, body, msg.mode);
   });
 
   cronJobs.push(job);
@@ -78,7 +79,8 @@ export function triggerManualNotification(): void {
   const totalTasks = tasks.length;
   const doneTasks = tasks.filter(t => t.done).length;
 
-  let { title, body, mode } = getDynamicMessage(hour, totalTasks, doneTasks, isMonday);
+  const msg = getDynamicMessage(hour, totalTasks, doneTasks, isMonday);
+  let body = msg.body;
 
   const nextTask = tasks.find(t => !t.done);
   if (nextTask) {
@@ -86,5 +88,5 @@ export function triggerManualNotification(): void {
     body += `\n${prefix} ${nextTask.text}`;
   }
 
-  sendNotification(title, body, mode);
+  sendNotification(msg.title, body, msg.mode);
 }

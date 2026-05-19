@@ -106,11 +106,11 @@ describe('ipc', () => {
     test('update-os-state should call tray and window update functions', () => {
       const { updateTooltip } = require('../src/tray');
       const { updateProgress } = require('../src/window');
-      
-      listeners['update-os-state']({}, { 
-        nextTaskText: 'Next', 
-        doneCount: 1, 
-        totalCount: 2 
+
+      listeners['update-os-state']({}, {
+        nextTaskText: 'Next',
+        doneCount: 1,
+        totalCount: 2
       });
 
       expect(updateTooltip).toHaveBeenCalledWith('Next', 1, 2);
