@@ -63,11 +63,11 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "icon.png"
+      "icon": "icon.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "icon.png"
+      "icon": "icon.icns"
     },
     "nsis": {
       "oneClick": true,
