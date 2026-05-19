@@ -90,4 +90,56 @@ describe('tray', () => {
 
     expect(checkForUpdates).toHaveBeenCalled();
   });
+
+  describe('updateTooltip', () => {
+    const { updateTooltip } = require('../src/tray');
+
+    test('should update tooltip with next task prefix', () => {
+      createTray();
+      const mockTrayInstance = (Tray as unknown as jest.Mock).mock.results[0].value;
+      
+      updateTooltip('Doing something important', 0, 3);
+      
+      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Weekly Planner - Next: Doing something important');
+    });
+
+    test('should update tooltip with focus prefix for single task', () => {
+      createTray();
+      const mockTrayInstance = (Tray as unknown as jest.Mock).mock.results[0].value;
+      
+      updateTooltip('Single task', 0, 1);
+      
+      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Weekly Planner - Focus: Single task');
+    });
+
+    test('should update tooltip with last task prefix', () => {
+      createTray();
+      const mockTrayInstance = (Tray as unknown as jest.Mock).mock.results[0].value;
+      
+      updateTooltip('One left', 2, 3);
+      
+      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Weekly Planner - Last task: One left');
+    });
+
+    test('should show all caught up if no task', () => {
+      createTray();
+      const mockTrayInstance = (Tray as unknown as jest.Mock).mock.results[0].value;
+      
+      updateTooltip(null, 0, 0);
+      
+      expect(mockTrayInstance.setToolTip).toHaveBeenCalledWith('Weekly Planner - All caught up!');
+    });
+
+    test('should truncate long task names', () => {
+      createTray();
+      const mockTrayInstance = (Tray as unknown as jest.Mock).mock.results[0].value;
+      const longTask = 'A'.repeat(100);
+      
+      updateTooltip(longTask, 0, 1);
+      
+      const tooltip = mockTrayInstance.setToolTip.mock.calls.find((c: any) => c[0].includes('...'))[0];
+      expect(tooltip.length).toBeLessThanOrEqual(60 + 'Weekly Planner - Focus: '.length);
+      expect(tooltip).toContain('...');
+    });
+  });
 });

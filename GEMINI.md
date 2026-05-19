@@ -48,6 +48,14 @@ The app uses isolated data directories to prevent development from affecting pro
 - **Persistence Mandate:** All backend saving logic (e.g., `src/store.ts`) MUST explicitly include the `notes` field during validation. Failure to do so will result in data loss during saves, restores, or cleanup actions.
 - **Summaries:** Notes must be included in the "Today's Summary" export, indented beneath the parent task.
 
+### 5. OS Integration (Main Process Sync)
+- **Flow:** Renderer (`state.ts`) calculates statistics -> `window.planner.updateOSState` -> Main Process (`ipc.ts`) -> Updates Tray (`tray.ts`) and Taskbar/Dock (`window.ts`).
+- **Stats:** Always include `nextTaskText` (first incomplete task), `doneCount`, and `totalCount` for the current day.
+- **Visuals:** 
+    - **Tray:** Tooltip shows the next task.
+    - **Taskbar (Windows):** Progress bar reflects daily completion.
+    - **Dock (macOS):** Badge count shows remaining tasks for today.
+
 ## Workflows
 
 | Command | Action |
@@ -57,7 +65,7 @@ The app uses isolated data directories to prevent development from affecting pro
 | `npm.cmd run build` | Package Windows executable |
 
 ## Future Work
-- [ ] Customizable notification intervals via UI.
+- [x] Customizable notification intervals via UI.
 - [ ] Weekend view toggle.
 - [ ] Task priority or tagging.
 - [ ] Global Keyboard Shortcut (Quick Add).

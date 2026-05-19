@@ -15,8 +15,12 @@ npm start
 
 - **Configurable Notifications** — Choose your preferred interval (30m, 1h, 2h, 4h) in Settings ⚙️.
 - **Respects Your Workday** — Notifications only fire during your configured **Work Start** and **Work End** hours.
-- **Smart Messaging** — Notifications change dynamically based on the time of day, progress on your tasks, and special focus for Monday planning.
+- **Smart Messaging** — Notifications change dynamically based on the time of day and progress. They now explicitly show your **Next up** task to keep you focused.
 - **Deep Linking** — Clicking a notification opens the app directly to the relevant view.
+- **OS Integration** — 
+    - **System Tray:** Hover over the tray icon to see your current progress and next task.
+    - **Taskbar (Windows):** A progress bar on the app icon reflects your daily completion.
+    - **Dock (macOS):** A red badge count shows the number of tasks remaining for today.
 - **System Tray** — The app stays active in the system tray (bottom-right on Windows, menu bar on Mac) to ensure notifications fire reliably.
 
 > ⚠️ Notifications only fire while the app is running in the background/tray. Quit from the tray menu to stop them completely.

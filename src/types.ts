@@ -65,6 +65,8 @@ export interface PlannerAPI {
   openReleasesPage: () => Promise<void>;
   copyToClipboard: (text: string) => Promise<void>;
   openExternal: (url: string) => Promise<void>;
+  updateOSState: (stats: { nextTaskText: string | null, doneCount: number, totalCount: number }) => void;
+  testNotification: () => Promise<void>;
 }
 
 declare global {

@@ -161,5 +161,22 @@ describe('notifications', () => {
 
       jest.useRealTimers();
     });
+
+    test('cron job callback should include the next incomplete task in the body', () => {
+      (store.getSetting as jest.Mock).mockReturnValue(60);
+      (store.getPlans as jest.Mock).mockReturnValue([
+        { text: 'Done Task', done: true },
+        { text: 'Next Task', done: false },
+        { text: 'Future Task', done: false }
+      ]);
+      reschedule();
+      const jobCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
+
+      jobCallback();
+
+      expect(Notification).toHaveBeenCalledWith(expect.objectContaining({
+        body: expect.stringContaining('Next: Next Task')
+      }));
+    });
   });
 });

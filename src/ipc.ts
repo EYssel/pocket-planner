@@ -138,6 +138,16 @@ export function registerHandlers(): void {
     return true;
   });
 
+  ipcMain.on('update-os-state', (_: any, { nextTaskText, doneCount, totalCount }: { nextTaskText: string | null, doneCount: number, totalCount: number }) => {
+    updateTooltip(nextTaskText, doneCount, totalCount);
+    updateProgress(doneCount, totalCount, nextTaskText);
+  });
+
+  ipcMain.handle('test-notification', () => {
+    triggerManualNotification();
+    return true;
+  });
+
   ipcMain.handle('get-release-notes', () => {
     try {
       const possiblePaths = [
