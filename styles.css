@@ -152,13 +152,31 @@ body {
 header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  -webkit-app-region: drag;
+  gap: 20px;
 }
-.logo { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); }
-.week-nav { display: flex; align-items: center; gap: 10px; }
+.logo-container { 
+  margin-left: 85px; 
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+.logo { 
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; 
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+}
+.week-nav { 
+  display: flex; align-items: center; gap: 10px; 
+  -webkit-app-region: no-drag;
+}
 .week-info { display: flex; flex-direction: column; align-items: center; min-width: 130px; }
 .cw-label { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--accent); line-height: 1.2; }
 .week-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
-.nav-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 18px; width: 28px; height: 28px; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.nav-btn { 
+  background: transparent; border: 1px solid var(--border); color: var(--muted); 
+  font-size: 18px; width: 28px; height: 28px; border-radius: var(--radius); 
+  cursor: pointer; display: flex; align-items: center; justify-content: center; 
+  transition: all 0.15s;
+}
 .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
 body.dragging-active #prev-week,
 body.dragging-active #next-week {
@@ -175,8 +193,15 @@ body.dragging-active #next-week {
 }
 .nav-btn:disabled { opacity: 0.2; cursor: default; }
 
-.header-right { display: flex; align-items: center; gap: 12px; }
-.icon-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); width: 28px; height: 28px; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.header-right { 
+  display: flex; align-items: center; gap: 12px; 
+  -webkit-app-region: no-drag;
+}
+.icon-btn { 
+  background: transparent; border: 1px solid var(--border); color: var(--muted); 
+  width: 28px; height: 28px; border-radius: var(--radius); cursor: pointer; 
+  display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+}
 .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── Grid ── */
