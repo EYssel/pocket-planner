@@ -21,6 +21,17 @@ npm start
 
 > ⚠️ Notifications only fire while the app is running in the background/tray. Quit from the tray menu to stop them completely.
 
+### macOS Installation Note
+Because this app is not signed by an identified developer, macOS may say the app is "damaged" or cannot be opened. To fix this:
+1. Open the downloaded `.dmg` file.
+2. Drag **Weekly Planner** to your **Applications** folder.
+3. **Crucial:** Do not open the app directly. Instead, right-click the **Weekly Planner** icon in your **Applications** folder and select **Open**.
+4. In the dialog that appears, click **Open** again.
+5. *Alternatively*, if it still won't open, run this command in your Terminal:
+   ```bash
+   xattr -cr /Applications/*Weekly*Planner*.dmg
+   ```
+
 ## Features & Usage
 
 - **Add task** — click `+ task` or press Enter inside a task field.

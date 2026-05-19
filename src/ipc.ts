@@ -118,6 +118,11 @@ export function registerHandlers(): void {
     return true;
   });
 
+  ipcMain.handle('open-releases-page', async () => {
+    await shell.openExternal('https://github.com/EYssel/planner-app/releases/latest');
+    return true;
+  });
+
   ipcMain.handle('get-release-notes', () => {
     try {
       const possiblePaths = [

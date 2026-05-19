@@ -24,6 +24,7 @@ export const updateStatus           = document.getElementById('update-status') a
 export const updateProgressContainer = document.getElementById('update-progress-container') as HTMLElement;
 export const updateProgressBar       = document.getElementById('update-progress-bar') as HTMLElement;
 export const installUpdateBtn       = document.getElementById('install-update-btn') as HTMLButtonElement;
+export const copyMacCmdBtn          = document.getElementById('copy-mac-cmd-btn') as HTMLButtonElement;
 export const closeUpdateBanner      = document.getElementById('close-update-banner') as HTMLElement;
 
 export const recycleBinOverlay = document.getElementById('recycle-bin-overlay') as HTMLElement;

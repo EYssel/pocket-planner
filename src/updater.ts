@@ -1,7 +1,7 @@
 'use strict';
 
 import { autoUpdater } from 'electron-updater';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 
 /**
  * Initializes the auto-updater to check for and notify about updates.
@@ -12,11 +12,16 @@ export function initUpdater(): void {
     return;
   }
 
+  // Disable auto-download on macOS because unsigned apps cannot be auto-updated
+  if (process.platform === 'darwin') {
+    autoUpdater.autoDownload = false;
+  }
+
   // Set up update events if needed (optional)
   autoUpdater.on('update-available', (info) => {
     console.log('Update available:', info.version);
     BrowserWindow.getAllWindows().forEach(win => {
-      win.webContents.send('update-available', info.version);
+      win.webContents.send('update-available', info.version, process.platform === 'darwin');
     });
   });
 
@@ -66,4 +71,11 @@ export function checkForUpdates(): void {
     return;
   }
   autoUpdater.checkForUpdates();
+}
+
+/**
+ * Opens the releases page in the user's default browser.
+ */
+export function openReleasesPage(): void {
+  shell.openExternal('https://github.com/EYssel/planner-app/releases/latest');
 }

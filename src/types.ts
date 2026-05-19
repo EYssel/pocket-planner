@@ -57,11 +57,12 @@ export interface PlannerAPI {
   getAppInfo: () => Promise<{ name: string; version: string }>;
   getReleaseNotes: () => Promise<string>;
   onCheckingForUpdates: (cb: () => void) => void;
-  onUpdateAvailable: (cb: (version: string) => void) => void;
+  onUpdateAvailable: (cb: (version: string, isMac: boolean) => void) => void;
   onUpdateNotAvailable: (cb: () => void) => void;
   onUpdateProgress: (cb: (percent: number) => void) => void;
   onUpdateDownloaded: (cb: () => void) => void;
   installUpdate: () => void;
+  openReleasesPage: () => Promise<void>;
   copyToClipboard: (text: string) => Promise<void>;
   openExternal: (url: string) => Promise<void>;
 }
