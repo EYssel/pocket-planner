@@ -7,7 +7,7 @@ import { init, createTray } from '../src/tray';
 import { checkForUpdates } from '../src/updater';
 
 jest.mock('electron', () => ({
-  app: { 
+  app: {
     quit: jest.fn(),
     getName: jest.fn().mockReturnValue('Weekly Planner'),
     getAppPath: jest.fn().mockReturnValue('/mock/path'),
@@ -59,12 +59,12 @@ describe('tray', () => {
 
   test('rebuild should create minimal menu', () => {
     createTray();
-    
+
     const template = (Menu.buildFromTemplate as jest.Mock).mock.calls[0][0];
     const openPlanner = template.find((i: any) => i.label === 'Open Planner');
-    const checkIn     = template.find((i: any) => i.label === 'Check In');
-    const quit        = template.find((i: any) => i.label === 'Quit');
-    
+    const checkIn = template.find((i: any) => i.label === 'Check In');
+    const quit = template.find((i: any) => i.label === 'Quit');
+
     expect(openPlanner).toBeDefined();
     expect(checkIn).toBeDefined();
     expect(quit).toBeDefined();
@@ -74,9 +74,9 @@ describe('tray', () => {
     createTray();
     const template = (Menu.buildFromTemplate as jest.Mock).mock.calls[0][0];
     const quitItem = template.find((i: any) => i.label === 'Quit');
-    
+
     quitItem.click();
-    
+
     expect(global.isQuitting).toBe(true);
     expect(app.quit).toHaveBeenCalled();
   });
@@ -85,9 +85,9 @@ describe('tray', () => {
     createTray();
     const template = (Menu.buildFromTemplate as jest.Mock).mock.calls[0][0];
     const updateItem = template.find((i: any) => i.label === 'Check for Updates');
-    
+
     updateItem.click();
-    
+
     expect(checkForUpdates).toHaveBeenCalled();
   });
 });

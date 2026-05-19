@@ -20,21 +20,21 @@ export function initUpdater(): void {
   // Set up update events if needed (optional)
   autoUpdater.on('update-available', (info) => {
     console.log('Update available:', info.version);
-    BrowserWindow.getAllWindows().forEach(win => {
+    BrowserWindow.getAllWindows().forEach((win) => {
       win.webContents.send('update-available', info.version, process.platform === 'darwin');
     });
   });
 
   autoUpdater.on('update-not-available', (info) => {
     console.log('Update not available:', info.version);
-    BrowserWindow.getAllWindows().forEach(win => {
+    BrowserWindow.getAllWindows().forEach((win) => {
       win.webContents.send('update-not-available', info.version);
     });
   });
 
   autoUpdater.on('checking-for-update', () => {
     console.log('Checking for updates...');
-    BrowserWindow.getAllWindows().forEach(win => {
+    BrowserWindow.getAllWindows().forEach((win) => {
       win.webContents.send('checking-for-updates');
     });
   });
@@ -42,14 +42,14 @@ export function initUpdater(): void {
   autoUpdater.on('download-progress', (progressObj) => {
     const percent = Math.round(progressObj.percent);
     console.log(`Download progress: ${percent}%`);
-    BrowserWindow.getAllWindows().forEach(win => {
+    BrowserWindow.getAllWindows().forEach((win) => {
       win.webContents.send('update-progress', percent);
     });
   });
 
   autoUpdater.on('update-downloaded', () => {
     console.log('Update downloaded; will install now or on next restart.');
-    BrowserWindow.getAllWindows().forEach(win => {
+    BrowserWindow.getAllWindows().forEach((win) => {
       win.webContents.send('update-downloaded');
     });
   });

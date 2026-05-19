@@ -10,7 +10,7 @@ import * as path from 'path';
 function getUserDataPath(): string {
   const appName = 'weekly-planner-dev';
   const home = process.env.HOME || process.env.USERPROFILE || '';
-  
+
   switch (process.platform) {
     case 'win32':
       return path.join(process.env.APPDATA || '', appName);

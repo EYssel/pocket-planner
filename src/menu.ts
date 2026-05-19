@@ -15,11 +15,11 @@ export function initMenu(): void {
           label: 'Check for Updates',
           click: () => {
             checkForUpdates();
-          }
+          },
         },
         { type: 'separator' },
-        { role: 'quit' }
-      ]
+        { role: 'quit' },
+      ],
     },
     {
       label: 'Edit',
@@ -30,8 +30,8 @@ export function initMenu(): void {
         { role: 'cut' },
         { role: 'copy' },
         { role: 'paste' },
-        { role: 'selectAll' }
-      ]
+        { role: 'selectAll' },
+      ],
     },
     {
       label: 'View',
@@ -44,15 +44,12 @@ export function initMenu(): void {
         { role: 'zoomIn' },
         { role: 'zoomOut' },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
-      ]
+        { role: 'togglefullscreen' },
+      ],
     },
     {
       label: 'Window',
-      submenu: [
-        { role: 'minimize' },
-        { role: 'close' }
-      ]
+      submenu: [{ role: 'minimize' }, { role: 'close' }],
     },
     {
       role: 'help',
@@ -61,10 +58,10 @@ export function initMenu(): void {
           label: 'GitHub Repository',
           click: async () => {
             await shell.openExternal('https://github.com/zaesy/planner-app');
-          }
-        }
-      ]
-    }
+          },
+        },
+      ],
+    },
   ];
 
   if (process.platform === 'darwin') {
@@ -79,8 +76,8 @@ export function initMenu(): void {
         { role: 'hideOthers' },
         { role: 'unhide' },
         { type: 'separator' },
-        { role: 'quit' }
-      ]
+        { role: 'quit' },
+      ],
     });
 
     // Window menu (macOS)
@@ -91,7 +88,7 @@ export function initMenu(): void {
       { type: 'separator' },
       { role: 'front' },
       { type: 'separator' },
-      { role: 'window' }
+      { role: 'window' },
     ];
   }
 

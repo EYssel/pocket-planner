@@ -20,7 +20,10 @@
     "seed": "node dist/scripts/seed-test-data.js",
     "clean": "node dist/scripts/clean-dev-data.js",
     "test": "jest",
-    "release": "standard-version --skip.commit --skip.tag"
+    "release": "standard-version --skip.commit --skip.tag",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "electron-store": "^8.1.0",
@@ -29,19 +32,27 @@
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
     "@types/marked": "^5.0.2",
     "@types/node": "^25.6.0",
     "@types/node-cron": "^3.0.11",
+    "@typescript-eslint/eslint-plugin": "^8.59.4",
+    "@typescript-eslint/parser": "^8.59.4",
     "electron": "^28.0.0",
     "electron-builder": "^24.0.0",
     "esbuild": "^0.28.0",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
+    "prettier": "^3.8.3",
     "standard-version": "^9.5.0",
     "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.4"
   },
   "build": {
     "appId": "com.estianyssel.weekly-planner",

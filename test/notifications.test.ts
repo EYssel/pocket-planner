@@ -36,11 +36,11 @@ describe('notifications', () => {
       const openWindow = jest.fn();
       init(openWindow);
       sendNotification('Title', 'Body', 'mode');
-      
+
       expect(Notification).toHaveBeenCalledWith({
         title: 'Title',
         body: 'Body',
-        silent: false
+        silent: false,
       });
       // @ts-ignore
       const instance = (Notification as jest.Mock).mock.results[0].value;
@@ -50,7 +50,7 @@ describe('notifications', () => {
     test('should handle click event', () => {
       const openWindow = jest.fn();
       init(openWindow);
-      
+
       let clickHandler: any;
       // @ts-ignore
       (Notification.prototype.on as jest.Mock) = jest.fn().mockImplementation((event, cb) => {
@@ -128,18 +128,19 @@ describe('notifications', () => {
       const jobCallback = (cron.schedule as jest.Mock).mock.calls[0][1];
 
       // Mock Monday 8:00 AM (May 4, 2026 is Monday)
-      const monday8AM = new Date(2026, 4, 4, 8, 0, 0); 
+      const monday8AM = new Date(2026, 4, 4, 8, 0, 0);
       jest.useFakeTimers().setSystemTime(monday8AM);
 
       jobCallback();
 
-      expect(Notification).toHaveBeenCalledWith(expect.objectContaining({
-        title: '📋 Plan your week'
-      }));
+      expect(Notification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: '📋 Plan your week',
+        }),
+      );
 
       jest.useRealTimers();
     });
-
 
     test('cron job callback should send "Daily check-in" otherwise', () => {
       (store.getSetting as jest.Mock).mockReturnValue(60);
@@ -152,9 +153,11 @@ describe('notifications', () => {
 
       jobCallback();
 
-      expect(Notification).toHaveBeenCalledWith(expect.objectContaining({
-        title: '☀️ Daily check-in'
-      }));
+      expect(Notification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: '☀️ Daily check-in',
+        }),
+      );
 
       jest.useRealTimers();
     });

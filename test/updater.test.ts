@@ -40,8 +40,14 @@ describe('updater', () => {
     test('should initialize and check for updates if packaged', () => {
       electron.app.isPackaged = true;
       updaterModule.initUpdater();
-      expect(electronUpdater.autoUpdater.on).toHaveBeenCalledWith('update-available', expect.any(Function));
-      expect(electronUpdater.autoUpdater.on).toHaveBeenCalledWith('update-downloaded', expect.any(Function));
+      expect(electronUpdater.autoUpdater.on).toHaveBeenCalledWith(
+        'update-available',
+        expect.any(Function),
+      );
+      expect(electronUpdater.autoUpdater.on).toHaveBeenCalledWith(
+        'update-downloaded',
+        expect.any(Function),
+      );
       expect(electronUpdater.autoUpdater.on).toHaveBeenCalledWith('error', expect.any(Function));
       expect(electronUpdater.autoUpdater.checkForUpdates).toHaveBeenCalled();
     });
@@ -61,7 +67,7 @@ describe('updater', () => {
       });
 
       updaterModule.initUpdater();
-      
+
       if (updateDownloadedCallback) {
         updateDownloadedCallback();
         expect(mockWin.webContents.send).toHaveBeenCalledWith('update-downloaded');

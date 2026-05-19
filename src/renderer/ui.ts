@@ -3,69 +3,83 @@
 import { Plan, DayData, WeekData } from './types';
 
 // DOM refs
-export const grid        = document.getElementById('week-grid') as HTMLElement;
-export const cwLabel     = document.getElementById('cw-label') as HTMLElement;
-export const weekLabel   = document.getElementById('week-label') as HTMLElement;
-export const prevBtn     = document.getElementById('prev-week') as HTMLButtonElement;
-export const nextBtn     = document.getElementById('next-week') as HTMLButtonElement;
-export const todayBtn    = document.getElementById('today-btn') as HTMLButtonElement;
+export const grid = document.getElementById('week-grid') as HTMLElement;
+export const cwLabel = document.getElementById('cw-label') as HTMLElement;
+export const weekLabel = document.getElementById('week-label') as HTMLElement;
+export const prevBtn = document.getElementById('prev-week') as HTMLButtonElement;
+export const nextBtn = document.getElementById('next-week') as HTMLButtonElement;
+export const todayBtn = document.getElementById('today-btn') as HTMLButtonElement;
 export const themeSelect = document.getElementById('theme-select') as HTMLSelectElement;
 
-export const staleBanner  = document.getElementById('stale-banner') as HTMLElement;
-export const staleCount   = document.getElementById('stale-count') as HTMLElement;
-export const openCleanup  = document.getElementById('open-cleanup') as HTMLElement;
-export const closeBanner  = document.getElementById('close-banner') as HTMLElement;
-export const cleanupList  = document.getElementById('cleanup-list') as HTMLElement;
+export const staleBanner = document.getElementById('stale-banner') as HTMLElement;
+export const staleCount = document.getElementById('stale-count') as HTMLElement;
+export const openCleanup = document.getElementById('open-cleanup') as HTMLElement;
+export const closeBanner = document.getElementById('close-banner') as HTMLElement;
+export const cleanupList = document.getElementById('cleanup-list') as HTMLElement;
 export const cleanupModal = document.getElementById('cleanup-overlay') as HTMLElement;
 export const closeCleanup = document.getElementById('close-cleanup') as HTMLElement;
 
-export const updateBanner           = document.getElementById('update-banner') as HTMLElement;
-export const updateStatus           = document.getElementById('update-status') as HTMLElement;
-export const updateProgressContainer = document.getElementById('update-progress-container') as HTMLElement;
-export const updateProgressBar       = document.getElementById('update-progress-bar') as HTMLElement;
-export const installUpdateBtn       = document.getElementById('install-update-btn') as HTMLButtonElement;
-export const copyMacCmdBtn          = document.getElementById('copy-mac-cmd-btn') as HTMLButtonElement;
-export const closeUpdateBanner      = document.getElementById('close-update-banner') as HTMLElement;
+export const updateBanner = document.getElementById('update-banner') as HTMLElement;
+export const updateStatus = document.getElementById('update-status') as HTMLElement;
+export const updateProgressContainer = document.getElementById(
+  'update-progress-container',
+) as HTMLElement;
+export const updateProgressBar = document.getElementById('update-progress-bar') as HTMLElement;
+export const installUpdateBtn = document.getElementById('install-update-btn') as HTMLButtonElement;
+export const copyMacCmdBtn = document.getElementById('copy-mac-cmd-btn') as HTMLButtonElement;
+export const closeUpdateBanner = document.getElementById('close-update-banner') as HTMLElement;
 
 export const recycleBinOverlay = document.getElementById('recycle-bin-overlay') as HTMLElement;
-export const recycleBinList    = document.getElementById('recycle-bin-list') as HTMLElement;
-export const openRecycleBin    = document.getElementById('open-recycle-bin') as HTMLElement;
+export const recycleBinList = document.getElementById('recycle-bin-list') as HTMLElement;
+export const openRecycleBin = document.getElementById('open-recycle-bin') as HTMLElement;
 export const generateSummaryBtn = document.getElementById('generate-summary') as HTMLButtonElement;
-export const closeRecycleBin   = document.getElementById('close-recycle-bin') as HTMLElement;
-export const clearBinBtn       = document.getElementById('clear-bin-btn') as HTMLElement;
+export const closeRecycleBin = document.getElementById('close-recycle-bin') as HTMLElement;
+export const clearBinBtn = document.getElementById('clear-bin-btn') as HTMLElement;
 
 export const settingsOverlay = document.getElementById('settings-overlay') as HTMLElement;
-export const openSettings    = document.getElementById('open-settings') as HTMLElement;
-export const closeSettings   = document.getElementById('close-settings') as HTMLElement;
+export const openSettings = document.getElementById('open-settings') as HTMLElement;
+export const closeSettings = document.getElementById('close-settings') as HTMLElement;
 
 export const summaryOverlay = document.getElementById('summary-overlay') as HTMLElement;
 export const summaryContent = document.getElementById('summary-content') as HTMLElement;
-export const closeSummary   = document.getElementById('close-summary') as HTMLElement;
+export const closeSummary = document.getElementById('close-summary') as HTMLElement;
 export const copySummaryBtn = document.getElementById('copy-summary-btn') as HTMLButtonElement;
 
-export const noteOverlay     = document.getElementById('note-overlay') as HTMLElement;
-export const taskNoteInput   = document.getElementById('task-note-input') as HTMLTextAreaElement;
-export const saveNoteBtn     = document.getElementById('save-note-btn') as HTMLButtonElement;
-export const closeNoteModal  = document.getElementById('close-note-modal') as HTMLButtonElement;
+export const noteOverlay = document.getElementById('note-overlay') as HTMLElement;
+export const taskNoteInput = document.getElementById('task-note-input') as HTMLTextAreaElement;
+export const saveNoteBtn = document.getElementById('save-note-btn') as HTMLButtonElement;
+export const closeNoteModal = document.getElementById('close-note-modal') as HTMLButtonElement;
 
 export const releaseNotesOverlay = document.getElementById('release-notes-overlay') as HTMLElement;
 export const releaseNotesContent = document.getElementById('release-notes-content') as HTMLElement;
-export const closeReleaseNotes   = document.getElementById('close-release-notes') as HTMLElement;
+export const closeReleaseNotes = document.getElementById('close-release-notes') as HTMLElement;
 
 export const releaseNotesBanner = document.getElementById('release-notes-banner') as HTMLElement;
-export const bannerVersion      = document.getElementById('banner-version') as HTMLElement;
-export const viewReleaseNotesBtn = document.getElementById('view-release-notes-btn') as HTMLButtonElement;
-export const dismissReleaseNotesBtn = document.getElementById('dismiss-release-notes-btn') as HTMLButtonElement;
-export const settingsVersionBtn = document.getElementById('settings-version-btn') as HTMLButtonElement;
+export const bannerVersion = document.getElementById('banner-version') as HTMLElement;
+export const viewReleaseNotesBtn = document.getElementById(
+  'view-release-notes-btn',
+) as HTMLButtonElement;
+export const dismissReleaseNotesBtn = document.getElementById(
+  'dismiss-release-notes-btn',
+) as HTMLButtonElement;
+export const settingsVersionBtn = document.getElementById(
+  'settings-version-btn',
+) as HTMLButtonElement;
 
 export const summaryModalTitle = document.getElementById('summary-modal-title') as HTMLElement;
 
-export const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;
-export const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
-export const workStartInput  = document.getElementById('work-start') as HTMLInputElement;
-export const workEndInput    = document.getElementById('work-end') as HTMLInputElement;
+export const intervalSelect = document.getElementById('interval-select') as HTMLSelectElement;
+export const collapseDoneSetting = document.getElementById(
+  'collapse-done-setting',
+) as HTMLInputElement;
+export const workStartInput = document.getElementById('work-start') as HTMLInputElement;
+export const workEndInput = document.getElementById('work-end') as HTMLInputElement;
 
-export function renderGrid(weekData: WeekData | null, defaultDoneCollapsed: boolean, callbacks: any) {
+export function renderGrid(
+  weekData: WeekData | null,
+  defaultDoneCollapsed: boolean,
+  callbacks: any,
+) {
   if (!grid) return;
   grid.innerHTML = '';
   if (weekData && weekData.days) {
@@ -75,13 +89,18 @@ export function renderGrid(weekData: WeekData | null, defaultDoneCollapsed: bool
   }
 }
 
-export function renderDay(dayKey: string, weekData: WeekData | null, defaultDoneCollapsed: boolean, callbacks: any) {
-  const day = weekData?.days?.find(d => d.key === dayKey);
+export function renderDay(
+  dayKey: string,
+  weekData: WeekData | null,
+  defaultDoneCollapsed: boolean,
+  callbacks: any,
+) {
+  const day = weekData?.days?.find((d) => d.key === dayKey);
   if (!day) return;
-  
+
   const oldCol = document.querySelector(`.day-col[data-day-key="${dayKey}"]`);
   if (!oldCol) return;
-  
+
   const newCol = buildDayCol(day, defaultDoneCollapsed, callbacks);
   oldCol.replaceWith(newCol);
 }
@@ -122,9 +141,9 @@ export function createDaySection(day: DayData, defaultDoneCollapsed: boolean, ca
   const tasksEl = section.querySelector(`#tasks-${day.key}`) as HTMLElement;
   const doneTasksEl = section.querySelector(`#done-tasks-${day.key}`) as HTMLElement;
   const doneSectionEl = section.querySelector(`#done-section-${day.key}`) as HTMLElement;
-  
+
   const ro = new ResizeObserver(() => {
-    section.querySelectorAll('.task-edit').forEach(ta => autoResize(ta as HTMLTextAreaElement));
+    section.querySelectorAll('.task-edit').forEach((ta) => autoResize(ta as HTMLTextAreaElement));
   });
   ro.observe(section);
 
@@ -160,8 +179,8 @@ export function buildTaskItem(dayKey: string, task: Plan, index: number, callbac
   const item = document.createElement('div');
   item.className = 'task-item' + (task.done ? ' done' : '');
   item.dataset.dayKey = dayKey;
-  item.dataset.index  = index.toString();
-  item.draggable      = true;
+  item.dataset.index = index.toString();
+  item.draggable = true;
 
   item.innerHTML = `
     <button class="check-btn" title="Toggle">${task.done ? '✓' : ''}</button>
@@ -176,7 +195,7 @@ export function buildTaskItem(dayKey: string, task: Plan, index: number, callbac
   `;
 
   const display = item.querySelector('.task-display') as HTMLElement;
-  const edit    = item.querySelector('.task-edit') as HTMLTextAreaElement;
+  const edit = item.querySelector('.task-edit') as HTMLTextAreaElement;
 
   display.addEventListener('click', () => {
     item.classList.add('editing');
@@ -225,29 +244,30 @@ export function autoResize(ta: HTMLTextAreaElement) {
 }
 
 export function updatePips(dayKey: string, plans: Plan[], container?: HTMLElement) {
-  const pipsEl = container 
-    ? container.querySelector(`#pips-${dayKey}`) as HTMLElement
+  const pipsEl = container
+    ? (container.querySelector(`#pips-${dayKey}`) as HTMLElement)
     : document.getElementById(`pips-${dayKey}`);
-    
+
   if (!pipsEl) return;
   pipsEl.innerHTML = [...plans]
     .sort((a, b) => (a.done === b.done ? 0 : a.done ? 1 : -1))
-    .map(p => `<div class="pip${p.done ? ' done' : ''}"></div>`)
+    .map((p) => `<div class="pip${p.done ? ' done' : ''}"></div>`)
     .join('');
 }
 
 export function escapeHtml(str: string) {
   if (!str) return '';
-  return str.replace(/&/g,'&amp;')
-            .replace(/</g,'&lt;')
-            .replace(/>/g,'&gt;')
-            .replace(/"/g,'&quot;')
-            .replace(/'/g,'&#39;');
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 export function renderMarkdown(text: string): string {
   if (!text) return '';
-  
+
   // First, escape HTML to prevent XSS
   let html = escapeHtml(text);
 
@@ -256,7 +276,9 @@ export function renderMarkdown(text: string): string {
   const links: string[] = [];
   html = html.replace(/\[(.*?)\]\((.*?)\)/g, (match, label, url) => {
     const index = links.length;
-    links.push(`<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${label}</a>`);
+    links.push(
+      `<a href="#" onclick="window.planner.openExternal('${url}'); return false;">${label}</a>`,
+    );
     return `__LINK_PLACEHOLDER_${index}__`;
   });
 

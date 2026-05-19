@@ -1,17 +1,17 @@
 'use strict';
 
-import { 
-  formatWeekKey, 
-  parseWeekKey, 
-  offsetWeekKey, 
-  getISOWeek, 
-  weeksInYear, 
-  getPreviousWeekKey, 
-  weekInfoFromKey, 
-  formatDayKey, 
-  weekDayKeys, 
-  dayInfoFromKey, 
-  weekKeyFromDayKey 
+import {
+  formatWeekKey,
+  parseWeekKey,
+  offsetWeekKey,
+  getISOWeek,
+  weeksInYear,
+  getPreviousWeekKey,
+  weekInfoFromKey,
+  formatDayKey,
+  weekDayKeys,
+  dayInfoFromKey,
+  weekKeyFromDayKey,
 } from '../src/weekUtils';
 
 describe('weekUtils', () => {

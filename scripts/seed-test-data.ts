@@ -12,7 +12,7 @@ import { currentWeekKey, getPreviousWeekKey, weekDayKeys } from '../src/weekUtil
 function getUserDataPath(): string {
   const appName = 'weekly-planner-dev';
   const home = process.env.HOME || process.env.USERPROFILE || '';
-  
+
   switch (process.platform) {
     case 'win32':
       return path.join(process.env.APPDATA || '', appName);
@@ -37,24 +37,24 @@ const prevWeekKey = getPreviousWeekKey(currentWeekKey());
 const days = weekDayKeys(prevWeekKey);
 
 const sampleTasks = [
-  "Review quarterly goals",
-  "Team sync meeting",
-  "Fix bug #123",
-  "Update documentation",
-  "Prepare presentation",
-  "Refactor store logic",
-  "Coffee with mentor",
-  "Buy groceries",
-  "Exercise for 30 mins",
-  "Read a book chapter"
+  'Review quarterly goals',
+  'Team sync meeting',
+  'Fix bug #123',
+  'Update documentation',
+  'Prepare presentation',
+  'Refactor store logic',
+  'Coffee with mentor',
+  'Buy groceries',
+  'Exercise for 30 mins',
+  'Read a book chapter',
 ];
 
 const data: any = {
   settings: {
-    notificationInterval: 60
+    notificationInterval: 60,
   },
   days: {},
-  recycleBin: []
+  recycleBin: [],
 };
 
 console.log(`Generating data for week: ${prevWeekKey}`);
@@ -63,12 +63,12 @@ days.forEach((dayKey, index) => {
   // Add 2-4 tasks per day
   const numTasks = Math.floor(Math.random() * 3) + 2;
   data.days[dayKey] = [];
-  
+
   for (let i = 0; i < numTasks; i++) {
     const taskIndex = (index * 3 + i) % sampleTasks.length;
     data.days[dayKey].push({
       text: sampleTasks[taskIndex],
-      done: Math.random() > 0.3 // Most tasks done in the past
+      done: Math.random() > 0.3, // Most tasks done in the past
     });
   }
 });

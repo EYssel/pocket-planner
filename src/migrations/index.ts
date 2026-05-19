@@ -8,8 +8,8 @@ import { migrateWeekendMerge } from './2026-05-05-weekendMerge';
  */
 export function runMigrations(store: Store<any>): void {
   console.log('Running data migrations...');
-  
+
   migrateWeekendMerge(store);
-  
+
   // Add future migrations here
 }

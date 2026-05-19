@@ -44,7 +44,10 @@ async function summarizeChangelog() {
 
   // If there's no second version, take everything until the end
   const end = secondVersionIndex !== -1 ? secondVersionIndex : lines.length;
-  const rawReleaseNotes = lines.slice(firstVersionIndex + 1, end).join('\n').trim();
+  const rawReleaseNotes = lines
+    .slice(firstVersionIndex + 1, end)
+    .join('\n')
+    .trim();
 
   if (!rawReleaseNotes) {
     console.log('No release notes found to summarize.');
@@ -90,7 +93,7 @@ ${rawReleaseNotes}
             },
           ],
         }),
-      }
+      },
     );
 
     const data: any = await response.json();

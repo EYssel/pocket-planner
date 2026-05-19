@@ -63,7 +63,7 @@ export function getPlans(dayKey: string): Task[] {
 
 export function savePlans(dayKey: string, plans: Task[]): void {
   if (!Array.isArray(plans)) throw new Error('plans must be an array');
-  const validated: Task[] = plans.map(p => ({
+  const validated: Task[] = plans.map((p) => ({
     text: typeof p.text === 'string' ? p.text : '',
     done: typeof p.done === 'boolean' ? p.done : false,
     notes: typeof p.notes === 'string' ? p.notes : undefined,

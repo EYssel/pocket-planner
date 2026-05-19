@@ -7,11 +7,11 @@ import { currentDayKey } from './weekUtils';
 import { getDynamicMessage } from './messages';
 
 export const INTERVAL_OPTIONS = [
-  { label: 'Every 30 minutes', minutes: 30  },
-  { label: 'Every hour',       minutes: 60  },
-  { label: 'Every 2 hours',    minutes: 120 },
-  { label: 'Every 4 hours',    minutes: 240 },
-  { label: 'Off',              minutes: 0   },
+  { label: 'Every 30 minutes', minutes: 30 },
+  { label: 'Every hour', minutes: 60 },
+  { label: 'Every 2 hours', minutes: 120 },
+  { label: 'Every 4 hours', minutes: 240 },
+  { label: 'Off', minutes: 0 },
 ];
 
 let cronJobs: cron.ScheduledTask[] = [];
@@ -29,14 +29,14 @@ export function sendNotification(title: string, body: string, mode: string): voi
 }
 
 export function reschedule(): void {
-  cronJobs.forEach(j => j.stop());
+  cronJobs.forEach((j) => j.stop());
   cronJobs = [];
 
   const minutes = getSetting('notificationInterval');
   if (!minutes) return;
 
   const workStart = getSetting('workStart') || 8;
-  const workEnd   = getSetting('workEnd')   || 18;
+  const workEnd = getSetting('workEnd') || 18;
 
   let cronExpr: string;
   if (minutes < 60) {
@@ -51,9 +51,9 @@ export function reschedule(): void {
     const hour = now.getHours();
     const isMonday = now.getDay() === 1;
 
-    const tasks = getPlans(currentDayKey()).filter(t => t.text.trim() !== '');
+    const tasks = getPlans(currentDayKey()).filter((t) => t.text.trim() !== '');
     const totalTasks = tasks.length;
-    const doneTasks = tasks.filter(t => t.done).length;
+    const doneTasks = tasks.filter((t) => t.done).length;
 
     const { title, body, mode } = getDynamicMessage(hour, totalTasks, doneTasks, isMonday);
     sendNotification(title, body, mode);

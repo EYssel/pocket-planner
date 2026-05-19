@@ -16,11 +16,17 @@ export function rebuild(): void {
 
   const menu = Menu.buildFromTemplate([
     { label: 'Open Planner', click: () => _openWindow!('planner') },
-    { label: 'Check In',     click: () => _openWindow!('checkin') },
+    { label: 'Check In', click: () => _openWindow!('checkin') },
     { type: 'separator' },
     { label: 'Check for Updates', click: () => checkForUpdates() },
     { type: 'separator' },
-    { label: 'Quit', click: () => { global.isQuitting = true; app.quit(); } },
+    {
+      label: 'Quit',
+      click: () => {
+        global.isQuitting = true;
+        app.quit();
+      },
+    },
   ]);
 
   tray.setContextMenu(menu);
@@ -33,7 +39,7 @@ export function createTray(): void {
   const iconName = process.platform === 'win32' ? 'icon.ico' : 'icon.png';
   const iconPath = path.join(app.getAppPath(), iconName);
   const icon = nativeImage.createFromPath(iconPath);
-  
+
   if (icon.isEmpty()) {
     console.error('Failed to load tray icon from:', iconPath);
   }

@@ -8,7 +8,7 @@ import * as fs from 'fs';
 if (!app.isPackaged) {
   const devName = 'Weekly Planner Dev';
   const devFolder = 'weekly-planner-dev';
-  
+
   app.setName(devName);
   const userDataPath = path.join(app.getPath('appData'), devFolder);
   app.setPath('userData', userDataPath);
@@ -16,7 +16,7 @@ if (!app.isPackaged) {
 } else {
   const prodName = 'Weekly Planner';
   const prodFolder = 'weekly-planner';
-  
+
   app.setName(prodName);
   const userDataPath = path.join(app.getPath('appData'), prodFolder);
   app.setPath('userData', userDataPath);

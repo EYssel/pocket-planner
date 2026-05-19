@@ -43,20 +43,17 @@ export function setDefaultDoneCollapsed(val: boolean) {
 
 export function maintainInvariant(day: any) {
   if (!day || !day.plans) return;
-  day.plans = [
-    ...day.plans.filter((p: Plan) => !p.done),
-    ...day.plans.filter((p: Plan) => p.done)
-  ];
+  day.plans = [...day.plans.filter((p: Plan) => !p.done), ...day.plans.filter((p: Plan) => p.done)];
 }
 
 export async function loadWeek(
-  key: string, 
-  skipStaleCheck = false, 
-  uiCallbacks: { 
-    renderGrid: () => void, 
-    updateLabels: (data: WeekData, isToday: boolean) => void,
-    checkStaleTasks: () => Promise<void>
-  }
+  key: string,
+  skipStaleCheck = false,
+  uiCallbacks: {
+    renderGrid: () => void;
+    updateLabels: (data: WeekData, isToday: boolean) => void;
+    checkStaleTasks: () => Promise<void>;
+  },
 ) {
   currentWeekKey = key;
   weekData = await window.planner.getWeek(key);
@@ -64,12 +61,12 @@ export async function loadWeek(
 
   // Ensure active tasks are before done tasks on load
   if (weekData.days) {
-    weekData.days.forEach(d => maintainInvariant(d));
+    weekData.days.forEach((d) => maintainInvariant(d));
   }
-  
-  const isToday = (key === await window.planner.currentWeekKey());
+
+  const isToday = key === (await window.planner.currentWeekKey());
   uiCallbacks.updateLabels(weekData, isToday);
-  
+
   uiCallbacks.renderGrid();
   if (!skipStaleCheck) await uiCallbacks.checkStaleTasks();
 }
@@ -77,12 +74,12 @@ export async function loadWeek(
 export async function checkStaleTasks(
   currentWeekKey: string | null,
   uiCallbacks: {
-    showBanner: (count: number) => void,
-    hideBanner: () => void
-  }
+    showBanner: (count: number) => void;
+    hideBanner: () => void;
+  },
 ) {
   if (!currentWeekKey) return;
-  
+
   const actualCurrentWeekKey = await window.planner.currentWeekKey();
   if (currentWeekKey !== actualCurrentWeekKey) {
     uiCallbacks.hideBanner();
@@ -91,7 +88,7 @@ export async function checkStaleTasks(
 
   const prevKey = await window.planner.getPreviousWeekKey(currentWeekKey);
   const prevWeek = await window.planner.getWeek(prevKey);
-  
+
   const newStaleTasks: StaleTask[] = [];
   if (prevWeek && prevWeek.days) {
     prevWeek.days.forEach((day: any) => {
@@ -117,7 +114,7 @@ export async function getPlansForDay(dayKey: string): Promise<Plan[]> {
   if (loadedDay) {
     return loadedDay.plans;
   }
-  
+
   const weekKey = await window.planner.weekKeyFromDayKey(dayKey);
   const week = await window.planner.getWeek(weekKey);
   const day = week.days.find((d: any) => d.key === dayKey);
@@ -125,21 +122,21 @@ export async function getPlansForDay(dayKey: string): Promise<Plan[]> {
 }
 
 export async function saveDay(
-  dayKey: string, 
-  updatePips?: (dayKey: string, plans: Plan[]) => void
+  dayKey: string,
+  updatePips?: (dayKey: string, plans: Plan[]) => void,
 ) {
   const day = weekData?.days?.find((d: any) => d.key === dayKey);
   if (!day) return;
 
-  const plans = day.plans.filter(p => p.text.trim() !== '');
+  const plans = day.plans.filter((p) => p.text.trim() !== '');
   await window.planner.savePlans(dayKey, plans);
   if (updatePips) updatePips(dayKey, plans);
 }
 
 export function addTask(dayKey: string): void {
-  const day = weekData?.days?.find(d => d.key === dayKey);
+  const day = weekData?.days?.find((d) => d.key === dayKey);
   if (day) {
-    const firstDoneIndex = day.plans.findIndex(p => p.done);
+    const firstDoneIndex = day.plans.findIndex((p) => p.done);
     const newTask = { text: '', done: false };
     if (firstDoneIndex === -1) {
       day.plans.push(newTask);
@@ -151,7 +148,7 @@ export function addTask(dayKey: string): void {
 }
 
 export function importTask(dayKey: string, task: Plan): void {
-  const day = weekData?.days?.find(d => d.key === dayKey);
+  const day = weekData?.days?.find((d) => d.key === dayKey);
   if (day) {
     day.plans.push(task);
     maintainInvariant(day);
@@ -160,7 +157,7 @@ export function importTask(dayKey: string, task: Plan): void {
 }
 
 export function updateTask(dayKey: string, index: number, text: string): void {
-  const day = weekData?.days?.find(d => d.key === dayKey);
+  const day = weekData?.days?.find((d) => d.key === dayKey);
   if (day && day.plans[index]) {
     day.plans[index].text = text;
     // No notifyChange here to avoid re-rendering while typing
@@ -168,7 +165,7 @@ export function updateTask(dayKey: string, index: number, text: string): void {
 }
 
 export function updateTaskNotes(dayKey: string, index: number, notes: string): void {
-  const day = weekData?.days?.find(d => d.key === dayKey);
+  const day = weekData?.days?.find((d) => d.key === dayKey);
   if (day && day.plans[index]) {
     day.plans[index].notes = notes;
     notifyChange(dayKey);
@@ -176,7 +173,7 @@ export function updateTaskNotes(dayKey: string, index: number, notes: string): v
 }
 
 export function toggleTask(dayKey: string, index: number): void {
-  const day = weekData?.days?.find(d => d.key === dayKey);
+  const day = weekData?.days?.find((d) => d.key === dayKey);
   if (day && day.plans[index]) {
     day.plans[index].done = !day.plans[index].done;
     maintainInvariant(day);
@@ -184,8 +181,8 @@ export function toggleTask(dayKey: string, index: number): void {
   }
 }
 
-export function deleteTask(dayKey: string, index: number): { text: string, done: boolean } | null {
-  const day = weekData?.days?.find(d => d.key === dayKey);
+export function deleteTask(dayKey: string, index: number): { text: string; done: boolean } | null {
+  const day = weekData?.days?.find((d) => d.key === dayKey);
   if (day && day.plans[index]) {
     const [deleted] = day.plans.splice(index, 1);
     notifyChange(dayKey);
@@ -195,19 +192,19 @@ export function deleteTask(dayKey: string, index: number): { text: string, done:
 }
 
 export function moveTask(
-  sourceDayKey: string, 
-  sourceIndex: number, 
-  targetDayKey: string, 
-  targetIndex: number, 
-  isDone?: boolean
+  sourceDayKey: string,
+  sourceIndex: number,
+  targetDayKey: string,
+  targetIndex: number,
+  isDone?: boolean,
 ): void {
-  const sourceDay = weekData?.days?.find(d => d.key === sourceDayKey);
-  const targetDay = weekData?.days?.find(d => d.key === targetDayKey);
-  
+  const sourceDay = weekData?.days?.find((d) => d.key === sourceDayKey);
+  const targetDay = weekData?.days?.find((d) => d.key === targetDayKey);
+
   if (sourceDay && targetDay && sourceDay.plans[sourceIndex]) {
     const [task] = sourceDay.plans.splice(sourceIndex, 1);
     if (isDone !== undefined) task.done = isDone;
-    
+
     let actualTargetIndex = targetIndex;
     if (sourceDayKey === targetDayKey && sourceIndex < targetIndex) {
       actualTargetIndex--;
@@ -215,7 +212,7 @@ export function moveTask(
 
     actualTargetIndex = Math.min(Math.max(0, actualTargetIndex), targetDay.plans.length);
     targetDay.plans.splice(actualTargetIndex, 0, task);
-    
+
     maintainInvariant(targetDay);
     if (sourceDayKey !== targetDayKey) maintainInvariant(sourceDay);
 

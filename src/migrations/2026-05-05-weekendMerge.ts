@@ -25,15 +25,15 @@ export function migrateWeekendMerge(store: Store<any>): void {
       if (dayOfWeek === 6 || dayOfWeek === 0) {
         const { week, year } = getISOWeek(date);
         const weekendKey = `${year}-W${String(week).padStart(2, '0')}-WE`;
-        
+
         const existingTasks = migratedDays[weekendKey] || [];
         const tasksToMove = days[dayKey];
-        
+
         if (tasksToMove && tasksToMove.length > 0) {
           migratedDays[weekendKey] = [...existingTasks, ...tasksToMove];
           migrationNeeded = true;
         }
-        
+
         // Remove old key
         delete migratedDays[dayKey];
       }
@@ -55,6 +55,6 @@ function getISOWeek(date: Date): { week: number; year: number } {
   const day = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - day);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const week = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  const week = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
   return { week, year: d.getUTCFullYear() };
 }

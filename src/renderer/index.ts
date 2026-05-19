@@ -16,7 +16,7 @@ async function init() {
         const logo = document.querySelector('.logo');
         if (logo) logo.textContent = appInfo.name;
       }
-      
+
       const v1 = document.getElementById('app-version');
       const v2 = document.getElementById('settings-version');
       if (v1) v1.textContent = `v${appInfo.version}`;
@@ -32,24 +32,26 @@ async function init() {
     });
 
     // Attach buildTaskItem to window for global access if needed
-    (window as any).buildTaskItem = (dayKey: string, task: Plan, index: number) => 
+    (window as any).buildTaskItem = (dayKey: string, task: Plan, index: number) =>
       ui.buildTaskItem(dayKey, task, index, getCallbacks());
 
     setupEventListeners({
       loadWeek,
       saveDay,
-      checkStaleTasks
+      checkStaleTasks,
     });
 
     await modals.initTheme();
     await modals.initSettings({
       loadWeek,
-      checkStaleTasks
+      checkStaleTasks,
     });
     await modals.initReleaseNotes();
 
     (document as any).fonts.ready.then(() => {
-      document.querySelectorAll('.task-edit').forEach(ta => ui.autoResize(ta as HTMLTextAreaElement));
+      document
+        .querySelectorAll('.task-edit')
+        .forEach((ta) => ui.autoResize(ta as HTMLTextAreaElement));
     });
   } catch (err: any) {
     console.error('Initialization failed:', err);
@@ -63,11 +65,11 @@ async function init() {
 }
 
 function getCallbacks() {
-  return { 
-    saveDay, 
+  return {
+    saveDay,
     updateTask: state.updateTask,
     deleteTask: state.deleteTask,
-    setupDropTarget: (el: HTMLElement, dk: string) => setupDropTarget(el, dk, { saveDay }) 
+    setupDropTarget: (el: HTMLElement, dk: string) => setupDropTarget(el, dk, { saveDay }),
   };
 }
 
@@ -75,11 +77,11 @@ async function loadWeek(key: string, skipStaleCheck = false) {
   await state.loadWeek(key, skipStaleCheck, {
     renderGrid: () => ui.renderGrid(state.weekData, state.defaultDoneCollapsed, getCallbacks()),
     updateLabels: (data: WeekData, isToday: boolean) => {
-      ui.cwLabel.textContent   = data.cwLabel;
+      ui.cwLabel.textContent = data.cwLabel;
       ui.weekLabel.textContent = data.dateRange;
       ui.todayBtn.disabled = isToday;
     },
-    checkStaleTasks
+    checkStaleTasks,
   });
 }
 
@@ -91,7 +93,7 @@ async function checkStaleTasks() {
     },
     hideBanner: () => {
       ui.staleBanner.classList.remove('show');
-    }
+    },
   });
 }
 

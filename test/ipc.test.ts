@@ -21,17 +21,18 @@ jest.mock('electron', () => ({
     on: jest.fn(),
   },
   app: {
-  getName: jest.fn().mockReturnValue('Weekly Planner'),
-  getVersion: jest.fn().mockReturnValue('1.1.0'),
-  getPath: jest.fn().mockImplementation((name) => {
-    if (name === 'exe') return '/mock/app/Weekly Planner.exe';
-    return '';
-  }),
-  getAppPath: jest.fn().mockReturnValue('/mock/app/path'),
-  isPackaged: true,
-  },  clipboard: {
+    getName: jest.fn().mockReturnValue('Weekly Planner'),
+    getVersion: jest.fn().mockReturnValue('1.1.0'),
+    getPath: jest.fn().mockImplementation((name) => {
+      if (name === 'exe') return '/mock/app/Weekly Planner.exe';
+      return '';
+    }),
+    getAppPath: jest.fn().mockReturnValue('/mock/app/path'),
+    isPackaged: true,
+  },
+  clipboard: {
     writeText: jest.fn(),
-  }
+  },
 }));
 
 jest.mock('electron-updater', () => ({
@@ -44,7 +45,7 @@ jest.mock('../src/store');
 jest.mock('../src/weekUtils');
 jest.mock('../src/notifications', () => ({
   reschedule: jest.fn(),
-  INTERVAL_OPTIONS: []
+  INTERVAL_OPTIONS: [],
 }));
 
 describe('ipc', () => {
@@ -60,15 +61,23 @@ describe('ipc', () => {
   test('registerHandlers should register all expected handlers', () => {
     registerHandlers();
     const expectedHandlers = [
-      'get-app-info', 'get-setting', 'set-setting', 
-      'get-current-week-key', 'get-offset-week-key', 
-      'get-current-day-key', 'get-week-key-from-day-key',
-      'get-week', 'save-plans', 'add-to-recycle-bin',
-      'get-recycle-bin', 'restore-from-recycle-bin',
-      'clear-recycle-bin', 'get-previous-week-key',
-      'install-update'
+      'get-app-info',
+      'get-setting',
+      'set-setting',
+      'get-current-week-key',
+      'get-offset-week-key',
+      'get-current-day-key',
+      'get-week-key-from-day-key',
+      'get-week',
+      'save-plans',
+      'add-to-recycle-bin',
+      'get-recycle-bin',
+      'restore-from-recycle-bin',
+      'clear-recycle-bin',
+      'get-previous-week-key',
+      'install-update',
     ];
-    expectedHandlers.forEach(name => {
+    expectedHandlers.forEach((name) => {
       expect(ipcMain.handle).toHaveBeenCalledWith(name, expect.any(Function));
     });
   });
@@ -111,12 +120,10 @@ describe('ipc', () => {
       (store.getPlans as jest.Mock).mockReturnValue(['task']);
 
       const result = await handlers['get-week']({}, '2026-W19');
-      
+
       expect(result).toEqual({
         key: '2026-W19',
-        days: [
-          { dayName: 'Mon', plans: ['task'] }
-        ]
+        days: [{ dayName: 'Mon', plans: ['task'] }],
       });
       expect(weekUtils.weekInfoFromKey).toHaveBeenCalledWith('2026-W19');
     });

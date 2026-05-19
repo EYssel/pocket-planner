@@ -4,22 +4,22 @@ import { ipcMain, app, clipboard, shell } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import { autoUpdater } from 'electron-updater';
-import { 
-  getPlans, 
-  savePlans, 
-  addToRecycleBin, 
-  getRecycleBin, 
+import {
+  getPlans,
+  savePlans,
+  addToRecycleBin,
+  getRecycleBin,
   restoreFromRecycleBin,
   clearRecycleBin,
-  getSetting, 
-  setSetting 
+  getSetting,
+  setSetting,
 } from './store';
 import { reschedule, INTERVAL_OPTIONS } from './notifications';
-import { 
-  weekInfoFromKey, 
-  currentWeekKey, 
-  weekDayKeys, 
-  dayInfoFromKey, 
+import {
+  weekInfoFromKey,
+  currentWeekKey,
+  weekDayKeys,
+  dayInfoFromKey,
   getPreviousWeekKey,
   offsetWeekKey,
   currentDayKey,
@@ -27,7 +27,7 @@ import {
   getPreviousWorkingDayKey,
   offsetDayKeyByWeeks,
   getFirstDayOfWeek,
-  getLastDayOfWeek
+  getLastDayOfWeek,
 } from './weekUtils';
 import { Task, SettingOptions, WeekData } from './types';
 
@@ -44,43 +44,58 @@ export function registerHandlers(): void {
   });
 
   // Settings handlers
-  ipcMain.handle('get-setting', <K extends keyof SettingOptions>(_: any, key: K) => getSetting(key));
-  ipcMain.handle('set-setting', <K extends keyof SettingOptions>(_: any, { key, value }: { key: K, value: SettingOptions[K] }) => {
-    setSetting(key, value);
-    if (['notificationInterval', 'workStart', 'workEnd'].includes(key as string)) {
-      reschedule();
-    }
-    return true;
-  });
+  ipcMain.handle('get-setting', <K extends keyof SettingOptions>(_: any, key: K) =>
+    getSetting(key),
+  );
+  ipcMain.handle(
+    'set-setting',
+    <K extends keyof SettingOptions>(
+      _: any,
+      { key, value }: { key: K; value: SettingOptions[K] },
+    ) => {
+      setSetting(key, value);
+      if (['notificationInterval', 'workStart', 'workEnd'].includes(key as string)) {
+        reschedule();
+      }
+      return true;
+    },
+  );
 
   ipcMain.handle('get-interval-options', () => INTERVAL_OPTIONS);
 
   // Utility handlers
   ipcMain.handle('get-current-week-key', () => currentWeekKey());
-  ipcMain.handle('get-offset-week-key', (_: any, { key, delta }: { key: string, delta: number }) => offsetWeekKey(key, delta));
+  ipcMain.handle('get-offset-week-key', (_: any, { key, delta }: { key: string; delta: number }) =>
+    offsetWeekKey(key, delta),
+  );
   ipcMain.handle('get-current-day-key', () => currentDayKey());
-  ipcMain.handle('get-week-key-from-day-key', (_: any, dayKey: string) => weekKeyFromDayKey(dayKey));
+  ipcMain.handle('get-week-key-from-day-key', (_: any, dayKey: string) =>
+    weekKeyFromDayKey(dayKey),
+  );
   ipcMain.handle('get-previous-working-day-key', (_: any, dayKey: string) => {
     return getPreviousWorkingDayKey(dayKey || currentDayKey());
   });
-  ipcMain.handle('offset-day-key-by-weeks', (_: any, { dayKey, delta }: { dayKey: string, delta: number }) => {
-    return offsetDayKeyByWeeks(dayKey, delta);
-  });
+  ipcMain.handle(
+    'offset-day-key-by-weeks',
+    (_: any, { dayKey, delta }: { dayKey: string; delta: number }) => {
+      return offsetDayKeyByWeeks(dayKey, delta);
+    },
+  );
   ipcMain.handle('get-first-day-of-week', (_: any, weekKey: string) => getFirstDayOfWeek(weekKey));
   ipcMain.handle('get-last-day-of-week', (_: any, weekKey: string) => getLastDayOfWeek(weekKey));
 
   // Returns week metadata + all 7 days with their tasks in one call
   ipcMain.handle('get-week', (_: any, weekKey: string): WeekData => {
-    const key  = weekKey || currentWeekKey();
+    const key = weekKey || currentWeekKey();
     const info = weekInfoFromKey(key);
-    const days = weekDayKeys(key).map(dayKey => ({
+    const days = weekDayKeys(key).map((dayKey) => ({
       ...dayInfoFromKey(dayKey),
       plans: getPlans(dayKey),
     }));
     return { ...info, days };
   });
 
-  ipcMain.handle('save-plans', (_: any, { dayKey, plans }: { dayKey: string, plans: Task[] }) => {
+  ipcMain.handle('save-plans', (_: any, { dayKey, plans }: { dayKey: string; plans: Task[] }) => {
     savePlans(dayKey, plans);
     return true;
   });
@@ -141,33 +156,31 @@ export function registerHandlers(): void {
       }
 
       if (!changelogPath) return '';
-      
+
       const content = fs.readFileSync(changelogPath, 'utf8');
       const version = app.getVersion();
-      
+
       // Look for the header containing the version
       const escapedVersion = version.replace(/\./g, '\\.');
       const headerRegex = new RegExp(`#+ .*${escapedVersion}.*`, 'i');
       const match = content.match(headerRegex);
-      
+
       if (!match || match.index === undefined) return '';
-      
+
       const startIndex = match.index;
       const rest = content.slice(startIndex + match[0].length);
       // Find the next version header
       const nextHeaderMatch = rest.match(/#+ .*\d+\.\d+\.\d+.*/);
-      
-      const notes = nextHeaderMatch 
-        ? rest.slice(0, nextHeaderMatch.index).trim()
-        : rest.trim();
-      
+
+      const notes = nextHeaderMatch ? rest.slice(0, nextHeaderMatch.index).trim() : rest.trim();
+
       // Filter sections to only include Features and Bug Fixes
       const sections = notes.split(/(?=### )/);
-      const filteredSections = sections.filter(section => {
+      const filteredSections = sections.filter((section) => {
         const trimmed = section.trim();
         return trimmed.startsWith('### Features') || trimmed.startsWith('### Bug Fixes');
       });
-      
+
       const filteredNotes = filteredSections.join('\n').trim();
       if (!filteredNotes) return '';
 
@@ -176,7 +189,7 @@ export function registerHandlers(): void {
         .replace(/\s*\(\[([a-f0-9]+)\]\(https:\/\/github\.com\/.*?\)\)/gi, '')
         .replace(/#+ What's New( in Weekly Planner)?/gi, '')
         .trim();
-      
+
       return cleanedNotes;
     } catch (err) {
       console.error('Failed to read release notes:', err);

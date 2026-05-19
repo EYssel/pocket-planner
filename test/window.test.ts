@@ -31,14 +31,16 @@ describe('Window Creation Title', () => {
     jest.isolateModules(() => {
       const { app, BrowserWindow } = require('electron');
       const { createWindow } = require('../src/window');
-      
+
       app.getName.mockReturnValue('Weekly Planner Dev');
-      
+
       createWindow('planner');
 
-      expect(BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
-        title: 'Weekly Planner Dev'
-      }));
+      expect(BrowserWindow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Weekly Planner Dev',
+        }),
+      );
     });
   });
 
@@ -46,14 +48,16 @@ describe('Window Creation Title', () => {
     jest.isolateModules(() => {
       const { app, BrowserWindow } = require('electron');
       const { createWindow } = require('../src/window');
-      
+
       app.getName.mockReturnValue('Weekly Planner');
-      
+
       createWindow('planner');
 
-      expect(BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
-        title: 'Weekly Planner'
-      }));
+      expect(BrowserWindow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Weekly Planner',
+        }),
+      );
     });
   });
 });
