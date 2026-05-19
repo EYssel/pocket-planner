@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/EYssel/planner-app/compare/v1.10.0...v1.11.0) (2026-05-19)
+
+### Features
+*   Enjoy improved integration with your operating system and smarter, more timely notifications.
+
+### Bug Fixes
+*   There are no bug fixes in this release.
+
 ## [1.10.0](https://github.com/EYssel/planner-app/compare/v1.9.0...v1.10.0) (2026-05-19)
 
 ### Features
