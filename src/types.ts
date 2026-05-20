@@ -4,6 +4,7 @@ export interface Task {
   text: string;
   done: boolean;
   notes?: string;
+  recurrence?: 'none' | 'daily' | 'weekdays' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday';
 }
 
 export interface Day {
@@ -43,8 +44,10 @@ export interface PlannerAPI {
   setSetting: <K extends keyof SettingOptions>(key: K, value: SettingOptions[K]) => Promise<void>;
   getIntervalOptions: () => Promise<{ label: string; minutes: number }[]>;
   getWeek: (weekKey: string) => Promise<WeekData>;
+  generateRecurringTasks: (weekKey: string) => Promise<void>;
   savePlans: (dayKey: string, plans: Task[]) => Promise<void>;
   onSetMode: (cb: (mode: string) => void) => void;
+  onQuickAddSuccess: (cb: () => void) => void;
   addToRecycleBin: (task: Task & { dayKey: string }) => Promise<void>;
   getRecycleBin: () => Promise<(Task & { dayKey: string })[]>;
   restoreFromRecycleBin: (index: number) => Promise<void>;

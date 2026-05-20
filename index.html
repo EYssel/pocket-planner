@@ -24,6 +24,7 @@
     <button class="nav-btn" id="today-btn" title="Go to Today">🎯</button>
   </div>
   <div class="header-right">
+    <button class="icon-btn" id="generate-recurring" title="Generate Recurring Tasks">🔁</button>
     <button class="icon-btn" id="generate-summary" title="Today's Summary">📋</button>
     <button class="icon-btn" id="open-recycle-bin" title="Recycle Bin">🗑️</button>
     <button class="icon-btn" id="open-settings" title="Settings">⚙️</button>
@@ -87,6 +88,19 @@
       <div class="modal-title">Task Notes</div>
     </div>
     <div class="modal-body">
+      <div class="settings-group" style="margin-bottom: 12px; margin-top: 0;">
+        <label class="settings-label" style="display:inline-block; margin-right:8px;">Recurrence</label>
+        <select id="task-recurrence-select" class="settings-select" style="width: auto; display: inline-block;">
+          <option value="none">None</option>
+          <option value="daily">Daily</option>
+          <option value="weekdays">Weekdays</option>
+          <option value="monday">Every Monday</option>
+          <option value="tuesday">Every Tuesday</option>
+          <option value="wednesday">Every Wednesday</option>
+          <option value="thursday">Every Thursday</option>
+          <option value="friday">Every Friday</option>
+        </select>
+      </div>
       <textarea id="task-note-input" class="settings-input" style="height: 200px; resize: vertical;" placeholder="Add details, links, or follow-ups..."></textarea>
     </div>
     <div class="modal-footer">

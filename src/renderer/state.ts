@@ -167,10 +167,15 @@ export function updateTask(dayKey: string, index: number, text: string): void {
   }
 }
 
-export function updateTaskNotes(dayKey: string, index: number, notes: string): void {
+export function updateTaskNotes(dayKey: string, index: number, notes: string, recurrence?: 'none' | 'daily' | 'weekdays' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday'): void {
   const day = weekData?.days?.find(d => d.key === dayKey);
   if (day && day.plans[index]) {
     day.plans[index].notes = notes;
+    if (recurrence && recurrence !== 'none') {
+      day.plans[index].recurrence = recurrence;
+    } else {
+      delete day.plans[index].recurrence;
+    }
     notifyChange(dayKey);
   }
 }

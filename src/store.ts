@@ -67,6 +67,7 @@ export function savePlans(dayKey: string, plans: Task[]): void {
     text: typeof p.text === 'string' ? p.text : '',
     done: typeof p.done === 'boolean' ? p.done : false,
     notes: typeof p.notes === 'string' ? p.notes : undefined,
+    recurrence: ['none', 'daily', 'weekdays', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'].includes(p.recurrence as string) ? p.recurrence : undefined,
   }));
   store.set(`days.${dayKey}`, validated);
 }

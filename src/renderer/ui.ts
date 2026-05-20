@@ -30,6 +30,7 @@ export const closeUpdateBanner      = document.getElementById('close-update-bann
 export const recycleBinOverlay = document.getElementById('recycle-bin-overlay') as HTMLElement;
 export const recycleBinList    = document.getElementById('recycle-bin-list') as HTMLElement;
 export const openRecycleBin    = document.getElementById('open-recycle-bin') as HTMLElement;
+export const generateRecurringBtn = document.getElementById('generate-recurring') as HTMLButtonElement;
 export const generateSummaryBtn = document.getElementById('generate-summary') as HTMLButtonElement;
 export const closeRecycleBin   = document.getElementById('close-recycle-bin') as HTMLElement;
 export const clearBinBtn       = document.getElementById('clear-bin-btn') as HTMLElement;
@@ -45,6 +46,7 @@ export const copySummaryBtn = document.getElementById('copy-summary-btn') as HTM
 
 export const noteOverlay     = document.getElementById('note-overlay') as HTMLElement;
 export const taskNoteInput   = document.getElementById('task-note-input') as HTMLTextAreaElement;
+export const taskRecurrenceSelect = document.getElementById('task-recurrence-select') as HTMLSelectElement;
 export const saveNoteBtn     = document.getElementById('save-note-btn') as HTMLButtonElement;
 export const closeNoteModal  = document.getElementById('close-note-modal') as HTMLButtonElement;
 
@@ -169,6 +171,7 @@ export function buildTaskItem(dayKey: string, task: Plan, index: number, callbac
       <div class="task-display" title="${escapeHtml(task.text)}">${escapeHtml(task.text)}</div>
       <textarea class="task-edit" placeholder="Task…" rows="1">${escapeHtml(task.text)}</textarea>
     </div>
+    ${task.recurrence && task.recurrence !== 'none' ? '<span class="recurrence-icon" title="Recurring Task" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: var(--accent2); font-size: 14px;">🔁</span>' : ''}
     <button class="note-btn ${task.notes ? 'has-notes' : ''}" title="Task Notes">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
     </button>

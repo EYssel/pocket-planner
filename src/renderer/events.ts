@@ -100,6 +100,7 @@ export function setupEventListeners(callbacks: {
           activeNoteDayKey = dayKey;
           activeNoteIndex = index;
           ui.taskNoteInput.value = task.notes || '';
+          ui.taskRecurrenceSelect.value = task.recurrence || 'none';
           ui.noteOverlay.classList.add('show');
           setTimeout(() => ui.taskNoteInput.focus(), 100);
         }
@@ -233,6 +234,20 @@ export function setupEventListeners(callbacks: {
     await generateSummaryForDay(todayKey);
   });
 
+  ui.generateRecurringBtn?.addEventListener('click', async () => {
+    const weekKey = state.currentWeekKey;
+    if (weekKey) {
+      await (window as any).planner.generateRecurringTasks(weekKey);
+      await callbacks.loadWeek(weekKey, true); // reload grid
+    }
+  });
+
+  window.planner.onQuickAddSuccess(async () => {
+    if (state.currentWeekKey) {
+      await callbacks.loadWeek(state.currentWeekKey, true);
+    }
+  });
+
   // Handle grid clicks for contextual summaries
   ui.grid.addEventListener('click', async (e: MouseEvent) => {
     const btn = (e.target as HTMLElement).closest('.day-summary-btn') as HTMLButtonElement;
@@ -267,7 +282,8 @@ export function setupEventListeners(callbacks: {
   ui.saveNoteBtn?.addEventListener('click', async () => {
     if (activeNoteDayKey !== null && activeNoteIndex !== null) {
       const newNotes = ui.taskNoteInput.value.trim();
-      state.updateTaskNotes(activeNoteDayKey, activeNoteIndex, newNotes);
+      const recurrence = ui.taskRecurrenceSelect.value as any;
+      state.updateTaskNotes(activeNoteDayKey, activeNoteIndex, newNotes, recurrence);
       await callbacks.saveDay(activeNoteDayKey);
       ui.noteOverlay.classList.remove('show');
       activeNoteDayKey = null;

@@ -42,6 +42,7 @@ exports[`Renderer UI Builders buildTaskItem renders a done task correctly 1`] = 
   </div>
   
     
+
   <button
     class="note-btn "
     title="Task Notes"
@@ -136,6 +137,7 @@ exports[`Renderer UI Builders buildTaskItem renders an active task correctly 1`]
   </div>
   
     
+
   <button
     class="note-btn has-notes"
     title="Task Notes"
@@ -230,6 +232,7 @@ exports[`Renderer UI Builders buildTaskItem renders escaped HTML to prevent XSS 
   </div>
   
     
+
   <button
     class="note-btn "
     title="Task Notes"
@@ -372,6 +375,7 @@ exports[`Renderer UI Builders createDaySection renders a full day section with t
       </div>
       
     
+
       <button
         class="note-btn "
         title="Task Notes"
@@ -492,6 +496,7 @@ exports[`Renderer UI Builders createDaySection renders a full day section with t
         </div>
         
     
+
         <button
           class="note-btn "
           title="Task Notes"
