@@ -5,7 +5,7 @@ import * as ui from './ui';
 import * as modals from './modals';
 
 export function setupEventListeners(callbacks: {
-  loadWeek: (key: string) => Promise<void>,
+  loadWeek: (key: string, skipStaleCheck?: boolean) => Promise<void>,
   saveDay: (dayKey: string) => Promise<void>,
   checkStaleTasks: () => Promise<void>
 }) {
