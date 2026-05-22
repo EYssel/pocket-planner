@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/EYssel/planner-app/compare/v1.13.0...v1.14.0) (2026-05-22)
+
+### Features
+* We've introduced a powerful new global search feature, making it easier than ever to quickly find any plan or entry across your entire planner.
+
+### Bug Fixes
+*
+
 ## [1.13.0](https://github.com/EYssel/planner-app/compare/v1.11.0...v1.13.0) (2026-05-22)
 
 ### Features
