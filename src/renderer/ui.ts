@@ -1,6 +1,7 @@
 'use strict';
 
 import { Plan, DayData, WeekData } from './types';
+import { SearchResult } from '../types';
 
 // DOM refs
 export const grid        = document.getElementById('week-grid') as HTMLElement;
@@ -64,6 +65,14 @@ export const closeNoteModal  = document.getElementById('close-note-modal') as HT
 export const releaseNotesOverlay = document.getElementById('release-notes-overlay') as HTMLElement;
 export const releaseNotesContent = document.getElementById('release-notes-content') as HTMLElement;
 export const closeReleaseNotes   = document.getElementById('close-release-notes') as HTMLElement;
+
+export const searchOverlay        = document.getElementById('search-overlay') as HTMLElement;
+export const searchInput          = document.getElementById('search-input') as HTMLInputElement;
+export const searchResultsList    = document.getElementById('search-results-list') as HTMLElement;
+export const closeSearchModalBtn  = document.getElementById('close-search-modal') as HTMLButtonElement;
+export const openSearchBtn        = document.getElementById('open-search') as HTMLButtonElement;
+export const searchScopeFilters   = document.getElementById('search-scope-filters') as HTMLElement;
+export const searchStatusFilters  = document.getElementById('search-status-filters') as HTMLElement;
 
 export const releaseNotesBanner = document.getElementById('release-notes-banner') as HTMLElement;
 export const bannerVersion      = document.getElementById('banner-version') as HTMLElement;
@@ -289,4 +298,82 @@ export function renderMarkdown(text: string): string {
   });
 
   return html;
+}
+
+function highlightText(text: string, query: string): string {
+  if (!query) return escapeHtml(text);
+  const escapedText = escapeHtml(text);
+  const escapedQuery = escapeHtml(query);
+  const regex = new RegExp(`(${escapedQuery.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+  return escapedText.replace(regex, '<mark>$1</mark>');
+}
+
+function getNotesSnippet(notes: string, query: string): string {
+  if (!notes) return '';
+  const queryLower = query.toLowerCase();
+  const notesLower = notes.toLowerCase();
+  const idx = notesLower.indexOf(queryLower);
+  
+  if (idx === -1) {
+    return notes.length > 60 ? notes.slice(0, 60) + '...' : notes;
+  }
+  
+  const start = Math.max(0, idx - 25);
+  const end = Math.min(notes.length, idx + query.length + 35);
+  let snippet = notes.slice(start, end);
+  if (start > 0) snippet = '...' + snippet;
+  if (end < notes.length) snippet = snippet + '...';
+  return snippet;
+}
+
+export function renderSearchResults(results: SearchResult[], query: string) {
+  if (!searchResultsList) return;
+  searchResultsList.innerHTML = '';
+
+  if (results.length === 0) {
+    searchResultsList.innerHTML = `<div class="search-no-results">No tasks or notes match "${escapeHtml(query)}"</div>`;
+    return;
+  }
+
+  let currentGroup = '';
+  
+  results.forEach(result => {
+    const groupLabel = `${result.weekKey.split('-W')[0]} - Week ${result.weekKey.split('-W')[1]}`;
+    
+    if (groupLabel !== currentGroup) {
+      currentGroup = groupLabel;
+      const header = document.createElement('div');
+      header.className = 'search-group-header';
+      header.textContent = groupLabel;
+      searchResultsList.appendChild(header);
+    }
+
+    const item = document.createElement('div');
+    item.className = 'search-result-item';
+    item.dataset.dayKey = result.dayKey;
+    item.dataset.weekKey = result.weekKey;
+    item.dataset.index = result.taskIndex.toString();
+
+    const snippet = result.notes ? getNotesSnippet(result.notes, query) : '';
+
+    item.innerHTML = `
+      <div class="search-result-status ${result.done ? 'done' : ''}">
+        ${result.done ? '✓' : ''}
+      </div>
+      <div class="search-result-content">
+        <div class="search-result-text">${highlightText(result.text, query)}</div>
+        ${result.notes ? `
+          <div class="search-result-notes" title="${escapeHtml(result.notes)}">
+            ${highlightText(snippet, query)}
+          </div>
+        ` : ''}
+      </div>
+      <div class="search-result-meta">
+        <div class="search-result-day">${result.dayName}</div>
+        <div class="search-result-date">${result.dateLabel}</div>
+      </div>
+    `;
+
+    searchResultsList.appendChild(item);
+  });
 }

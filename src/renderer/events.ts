@@ -569,6 +569,115 @@ export function setupEventListeners(callbacks: {
       e.preventDefault();
       state.weekData?.days?.forEach((d: any) => callbacks.saveDay(d.key));
     }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+      e.preventDefault();
+      ui.searchOverlay.classList.add('show');
+      setTimeout(() => ui.searchInput.focus(), 100);
+      performSearch();
+    }
+    if (e.key === 'Escape') {
+      if (ui.searchOverlay.classList.contains('show')) {
+        ui.searchOverlay.classList.remove('show');
+        ui.searchInput.value = '';
+        ui.searchResultsList.innerHTML = '';
+      }
+    }
+  });
+
+  // ── Global Search Event Listeners ──────────────────────────────────────────
+
+  let searchTimeout: any = null;
+  let activeSearchScope = 'all';
+  let activeSearchStatus = 'all';
+
+  const performSearch = async () => {
+    const query = ui.searchInput.value.trim();
+    if (!query) {
+      ui.searchResultsList.innerHTML = '';
+      return;
+    }
+
+    const results = await window.planner.searchPlans(query, {
+      scope: activeSearchScope,
+      status: activeSearchStatus
+    });
+
+    ui.renderSearchResults(results, query);
+  };
+
+  const debouncedSearch = () => {
+    if (searchTimeout) clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(performSearch, 200);
+  };
+
+  ui.openSearchBtn?.addEventListener('click', () => {
+    ui.searchOverlay.classList.add('show');
+    setTimeout(() => ui.searchInput.focus(), 100);
+    performSearch();
+  });
+
+  ui.closeSearchModalBtn?.addEventListener('click', () => {
+    ui.searchOverlay.classList.remove('show');
+    ui.searchInput.value = '';
+    ui.searchResultsList.innerHTML = '';
+  });
+
+  ui.searchInput?.addEventListener('input', debouncedSearch);
+
+  ui.searchScopeFilters?.addEventListener('click', (e: MouseEvent) => {
+    const chip = (e.target as HTMLElement).closest('.chip') as HTMLElement;
+    if (chip) {
+      ui.searchScopeFilters.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeSearchScope = chip.dataset.value || 'all';
+      performSearch();
+    }
+  });
+
+  ui.searchStatusFilters?.addEventListener('click', (e: MouseEvent) => {
+    const chip = (e.target as HTMLElement).closest('.chip') as HTMLElement;
+    if (chip) {
+      ui.searchStatusFilters.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeSearchStatus = chip.dataset.value || 'all';
+      performSearch();
+    }
+  });
+
+  ui.searchResultsList?.addEventListener('click', async (e: MouseEvent) => {
+    const item = (e.target as HTMLElement).closest('.search-result-item') as HTMLElement;
+    if (!item) return;
+
+    const dayKey = item.dataset.dayKey!;
+    const weekKey = item.dataset.weekKey!;
+    const index = parseInt(item.dataset.index!, 10);
+
+    ui.searchOverlay.classList.remove('show');
+    ui.searchInput.value = '';
+    ui.searchResultsList.innerHTML = '';
+
+    await callbacks.loadWeek(weekKey);
+
+    const doneSection = document.getElementById(`done-section-${dayKey}`);
+    const taskItem = document.querySelector(`.task-item[data-day-key="${dayKey}"][data-index="${index}"]`) as HTMLElement;
+    
+    if (taskItem && taskItem.classList.contains('done')) {
+      if (doneSection && doneSection.classList.contains('collapsed')) {
+        doneSection.classList.remove('collapsed');
+        localStorage.setItem(`done-collapsed-${dayKey}`, 'false');
+      }
+    }
+
+    const targetItem = document.querySelector(`.task-item[data-day-key="${dayKey}"][data-index="${index}"]`) as HTMLElement;
+    if (targetItem) {
+      targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetItem.classList.remove('highlight-flash');
+      void targetItem.offsetWidth;
+      targetItem.classList.add('highlight-flash');
+      setTimeout(() => {
+        targetItem.classList.remove('highlight-flash');
+      }, 2500);
+    }
   });
 
   window.addEventListener('resize', () => {

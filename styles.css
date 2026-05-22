@@ -546,3 +546,251 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 .note-text a:hover {
   border-bottom-style: solid;
 }
+
+/* ── Global Search ── */
+.search-modal {
+  width: 650px;
+  max-width: 90vw;
+}
+
+.search-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 16px;
+}
+
+.search-input-wrapper:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(232, 255, 71, 0.15);
+}
+
+.search-icon {
+  font-size: 16px;
+}
+
+#search-input {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  width: 100%;
+}
+
+.search-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 6px;
+}
+
+.chip {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 500;
+}
+
+.search-results-body {
+  padding: 10px 0;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+#search-results-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-no-results {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.search-group-header {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  padding: 12px 20px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--surface2);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.search-result-item:hover {
+  background: var(--surface2);
+}
+
+.search-result-status {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  margin-right: 12px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.search-result-status.done {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.search-result-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-result-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.search-result-notes {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 6px;
+  padding-left: 8px;
+  border-left: 2px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-result-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+  text-align: right;
+  margin-top: 2px;
+}
+
+.search-result-day {
+  color: var(--accent2);
+}
+
+.search-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+}
+
+.search-tip {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.search-tip kbd {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+}
+
+mark {
+  background: rgba(232, 255, 71, 0.3);
+  color: var(--text);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ── Flash Highlight Animation ── */
+.highlight-flash {
+  animation: flashGlow 2.5s ease-out;
+}
+
+@keyframes flashGlow {
+  0% {
+    background: rgba(232, 255, 71, 0.4);
+    box-shadow: 0 0 15px rgba(232, 255, 71, 0.8);
+    transform: scale(1.02);
+  }
+  15% {
+    background: rgba(232, 255, 71, 0.3);
+    box-shadow: 0 0 10px rgba(232, 255, 71, 0.5);
+    transform: scale(1.01);
+  }
+  100% {
+    background: transparent;
+    box-shadow: none;
+    transform: scale(1);
+  }
+}
+

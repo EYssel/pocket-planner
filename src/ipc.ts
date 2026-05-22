@@ -6,6 +6,7 @@ import * as path from 'path';
 import { autoUpdater } from 'electron-updater';
 import { RecurringTask } from './types';
 import { 
+  store,
   getPlans, 
   savePlans, 
   addToRecycleBin, 
@@ -34,9 +35,10 @@ import {
   getPreviousWorkingDayKey,
   offsetDayKeyByWeeks,
   getFirstDayOfWeek,
-  getLastDayOfWeek
+  getLastDayOfWeek,
+  parseWeekKey
 } from './weekUtils';
-import { Task, SettingOptions, WeekData } from './types';
+import { Task, SettingOptions, WeekData, SearchResult } from './types';
 
 export function registerHandlers(): void {
   // App info
@@ -218,5 +220,71 @@ export function registerHandlers(): void {
       console.error('Failed to read release notes:', err);
       return '';
     }
+  });
+
+  ipcMain.handle('search-plans', (_: any, { query, options }: { query: string, options: { status: string; scope: string } }): SearchResult[] => {
+    const queryLower = (query || '').toLowerCase().trim();
+    if (!queryLower) return [];
+
+    const days = store.get('days') || {};
+    const results: SearchResult[] = [];
+
+    for (const [dayKey, plans] of Object.entries(days)) {
+      if (!Array.isArray(plans)) continue;
+      
+      let dayName = '';
+      let dateLabel = '';
+      let weekKey = '';
+      try {
+        const info = dayInfoFromKey(dayKey);
+        dayName = info.dayName;
+        dateLabel = typeof info.date === 'number' ? `${info.month} ${info.date}` : `${info.month} ${info.date}`;
+        weekKey = weekKeyFromDayKey(dayKey);
+      } catch (err) {
+        console.error('Error parsing dayKey in search:', dayKey, err);
+        continue;
+      }
+
+      plans.forEach((task, taskIndex) => {
+        if (options.status === 'pending' && task.done) return;
+        if (options.status === 'done' && !task.done) return;
+
+        const textMatch = options.scope !== 'notes' && task.text.toLowerCase().includes(queryLower);
+        const notesMatch = options.scope !== 'text' && !!task.notes && task.notes.toLowerCase().includes(queryLower);
+
+        if (textMatch || notesMatch) {
+          results.push({
+            dayKey,
+            weekKey,
+            dayName,
+            dateLabel,
+            text: task.text,
+            done: task.done,
+            notes: task.notes,
+            taskIndex
+          });
+        }
+      });
+    }
+
+    results.sort((a, b) => {
+      const getSortTime = (key: string) => {
+        if (key.endsWith('-WE')) {
+          const wk = key.replace('-WE', '');
+          const { year, week } = parseWeekKey(wk);
+          const jan4 = new Date(Date.UTC(year, 0, 4));
+          const jan4Day = jan4.getUTCDay() || 7;
+          const monday = new Date(jan4);
+          monday.setUTCDate(jan4.getUTCDate() - jan4Day + 1 + (week - 1) * 7);
+          return monday.getTime() + 5 * 86400000; // Saturday time
+        } else {
+          const [y, m, d] = key.split('-').map(Number);
+          return Date.UTC(y, m - 1, d);
+        }
+      };
+      return getSortTime(b.dayKey) - getSortTime(a.dayKey);
+    });
+
+    return results;
   });
 }
