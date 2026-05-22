@@ -165,18 +165,23 @@ export async function handleRecurringAction(id: string, action: string, callback
   }
 }
 
-export function applyTheme(theme: string) {
-  const classes = Array.from(document.body.classList).filter(c => c.startsWith('theme-'));
-  if (classes.length > 0) document.body.classList.remove(...classes);
-  if (theme !== 'dark') {
-    document.body.classList.add(`theme-${theme}`);
-  }
+export function applyAppearance(theme: string, fontSize: string) {
+  // Clear existing theme and font classes
+  const themeClasses = Array.from(document.body.classList).filter(c => c.startsWith('theme-'));
+  const fontClasses = Array.from(document.body.classList).filter(c => c.startsWith('font-'));
+  if (themeClasses.length > 0) document.body.classList.remove(...themeClasses);
+  if (fontClasses.length > 0) document.body.classList.remove(...fontClasses);
+  
+  if (theme !== 'dark') document.body.classList.add(`theme-${theme}`);
+  document.body.classList.add(`font-${fontSize}`);
 }
 
-export async function initTheme() {
+export async function initAppearance() {
   const theme = await window.planner.getSetting('theme');
-  applyTheme(theme);
+  const fontSize = await window.planner.getSetting('fontSize');
   if (ui.themeSelect) ui.themeSelect.value = theme;
+  if (ui.fontSizeSelect) ui.fontSizeSelect.value = fontSize;
+  applyAppearance(theme, fontSize);
 }
 
 export async function initReleaseNotes() {
