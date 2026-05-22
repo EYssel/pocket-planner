@@ -4,6 +4,7 @@ import { ipcMain, app, clipboard, shell } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import { autoUpdater } from 'electron-updater';
+import { RecurringTask } from './types';
 import { 
   getPlans, 
   savePlans, 
