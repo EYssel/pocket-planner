@@ -346,7 +346,18 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 .task-item.done .check-btn { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 
 .task-text-container { position: relative; width: 100%; min-height: 18px; }
-.task-display { font-size: calc(12px * var(--font-scale)); line-height: 1.4; color: var(--text); word-break: break-word; white-space: pre-wrap; }
+.task-display {
+  font-size: calc(12px * var(--font-scale));
+  line-height: 1.4;
+  color: var(--text);
+  word-break: break-word;
+  white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .task-edit {
   background: transparent; border: none; color: var(--text); font-family: 'DM Sans', sans-serif;
   font-size: calc(12px * var(--font-scale)); outline: none; width: 100%; line-height: 1.4; resize: none; overflow: hidden; display: none;

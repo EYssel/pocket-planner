@@ -224,7 +224,6 @@ export function setupEventListeners(callbacks: {
       if (addBtn) {
         const dayKey = addBtn.dataset.day!;
         state.addTask(dayKey);
-        await callbacks.saveDay(dayKey);
         
         // Focus the new task
         const tasksEl = document.getElementById(`tasks-${dayKey}`);
@@ -293,7 +292,7 @@ export function setupEventListeners(callbacks: {
                 <div class="summary-item" style="flex-direction: column; gap: 0;">
                   <div style="display: flex; gap: 12px;">
                     <span class="summary-item-bullet">✓</span>
-                    <span>${ui.escapeHtml(p.text)}</span>
+                    <span>${ui.escapeHtml(ui.truncate(p.text))}</span>
                   </div>
                   ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
@@ -308,7 +307,7 @@ export function setupEventListeners(callbacks: {
                 <div class="summary-item" style="flex-direction: column; gap: 0;">
                   <div style="display: flex; gap: 12px;">
                     <span class="summary-item-bullet">→</span>
-                    <span>${ui.escapeHtml(p.text)}</span>
+                    <span>${ui.escapeHtml(ui.truncate(p.text))}</span>
                   </div>
                   ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
@@ -323,7 +322,7 @@ export function setupEventListeners(callbacks: {
                 <div class="summary-item" style="flex-direction: column; gap: 0;">
                   <div style="display: flex; gap: 12px;">
                     <span class="summary-item-bullet">•</span>
-                    <span>${ui.escapeHtml(p.text)}</span>
+                    <span>${ui.escapeHtml(ui.truncate(p.text))}</span>
                   </div>
                   ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
@@ -629,7 +628,6 @@ export function setupEventListeners(callbacks: {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       state.addTask(dayKey);
-      await callbacks.saveDay(dayKey);
       
       const tasksEl = document.getElementById(`tasks-${dayKey}`);
       if (tasksEl) {

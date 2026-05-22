@@ -52,6 +52,15 @@ describe('store', () => {
       ]);
     });
 
+    test('savePlans should truncate task text to 200 characters', () => {
+      const longText = 'a'.repeat(250);
+      const plans = [{ text: longText, done: false }] as any;
+      store.savePlans('2026-04-23', plans);
+      expect(mockStoreInstance.set).toHaveBeenCalledWith('days.2026-04-23', [
+        { text: 'a'.repeat(200), done: false },
+      ]);
+    });
+
     test('savePlans should throw if plans is not an array', () => {
       expect(() => store.savePlans('2026-04-23', 'not-an-array' as any)).toThrow('plans must be an array');
     });

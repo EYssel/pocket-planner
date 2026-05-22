@@ -11,7 +11,7 @@ export function renderCleanupList() {
     item.className = 'stale-task-item';
     item.innerHTML = `
       <div class="stale-task-info">
-        <div class="stale-task-text">${ui.escapeHtml(task.text)}</div>
+        <div class="stale-task-text">${ui.escapeHtml(ui.truncate(task.text))}</div>
         <div class="stale-task-date">From ${task.dayKey}</div>
       </div>
       <div class="stale-task-actions">

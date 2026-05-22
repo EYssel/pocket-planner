@@ -201,7 +201,7 @@ export function importTask(dayKey: string, task: Plan): void {
 export function updateTask(dayKey: string, index: number, text: string): void {
   const day = weekData?.days?.find(d => d.key === dayKey);
   if (day && day.plans[index]) {
-    day.plans[index].text = text;
+    day.plans[index].text = text.slice(0, 200);
     // No notifyChange here to avoid re-rendering while typing
   }
 }
