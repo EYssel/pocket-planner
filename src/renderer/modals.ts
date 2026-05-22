@@ -133,7 +133,7 @@ export async function renderRecurringList() {
         <div class="stale-task-text">${ui.escapeHtml(task.text)}</div>
         <div class="stale-task-date" style="display: flex; gap: 4px; margin-top: 4px;">
           ${dayNames.map((name, i) => `
-            <span style="font-size: 10px; padding: 2px 4px; border-radius: 3px; background: ${task.days.includes(i + 1) ? 'var(--accent)' : 'var(--surface)'}; color: ${task.days.includes(i + 1) ? 'var(--on-accent)' : 'var(--muted)'};">
+            <span style="font-size: 10px; padding: 2px 4px; border-radius: 3px; background: ${task.days.includes(i + 1) ? 'var(--accent)' : 'var(--surface2)'}; color: ${task.days.includes(i + 1) ? 'var(--bg)' : 'var(--muted)'};">
               ${name}
             </span>
           `).join('')}
