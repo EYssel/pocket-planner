@@ -13,6 +13,96 @@ export function setupEventListeners(callbacks: {
   ui.nextBtn?.addEventListener('click', async () => callbacks.loadWeek(await window.planner.offsetWeekKey(state.currentWeekKey!, +1)));
   ui.todayBtn?.addEventListener('click', async () => callbacks.loadWeek(await window.planner.currentWeekKey()));
 
+  ui.syncRecurringBtn?.addEventListener('click', async () => {
+    if (state.currentWeekKey) {
+      ui.syncRecurringBtn.classList.add('rotating');
+      await state.syncRecurringTasks(state.currentWeekKey, { loadWeek: callbacks.loadWeek });
+      ui.syncRecurringBtn.classList.remove('rotating');
+    }
+  });
+
+  ui.openRecurringManager?.addEventListener('click', async () => {
+    await modals.renderRecurringList();
+    ui.recurringManagerOverlay.classList.add('show');
+  });
+
+  ui.closeRecurringManager?.addEventListener('click', () => {
+    ui.recurringManagerOverlay.classList.remove('show');
+  });
+
+  ui.recurringList?.addEventListener('click', async (e: MouseEvent) => {
+    const btn = (e.target as HTMLElement).closest('.action-btn') as HTMLButtonElement;
+    if (btn) {
+      await modals.handleRecurringAction(btn.dataset.id!, btn.dataset.action!, { 
+        openSetup: openRecurrenceSetup,
+        loadWeek: callbacks.loadWeek 
+      });
+    }
+  });
+
+  let activeRecurrenceTask: any = null;
+
+  function openRecurrenceSetup(taskTemplate: any) {
+    activeRecurrenceTask = taskTemplate;
+    ui.recurrenceTaskText.textContent = taskTemplate.text;
+    
+    // Reset checks
+    const checks = ui.recurrenceSetupOverlay.querySelectorAll('.day-check') as NodeListOf<HTMLInputElement>;
+    checks.forEach(c => {
+      c.checked = taskTemplate.days ? taskTemplate.days.includes(parseInt(c.value, 10)) : false;
+    });
+
+    ui.stopRecurrenceBtn.style.display = taskTemplate.id ? 'inline-block' : 'none';
+    ui.recurrenceSetupOverlay.classList.add('show');
+  }
+
+  ui.saveRecurrenceBtn?.addEventListener('click', async () => {
+    if (activeRecurrenceTask) {
+      const checks = ui.recurrenceSetupOverlay.querySelectorAll('.day-check') as NodeListOf<HTMLInputElement>;
+      const selectedDays = Array.from(checks).filter(c => c.checked).map(c => parseInt(c.value, 10));
+      
+      if (selectedDays.length === 0) {
+        alert('Please select at least one day.');
+        return;
+      }
+
+      const template = {
+        id: activeRecurrenceTask.id || `rec-${Date.now()}`,
+        text: activeRecurrenceTask.text,
+        days: selectedDays
+      };
+
+      await window.planner.saveRecurringTask(template);
+      
+      // If we upgraded a task, update its recurringId in the current view
+      if (activeRecurrenceTask.dayKey !== undefined) {
+        const day = state.weekData?.days?.find(d => d.key === activeRecurrenceTask.dayKey);
+        if (day && day.plans[activeRecurrenceTask.index]) {
+          day.plans[activeRecurrenceTask.index].recurringId = template.id;
+          await callbacks.saveDay(activeRecurrenceTask.dayKey);
+        }
+      }
+
+      ui.recurrenceSetupOverlay.classList.remove('show');
+      await state.syncRecurringTasks(state.currentWeekKey!, { loadWeek: callbacks.loadWeek });
+    }
+  });
+
+  ui.stopRecurrenceBtn?.addEventListener('click', async () => {
+    if (activeRecurrenceTask && activeRecurrenceTask.id) {
+      if (confirm('Stop this recurrence and delete the template? Existing tasks in your weeks will remain.')) {
+        await window.planner.deleteRecurringTask(activeRecurrenceTask.id);
+        ui.recurrenceSetupOverlay.classList.remove('show');
+        await callbacks.loadWeek(state.currentWeekKey!);
+      }
+    }
+  });
+
+  ui.closeRecurrenceSetup?.addEventListener('click', () => {
+    ui.recurrenceSetupOverlay.classList.remove('show');
+    activeRecurrenceTask = null;
+  });
+
   [ui.prevBtn, ui.nextBtn].forEach((btn, i) => {
     const delta = i === 0 ? -1 : 1;
     btn?.addEventListener('dragover', (e: DragEvent) => {
@@ -84,6 +174,7 @@ export function setupEventListeners(callbacks: {
       const checkBtn = target.closest('.check-btn');
       const delBtn = target.closest('.del-btn');
       const noteBtn = target.closest('.note-btn');
+      const recurBtn = target.closest('.recur-btn');
 
       if (checkBtn) {
         state.toggleTask(dayKey, index);
@@ -102,6 +193,22 @@ export function setupEventListeners(callbacks: {
           ui.taskNoteInput.value = task.notes || '';
           ui.noteOverlay.classList.add('show');
           setTimeout(() => ui.taskNoteInput.focus(), 100);
+        }
+      } else if (recurBtn) {
+        const task = state.weekData?.days?.find(d => d.key === dayKey)?.plans[index];
+        if (task) {
+          if (task.recurringId) {
+            const templates = await window.planner.getRecurringTasks();
+            const template = templates.find(t => t.id === task.recurringId);
+            if (template) {
+              openRecurrenceSetup({ ...template, dayKey, index });
+            } else {
+              // Template missing? treat as new
+              openRecurrenceSetup({ text: task.text, dayKey, index });
+            }
+          } else {
+            openRecurrenceSetup({ text: task.text, dayKey, index });
+          }
         }
       }
     } else {
@@ -386,10 +493,27 @@ export function setupEventListeners(callbacks: {
     await window.planner.testNotification();
   });
 
-  ui.grid?.addEventListener('focusout', (e: FocusEvent) => {
+  ui.grid?.addEventListener('focusout', async (e: FocusEvent) => {
     if ((e.target as HTMLElement).classList.contains('task-edit')) {
-      const dayKey = (e.target as HTMLElement).closest('.task-item')?.getAttribute('data-day-key');
-      if (dayKey) callbacks.saveDay(dayKey);
+      const item = (e.target as HTMLElement).closest('.task-item') as HTMLElement;
+      const dayKey = item?.getAttribute('data-day-key');
+      const index = parseInt(item?.dataset.index || '-1', 10);
+      if (dayKey) {
+        await callbacks.saveDay(dayKey);
+        
+        // If it's a recurring task, update the template if text changed
+        const task = state.weekData?.days?.find(d => d.key === dayKey)?.plans[index];
+        if (task && task.recurringId) {
+          const templates = await window.planner.getRecurringTasks();
+          const template = templates.find(t => t.id === task.recurringId);
+          if (template && template.text !== task.text) {
+            template.text = task.text;
+            await window.planner.saveRecurringTask(template);
+            // Optionally reload to update other instances in view
+            // but that might be jarring while typing/focusing out.
+          }
+        }
+      }
     }
   }, true);
 

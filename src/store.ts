@@ -3,12 +3,14 @@
 import { app } from 'electron';
 import * as path from 'path';
 import Store from 'electron-store';
-import { Task, SettingOptions } from './types';
+import { Task, SettingOptions, RecurringTask } from './types';
+import { weekDayKeys } from './weekUtils';
 
 interface Schema {
   settings: SettingOptions;
   days: Record<string, Task[]>;
   recycleBin: (Task & { dayKey: string; deletedAt: string })[];
+  recurringTasks: RecurringTask[];
 }
 
 const isDev = app ? !app.isPackaged : true;
@@ -30,6 +32,7 @@ const getStoreOptions = () => {
       settings: DEFAULT_SETTINGS,
       days: {},
       recycleBin: [],
+      recurringTasks: [],
     },
   };
 
@@ -67,8 +70,63 @@ export function savePlans(dayKey: string, plans: Task[]): void {
     text: typeof p.text === 'string' ? p.text : '',
     done: typeof p.done === 'boolean' ? p.done : false,
     notes: typeof p.notes === 'string' ? p.notes : undefined,
+    recurringId: typeof p.recurringId === 'string' ? p.recurringId : undefined,
   }));
   store.set(`days.${dayKey}`, validated);
+}
+
+// ── Recurring Tasks ───────────────────────────────────────────────────────────
+
+export function getRecurringTasks(): RecurringTask[] {
+  return store.get('recurringTasks', []);
+}
+
+export function saveRecurringTask(task: RecurringTask): void {
+  const tasks = getRecurringTasks();
+  const idx = tasks.findIndex(t => t.id === task.id);
+  if (idx !== -1) {
+    tasks[idx] = task;
+  } else {
+    tasks.push(task);
+  }
+  store.set('recurringTasks', tasks);
+}
+
+export function deleteRecurringTask(id: string): void {
+  const tasks = getRecurringTasks();
+  const filtered = tasks.filter(t => t.id !== id);
+  store.set('recurringTasks', filtered);
+}
+
+export function generateRecurringTasks(weekKey: string): void {
+  const dayKeys = weekDayKeys(weekKey);
+  const templates = getRecurringTasks();
+
+  dayKeys.forEach((dayKey, index) => {
+    const dayNum = index + 1; // 1-5 for Mon-Fri, 6 for Weekend
+    const applicable = templates.filter(t => t.days.includes(dayNum));
+    
+    if (applicable.length === 0) return;
+
+    const currentPlans = getPlans(dayKey);
+    let changed = false;
+
+    applicable.forEach(template => {
+      const exists = currentPlans.some(p => p.recurringId === template.id);
+      if (!exists) {
+        currentPlans.push({
+          text: template.text,
+          done: false,
+          recurringId: template.id
+        });
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      savePlans(dayKey, currentPlans);
+    }
+  });
 }
 
 // ── Recycle Bin ───────────────────────────────────────────────────────────────

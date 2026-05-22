@@ -43,6 +43,40 @@ exports[`Renderer UI Builders buildTaskItem renders a done task correctly 1`] = 
   
     
   <button
+    class="recur-btn "
+    title="Make Recurring"
+  >
+    
+      
+    <svg
+      fill="none"
+      height="13"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="13"
+    >
+      <path
+        d="M17 1l4 4-4 4"
+      />
+      <path
+        d="M3 11V9a4 4 0 0 1 4-4h14"
+      />
+      <path
+        d="M7 23l-4-4 4-4"
+      />
+      <path
+        d="M21 13v2a4 4 0 0 1-4 4H3"
+      />
+    </svg>
+    
+    
+  </button>
+  
+    
+  <button
     class="note-btn "
     title="Task Notes"
   >
@@ -137,6 +171,40 @@ exports[`Renderer UI Builders buildTaskItem renders an active task correctly 1`]
   
     
   <button
+    class="recur-btn "
+    title="Make Recurring"
+  >
+    
+      
+    <svg
+      fill="none"
+      height="13"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="13"
+    >
+      <path
+        d="M17 1l4 4-4 4"
+      />
+      <path
+        d="M3 11V9a4 4 0 0 1 4-4h14"
+      />
+      <path
+        d="M7 23l-4-4 4-4"
+      />
+      <path
+        d="M21 13v2a4 4 0 0 1-4 4H3"
+      />
+    </svg>
+    
+    
+  </button>
+  
+    
+  <button
     class="note-btn has-notes"
     title="Task Notes"
   >
@@ -228,6 +296,40 @@ exports[`Renderer UI Builders buildTaskItem renders escaped HTML to prevent XSS 
     
     
   </div>
+  
+    
+  <button
+    class="recur-btn "
+    title="Make Recurring"
+  >
+    
+      
+    <svg
+      fill="none"
+      height="13"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="13"
+    >
+      <path
+        d="M17 1l4 4-4 4"
+      />
+      <path
+        d="M3 11V9a4 4 0 0 1 4-4h14"
+      />
+      <path
+        d="M7 23l-4-4 4-4"
+      />
+      <path
+        d="M21 13v2a4 4 0 0 1-4 4H3"
+      />
+    </svg>
+    
+    
+  </button>
   
     
   <button
@@ -373,6 +475,40 @@ exports[`Renderer UI Builders createDaySection renders a full day section with t
       
     
       <button
+        class="recur-btn "
+        title="Make Recurring"
+      >
+        
+      
+        <svg
+          fill="none"
+          height="13"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="13"
+        >
+          <path
+            d="M17 1l4 4-4 4"
+          />
+          <path
+            d="M3 11V9a4 4 0 0 1 4-4h14"
+          />
+          <path
+            d="M7 23l-4-4 4-4"
+          />
+          <path
+            d="M21 13v2a4 4 0 0 1-4 4H3"
+          />
+        </svg>
+        
+    
+      </button>
+      
+    
+      <button
         class="note-btn "
         title="Task Notes"
       >
@@ -490,6 +626,40 @@ exports[`Renderer UI Builders createDaySection renders a full day section with t
           
     
         </div>
+        
+    
+        <button
+          class="recur-btn "
+          title="Make Recurring"
+        >
+          
+      
+          <svg
+            fill="none"
+            height="13"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="13"
+          >
+            <path
+              d="M17 1l4 4-4 4"
+            />
+            <path
+              d="M3 11V9a4 4 0 0 1 4-4h14"
+            />
+            <path
+              d="M7 23l-4-4 4-4"
+            />
+            <path
+              d="M21 13v2a4 4 0 0 1-4 4H3"
+            />
+          </svg>
+          
+    
+        </button>
         
     
         <button

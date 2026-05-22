@@ -42,4 +42,8 @@ contextBridge.exposeInMainWorld('planner', {
   openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
   updateOSState: (stats: { nextTaskText: string | null, doneCount: number, totalCount: number }) => ipcRenderer.send('update-os-state', stats),
   testNotification: () => ipcRenderer.invoke('test-notification'),
+  getRecurringTasks: () => ipcRenderer.invoke('get-recurring-tasks'),
+  saveRecurringTask: (task: any) => ipcRenderer.invoke('save-recurring-task', task),
+  deleteRecurringTask: (id: string) => ipcRenderer.invoke('delete-recurring-task', id),
+  syncRecurringTasks: (weekKey: string) => ipcRenderer.invoke('sync-recurring-tasks', weekKey),
 });

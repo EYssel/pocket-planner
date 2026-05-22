@@ -114,6 +114,57 @@ export async function handleBinAction(index: number, action: string, callbacks: 
   }
 }
 
+export async function renderRecurringList() {
+  const tasks = await window.planner.getRecurringTasks();
+  ui.recurringList.innerHTML = '';
+  
+  if (tasks.length === 0) {
+    ui.recurringList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--muted);">No recurring tasks set up.</div>';
+    return;
+  }
+
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'WE'];
+
+  tasks.forEach((task) => {
+    const item = document.createElement('div');
+    item.className = 'stale-task-item'; // Reuse styling
+    item.innerHTML = `
+      <div class="stale-task-info" style="flex: 1;">
+        <div class="stale-task-text">${ui.escapeHtml(task.text)}</div>
+        <div class="stale-task-date" style="display: flex; gap: 4px; margin-top: 4px;">
+          ${dayNames.map((name, i) => `
+            <span style="font-size: 10px; padding: 2px 4px; border-radius: 3px; background: ${task.days.includes(i + 1) ? 'var(--accent)' : 'var(--surface2)'}; color: ${task.days.includes(i + 1) ? 'var(--bg)' : 'var(--muted)'};">
+              ${name}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+      <div class="stale-task-actions">
+        <button class="banner-btn action-btn" data-id="${task.id}" data-action="edit" title="Edit">✏️</button>
+        <button class="banner-btn action-btn" data-id="${task.id}" data-action="delete" title="Delete Template">🗑️</button>
+      </div>
+    `;
+    ui.recurringList.appendChild(item);
+  });
+}
+
+export async function handleRecurringAction(id: string, action: string, callbacks: { openSetup: (task: any) => void, loadWeek: (key: string) => Promise<void> }) {
+  if (action === 'delete') {
+    if (confirm('Stop this recurrence and delete the template? Existing tasks in your weeks will remain.')) {
+      await window.planner.deleteRecurringTask(id);
+      await renderRecurringList();
+      await callbacks.loadWeek(state.currentWeekKey!);
+    }
+  } else if (action === 'edit') {
+    const tasks = await window.planner.getRecurringTasks();
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      ui.recurringManagerOverlay.classList.remove('show');
+      callbacks.openSetup(task);
+    }
+  }
+}
+
 export function applyTheme(theme: string) {
   const classes = Array.from(document.body.classList).filter(c => c.startsWith('theme-'));
   if (classes.length > 0) document.body.classList.remove(...classes);

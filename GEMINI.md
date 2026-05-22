@@ -56,6 +56,13 @@ The app uses isolated data directories to prevent development from affecting pro
     - **Taskbar (Windows):** Progress bar reflects daily completion.
     - **Dock (macOS):** Badge count shows remaining tasks for today.
 
+### 6. Recurring Tasks
+- **Model**: Templates stored in `recurringTasks`. Instances injected into daily plans via `syncRecurringTasks(weekKey)`.
+- **Generation**: Triggered automatically for the current week on launch; manually triggered for future weeks via the Sync button.
+- **Sync Logic**: Injects tasks from templates that aren't already present (checked via `recurringId`).
+- **Persistence Mandate**: Backend saving logic (`src/store.ts`) MUST preserve `recurringId`.
+- **Management**: Centralized modal for managing templates; contextual icon on tasks for quick setup.
+
 ## Workflows
 
 | Command | Action |
@@ -66,6 +73,7 @@ The app uses isolated data directories to prevent development from affecting pro
 
 ## Future Work
 - [x] Customizable notification intervals via UI.
+- [x] Recurring tasks (Daily/Weekly/Specific Days).
 - [ ] Weekend view toggle.
 - [ ] Task priority or tagging.
 - [ ] Global Keyboard Shortcut (Quick Add).

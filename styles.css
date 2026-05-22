@@ -249,22 +249,48 @@ body.dragging-active #next-week {
 .day-tasks::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
 .task-item {
-  display: grid; grid-template-columns: 16px 1fr auto auto; align-items: start;
+  display: grid; grid-template-columns: 16px 1fr auto auto auto; align-items: start;
   gap: 4px; padding: 4px 6px; border-radius: var(--radius); border: 1px solid transparent;
   animation: fadeIn 0.15s ease both; cursor: grab;
 }
 .task-item:active { cursor: grabbing; }
 
-.note-btn {
-  background: transparent; border: none; color: transparent; cursor: pointer;
-  margin-top: 2px; transition: color 0.1s;
-  display: none; align-items: center; justify-content: center;
+.note-btn, .recur-btn, .del-btn {
+  background: transparent; border: none; color: var(--muted); cursor: pointer;
+  width: 24px; height: 24px; display: none; align-items: center; justify-content: center;
+  transition: all 0.15s; border-radius: 3px; flex-shrink: 0;
 }
-.task-item:hover .note-btn { display: flex; color: var(--muted); }
-.note-btn.has-notes { display: flex; color: var(--accent) !important; }
-.note-btn:hover { color: var(--accent) !important; }
+
+.note-btn svg, .recur-btn svg { width: 13px; height: 13px; }
+
+/* Show all icons on row hover */
+.task-item:hover .note-btn,
+.task-item:hover .recur-btn,
+.task-item:hover .del-btn {
+  display: flex;
+}
+
+/* Always show active indicators even when not hovering */
+.note-btn.has-notes,
+.recur-btn.is-recurring {
+  display: flex;
+  color: var(--accent);
+}
+
+.note-btn:hover, .recur-btn:hover { color: var(--accent) !important; background: var(--surface2); }
+.del-btn:hover { color: var(--accent2) !important; background: var(--surface2); }
 
 .task-item.dragging { opacity: 0.3; background: var(--surface2); border: 1px dashed var(--accent); }
+
+.rotating {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
 .drop-indicator {

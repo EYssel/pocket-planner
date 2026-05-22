@@ -4,6 +4,13 @@ export interface Task {
   text: string;
   done: boolean;
   notes?: string;
+  recurringId?: string;
+}
+
+export interface RecurringTask {
+  id: string;
+  text: string;
+  days: number[]; // 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Weekend
 }
 
 export interface Day {
@@ -67,6 +74,10 @@ export interface PlannerAPI {
   openExternal: (url: string) => Promise<void>;
   updateOSState: (stats: { nextTaskText: string | null, doneCount: number, totalCount: number }) => void;
   testNotification: () => Promise<void>;
+  getRecurringTasks: () => Promise<RecurringTask[]>;
+  saveRecurringTask: (task: RecurringTask) => Promise<void>;
+  deleteRecurringTask: (id: string) => Promise<void>;
+  syncRecurringTasks: (weekKey: string) => Promise<void>;
 }
 
 declare global {
