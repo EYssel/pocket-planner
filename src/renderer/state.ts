@@ -86,6 +86,11 @@ export async function loadWeek(
     checkStaleTasks: () => Promise<void>
   }
 ) {
+  const actualCurrentWeekKey = await window.planner.currentWeekKey();
+  if (key === actualCurrentWeekKey) {
+    await window.planner.syncRecurringTasks(key);
+  }
+
   currentWeekKey = key;
   weekData = await window.planner.getWeek(key);
   if (!weekData) throw new Error('No week data returned from backend');
@@ -163,6 +168,11 @@ export async function saveDay(
   const plans = day.plans.filter(p => p.text.trim() !== '');
   await window.planner.savePlans(dayKey, plans);
   if (updatePips) updatePips(dayKey, plans);
+}
+
+export async function syncRecurringTasks(weekKey: string, callbacks: { loadWeek: (key: string) => Promise<void> }) {
+  await window.planner.syncRecurringTasks(weekKey);
+  await callbacks.loadWeek(weekKey);
 }
 
 export function addTask(dayKey: string): void {

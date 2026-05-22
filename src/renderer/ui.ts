@@ -38,6 +38,18 @@ export const settingsOverlay = document.getElementById('settings-overlay') as HT
 export const openSettings    = document.getElementById('open-settings') as HTMLElement;
 export const closeSettings   = document.getElementById('close-settings') as HTMLElement;
 
+export const syncRecurringBtn      = document.getElementById('sync-recurring') as HTMLButtonElement;
+export const openRecurringManager  = document.getElementById('open-recurring-manager') as HTMLElement;
+export const closeRecurringManager = document.getElementById('close-recurring-manager') as HTMLElement;
+export const recurringManagerOverlay = document.getElementById('recurring-manager-overlay') as HTMLElement;
+export const recurringList          = document.getElementById('recurring-list') as HTMLElement;
+
+export const recurrenceSetupOverlay = document.getElementById('recurrence-setup-overlay') as HTMLElement;
+export const closeRecurrenceSetup   = document.getElementById('close-recurrence-setup') as HTMLElement;
+export const saveRecurrenceBtn      = document.getElementById('save-recurrence-btn') as HTMLButtonElement;
+export const stopRecurrenceBtn      = document.getElementById('stop-recurrence-btn') as HTMLButtonElement;
+export const recurrenceTaskText     = document.getElementById('recurrence-task-text') as HTMLElement;
+
 export const summaryOverlay = document.getElementById('summary-overlay') as HTMLElement;
 export const summaryContent = document.getElementById('summary-content') as HTMLElement;
 export const closeSummary   = document.getElementById('close-summary') as HTMLElement;
@@ -170,6 +182,9 @@ export function buildTaskItem(dayKey: string, task: Plan, index: number, callbac
       <div class="task-display" title="${escapeHtml(task.text)}">${escapeHtml(task.text)}</div>
       <textarea class="task-edit" placeholder="Task…" rows="1">${escapeHtml(task.text)}</textarea>
     </div>
+    <button class="recur-btn ${task.recurringId ? 'is-recurring' : ''}" title="${task.recurringId ? 'Edit Recurrence' : 'Make Recurring'}">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+    </button>
     <button class="note-btn ${task.notes ? 'has-notes' : ''}" title="Task Notes">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
     </button>

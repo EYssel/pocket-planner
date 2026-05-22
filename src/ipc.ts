@@ -12,7 +12,11 @@ import {
   restoreFromRecycleBin,
   clearRecycleBin,
   getSetting, 
-  setSetting 
+  setSetting,
+  getRecurringTasks,
+  saveRecurringTask,
+  deleteRecurringTask,
+  generateRecurringTasks
 } from './store';
 import { reschedule, triggerManualNotification, INTERVAL_OPTIONS } from './notifications';
 import { updateTooltip } from './tray';
@@ -94,6 +98,25 @@ export function registerHandlers(): void {
 
   ipcMain.handle('get-recycle-bin', () => {
     return getRecycleBin();
+  });
+
+  ipcMain.handle('get-recurring-tasks', () => {
+    return getRecurringTasks();
+  });
+
+  ipcMain.handle('save-recurring-task', (_: any, task: RecurringTask) => {
+    saveRecurringTask(task);
+    return true;
+  });
+
+  ipcMain.handle('delete-recurring-task', (_: any, id: string) => {
+    deleteRecurringTask(id);
+    return true;
+  });
+
+  ipcMain.handle('sync-recurring-tasks', (_: any, weekKey: string) => {
+    generateRecurringTasks(weekKey);
+    return true;
   });
 
   ipcMain.handle('restore-from-recycle-bin', (_: any, index: number) => {
