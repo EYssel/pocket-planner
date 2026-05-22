@@ -79,6 +79,18 @@ export interface PlannerAPI {
   saveRecurringTask: (task: RecurringTask) => Promise<void>;
   deleteRecurringTask: (id: string) => Promise<void>;
   syncRecurringTasks: (weekKey: string) => Promise<void>;
+  searchPlans: (query: string, options: { status: string; scope: string }) => Promise<SearchResult[]>;
+}
+
+export interface SearchResult {
+  dayKey: string;
+  weekKey: string;
+  dayName: string;
+  dateLabel: string;
+  text: string;
+  done: boolean;
+  notes?: string;
+  taskIndex: number;
 }
 
 declare global {

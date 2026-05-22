@@ -32,6 +32,7 @@
     </button>
     <button class="icon-btn" id="generate-summary" title="Today's Summary">📋</button>
     <button class="icon-btn" id="open-recycle-bin" title="Recycle Bin">🗑️</button>
+    <button class="icon-btn" id="open-search" title="Search (Ctrl+F)">🔍</button>
     <button class="icon-btn" id="open-settings" title="Settings">⚙️</button>
   </div>
 </header>
@@ -110,6 +111,42 @@
     <div class="modal-body" id="release-notes-content" style="max-height: 70vh; overflow-y: auto; padding: 20px; line-height: 1.6;"></div>
     <div class="modal-footer">
       <button class="banner-btn secondary" id="close-release-notes">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="search-overlay">
+  <div class="modal search-modal">
+    <div class="modal-header search-modal-header">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search tasks & notes..." autocomplete="off" />
+      </div>
+    </div>
+    <div class="search-filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">Scope:</span>
+        <div class="filter-chips" id="search-scope-filters">
+          <button class="chip active" data-value="all">Both</button>
+          <button class="chip" data-value="text">Tasks</button>
+          <button class="chip" data-value="notes">Notes</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Status:</span>
+        <div class="filter-chips" id="search-status-filters">
+          <button class="chip active" data-value="all">All</button>
+          <button class="chip" data-value="pending">Pending</button>
+          <button class="chip" data-value="done">Done</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-body search-results-body">
+      <div id="search-results-list"></div>
+    </div>
+    <div class="modal-footer search-modal-footer">
+      <div class="search-tip">Press <kbd>Esc</kbd> to close. Click a result to jump.</div>
+      <button class="banner-btn secondary" id="close-search-modal">Close</button>
     </div>
   </div>
 </div>

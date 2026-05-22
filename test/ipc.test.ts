@@ -76,7 +76,7 @@ describe('ipc', () => {
       'get-week', 'save-plans', 'add-to-recycle-bin',
       'get-recycle-bin', 'restore-from-recycle-bin',
       'clear-recycle-bin', 'get-previous-week-key',
-      'install-update'
+      'install-update', 'search-plans'
     ];
     expectedHandlers.forEach(name => {
       expect(ipcMain.handle).toHaveBeenCalledWith(name, expect.any(Function));
@@ -203,6 +203,91 @@ describe('ipc', () => {
       (fs.existsSync as jest.Mock).mockReturnValue(false);
       const result = await handlers['get-release-notes']({});
       expect(result).toBe('');
+    });
+
+    test('search-plans should return matches and sort them chronologically', async () => {
+      const mockDays = {
+        '2026-05-22': [
+          { text: 'Buy apples', done: false, notes: 'Apples are sweet' },
+          { text: 'Do laundry', done: true }
+        ],
+        '2026-05-20': [
+          { text: 'Eat banana', done: false, notes: 'Banana is yellow' },
+          { text: 'Clean room', done: false }
+        ],
+        '2026-W21-WE': [
+          { text: 'Weekend run', done: false, notes: 'Find banana smoothie' }
+        ]
+      };
+      (store.store.get as jest.Mock).mockReturnValue(mockDays);
+
+      (weekUtils.dayInfoFromKey as jest.Mock).mockImplementation((key: string) => {
+        if (key === '2026-05-22') return { dayName: 'Friday', date: 22, month: 'May' };
+        if (key === '2026-05-20') return { dayName: 'Wednesday', date: 20, month: 'May' };
+        if (key === '2026-W21-WE') return { dayName: 'Weekend', date: 'Weekend', month: '' };
+        return { dayName: '', date: '', month: '' };
+      });
+      (weekUtils.weekKeyFromDayKey as jest.Mock).mockImplementation((key: string) => {
+        return '2026-W21';
+      });
+      (weekUtils.parseWeekKey as jest.Mock).mockImplementation((key: string) => {
+        return { year: 2026, week: 21 };
+      });
+
+      const results1 = await handlers['search-plans']({}, {
+        query: 'banana',
+        options: { status: 'all', scope: 'both' }
+      });
+
+      expect(results1.length).toBe(2);
+      expect(results1[0].text).toBe('Weekend run');
+      expect(results1[0].dayKey).toBe('2026-W21-WE');
+      expect(results1[1].text).toBe('Eat banana');
+      expect(results1[1].dayKey).toBe('2026-05-20');
+
+      const resultsDone = await handlers['search-plans']({}, {
+        query: 'laundry',
+        options: { status: 'done', scope: 'both' }
+      });
+      expect(resultsDone.length).toBe(1);
+      expect(resultsDone[0].text).toBe('Do laundry');
+
+      const resultsNotes = await handlers['search-plans']({}, {
+        query: 'sweet',
+        options: { status: 'all', scope: 'notes' }
+      });
+      expect(resultsNotes.length).toBe(1);
+      expect(resultsNotes[0].text).toBe('Buy apples');
+
+      const resultsTextOnly = await handlers['search-plans']({}, {
+        query: 'sweet',
+        options: { status: 'all', scope: 'text' }
+      });
+      expect(resultsTextOnly.length).toBe(0);
+    });
+
+    test('search-plans should return empty array for empty query', async () => {
+      const results = await handlers['search-plans']({}, {
+        query: '  ',
+        options: { status: 'all', scope: 'both' }
+      });
+      expect(results).toEqual([]);
+    });
+
+    test('search-plans should handle parse errors gracefully', async () => {
+      const mockDays = {
+        'invalid-key': [{ text: 'some text', done: false }]
+      };
+      (store.store.get as jest.Mock).mockReturnValue(mockDays);
+      (weekUtils.dayInfoFromKey as jest.Mock).mockImplementation(() => {
+        throw new Error('Invalid day key');
+      });
+
+      const results = await handlers['search-plans']({}, {
+        query: 'some',
+        options: { status: 'all', scope: 'both' }
+      });
+      expect(results).toEqual([]);
     });
   });
 });

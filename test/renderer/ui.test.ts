@@ -128,4 +128,72 @@ describe('Renderer UI Builders', () => {
       expect(section).toMatchSnapshot();
     });
   });
+
+  describe('renderSearchResults', () => {
+    let isolatedUi: any;
+
+    beforeEach(() => {
+      jest.resetModules();
+      document.body.innerHTML = `
+        <div id="week-grid"></div>
+        <div id="search-results-list"></div>
+      `;
+      isolatedUi = require('../../src/renderer/ui');
+    });
+
+    test('renders no results message', () => {
+      isolatedUi.renderSearchResults([], 'banana');
+      const list = document.getElementById('search-results-list');
+      expect(list?.innerHTML).toContain('No tasks or notes match "banana"');
+    });
+
+    test('renders grouped search results with highlighted query', () => {
+      const mockResults = [
+        {
+          dayKey: '2026-05-22',
+          weekKey: '2026-W21',
+          dayName: 'Friday',
+          dateLabel: 'May 22',
+          text: 'Buy banana at store',
+          done: false,
+          notes: 'Bananas are yellow fruit',
+          taskIndex: 0
+        },
+        {
+          dayKey: '2026-05-20',
+          weekKey: '2026-W21',
+          dayName: 'Wednesday',
+          dateLabel: 'May 20',
+          text: 'Go bananas',
+          done: true,
+          notes: undefined,
+          taskIndex: 1
+        }
+      ];
+
+      isolatedUi.renderSearchResults(mockResults, 'banana');
+      const list = document.getElementById('search-results-list');
+      
+      expect(list?.querySelector('.search-group-header')?.textContent).toBe('2026 - Week 21');
+
+      const items = list?.querySelectorAll('.search-result-item');
+      expect(items?.length).toBe(2);
+
+      const first = items?.[0];
+      expect(first?.getAttribute('data-day-key')).toBe('2026-05-22');
+      expect(first?.getAttribute('data-week-key')).toBe('2026-W21');
+      expect(first?.getAttribute('data-index')).toBe('0');
+      expect(first?.querySelector('.search-result-status')?.textContent?.trim()).toBe('');
+      expect(first?.querySelector('.search-result-text')?.innerHTML).toBe('Buy <mark>banana</mark> at store');
+      expect(first?.querySelector('.search-result-notes')?.innerHTML?.trim()).toBe('<mark>Banana</mark>s are yellow fruit');
+
+      const second = items?.[1];
+      expect(second?.getAttribute('data-day-key')).toBe('2026-05-20');
+      expect(second?.getAttribute('data-week-key')).toBe('2026-W21');
+      expect(second?.getAttribute('data-index')).toBe('1');
+      expect(second?.querySelector('.search-result-status')?.textContent?.trim()).toBe('✓');
+      expect(second?.querySelector('.search-result-text')?.innerHTML).toBe('Go <mark>banana</mark>s');
+      expect(second?.querySelector('.search-result-notes')).toBeNull();
+    });
+  });
 });
