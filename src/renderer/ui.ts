@@ -9,7 +9,8 @@ export const weekLabel   = document.getElementById('week-label') as HTMLElement;
 export const prevBtn     = document.getElementById('prev-week') as HTMLButtonElement;
 export const nextBtn     = document.getElementById('next-week') as HTMLButtonElement;
 export const todayBtn    = document.getElementById('today-btn') as HTMLButtonElement;
-export const themeSelect = document.getElementById('theme-select') as HTMLSelectElement;
+export const themeSelect    = document.getElementById('theme-select') as HTMLSelectElement;
+export const fontSizeSelect = document.getElementById('font-size-select') as HTMLSelectElement;
 
 export const staleBanner  = document.getElementById('stale-banner') as HTMLElement;
 export const staleCount   = document.getElementById('stale-count') as HTMLElement;

@@ -142,10 +142,18 @@ export function setupEventListeners(callbacks: {
     });
   });
 
-  ui.themeSelect?.addEventListener('change', async (e: Event) => {
-    const newTheme = (e.target as HTMLSelectElement).value;
-    modals.applyTheme(newTheme);
-    await window.planner.setSetting('theme' as any, newTheme);
+  ui.themeSelect?.addEventListener('change', async () => {
+    const theme = ui.themeSelect.value;
+    const fontSize = ui.fontSizeSelect.value;
+    modals.applyAppearance(theme, fontSize);
+    await window.planner.setSetting('theme' as any, theme);
+  });
+
+  ui.fontSizeSelect?.addEventListener('change', async () => {
+    const theme = ui.themeSelect.value;
+    const fontSize = ui.fontSizeSelect.value;
+    modals.applyAppearance(theme, fontSize);
+    await window.planner.setSetting('fontSize' as any, fontSize);
   });
 
   window.planner.onSetMode(async () => {

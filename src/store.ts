@@ -20,6 +20,7 @@ const DEFAULT_SETTINGS: SettingOptions = {
   workStart: 8,
   workEnd: 18,
   theme: 'dark',
+  fontSize: 'medium',
   doneTasksCollapsed: true,
   lastRunVersion: '0.0.0',
 };

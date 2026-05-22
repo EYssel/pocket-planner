@@ -34,6 +34,7 @@ export interface WeekData {
 
 export interface SettingOptions {
   theme: string;
+  fontSize: 'extra-small' | 'small' | 'medium' | 'large' | 'extra-large';
   notificationInterval: number;
   workStart: number;
   workEnd: number;

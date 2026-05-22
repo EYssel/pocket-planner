@@ -41,7 +41,7 @@ async function init() {
       checkStaleTasks
     });
 
-    await modals.initTheme();
+    await modals.initAppearance();
     await modals.initSettings({
       loadWeek,
       checkStaleTasks
