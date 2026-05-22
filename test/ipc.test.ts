@@ -51,6 +51,17 @@ jest.mock('../src/tray', () => ({
 }));
 jest.mock('../src/window', () => ({
   updateProgress: jest.fn(),
+  reRegisterQuickAddShortcut: jest.fn(),
+  closeQuickAddWindow: jest.fn(),
+  getMainWindow: jest.fn().mockReturnValue({
+    isDestroyed: jest.fn().mockReturnValue(false),
+    webContents: {
+      send: jest.fn(),
+    },
+  }),
+}));
+jest.mock('../src/menu', () => ({
+  initMenu: jest.fn(),
 }));
 
 describe('ipc', () => {
@@ -288,6 +299,29 @@ describe('ipc', () => {
         options: { status: 'all', scope: 'both' }
       });
       expect(results).toEqual([]);
+    });
+
+    test('close-quick-add should call closeQuickAddWindow', async () => {
+      const { closeQuickAddWindow } = require('../src/window');
+      await handlers['close-quick-add']({});
+      expect(closeQuickAddWindow).toHaveBeenCalled();
+    });
+
+    test('set-setting with quickAddShortcut should call reRegisterQuickAddShortcut and initMenu', async () => {
+      const { reRegisterQuickAddShortcut } = require('../src/window');
+      const { initMenu } = require('../src/menu');
+      await handlers['set-setting']({}, { key: 'quickAddShortcut', value: 'Ctrl+Shift+K' });
+      expect(reRegisterQuickAddShortcut).toHaveBeenCalledWith('Ctrl+Shift+K');
+      expect(initMenu).toHaveBeenCalled();
+    });
+
+    test('save-plans should save plans and broadcast plans-updated to main window', async () => {
+      const { getMainWindow } = require('../src/window');
+      const mockWin = getMainWindow();
+      
+      await handlers['save-plans']({}, { dayKey: '2026-05-25', plans: [] });
+      expect(store.savePlans).toHaveBeenCalledWith('2026-05-25', []);
+      expect(mockWin.webContents.send).toHaveBeenCalledWith('plans-updated', { dayKey: '2026-05-25' });
     });
   });
 });

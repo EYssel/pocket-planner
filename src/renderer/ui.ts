@@ -87,6 +87,8 @@ export const testNotificationBtn = document.getElementById('test-notification-bt
 export const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
 export const workStartInput  = document.getElementById('work-start') as HTMLInputElement;
 export const workEndInput    = document.getElementById('work-end') as HTMLInputElement;
+export const shortcutDisplayInput = document.getElementById('shortcut-display-input') as HTMLInputElement;
+export const clearShortcutBtn = document.getElementById('clear-shortcut-btn') as HTMLButtonElement;
 
 export function renderGrid(weekData: WeekData | null, defaultDoneCollapsed: boolean, callbacks: any) {
   if (!grid) return;

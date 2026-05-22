@@ -260,6 +260,14 @@ async function parseMarkdown(md: string): Promise<string> {
   }) as Promise<string> | string;
 }
 
+export function formatShortcutLabel(shortcut: string): string {
+  if (!shortcut || shortcut === 'None') return 'None / Disabled';
+  return shortcut
+    .replace('CommandOrControl', 'Ctrl')
+    .replace('CmdOrCtrl', 'Ctrl')
+    .replace(/\+/g, ' + ');
+}
+
 export async function initSettings(callbacks: { loadWeek: (key: string) => Promise<void>, checkStaleTasks: () => Promise<void> }) {
   const options = await window.planner.getIntervalOptions();
   ui.intervalSelect.innerHTML = options
@@ -270,12 +278,16 @@ export async function initSettings(callbacks: { loadWeek: (key: string) => Promi
   const collapsedPref = await window.planner.getSetting('doneTasksCollapsed');
   const workStart = await window.planner.getSetting('workStart');
   const workEnd = await window.planner.getSetting('workEnd');
+  const shortcut = await window.planner.getSetting('quickAddShortcut');
 
   ui.intervalSelect.value = (interval ?? 60).toString();
   ui.collapseDoneSetting.checked = !!collapsedPref;
   state.setDefaultDoneCollapsed(!!collapsedPref);
   ui.workStartInput.value = (workStart ?? 8).toString();
   ui.workEndInput.value   = (workEnd ?? 18).toString();
+  if (ui.shortcutDisplayInput) {
+    ui.shortcutDisplayInput.value = formatShortcutLabel(shortcut || 'None');
+  }
 
   const { name } = await window.planner.getAppInfo();
   if (!name.includes('Dev') && ui.testNotificationBtn) {

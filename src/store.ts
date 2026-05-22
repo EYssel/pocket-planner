@@ -23,6 +23,7 @@ const DEFAULT_SETTINGS: SettingOptions = {
   fontSize: 'medium',
   doneTasksCollapsed: true,
   lastRunVersion: '0.0.0',
+  quickAddShortcut: 'CommandOrControl+Shift+Space',
 };
 
 // We explicitly calculate the path to avoid initialization order issues in main.ts

@@ -73,7 +73,7 @@
     <span>Collapse Done Tasks by Default</span>
   </label>
 </div>
-<div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div></div></div><div class="modal-footer"><button id="settings-version-btn" style="background:none; border:none; padding:0; cursor:pointer; font-family: 'Space Mono', monospace; font-size: calc(10px * var(--font-scale)); color: var(--muted); margin-right: auto; transition: color 0.15s;" title="View Release Notes" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">v0.0.0</button><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
+<div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div><div class="settings-group" style="grid-column: 1 / -1;"><label class="settings-label">Quick Add Shortcut</label><div style="display: flex; gap: 8px;"><input type="text" id="shortcut-display-input" class="settings-input" readonly placeholder="Click to record..." style="cursor: pointer; text-align: center; font-weight: bold; caret-color: transparent;" /><button class="banner-btn secondary" id="clear-shortcut-btn" style="padding: 0 12px; height: 36px; display: flex; align-items: center; justify-content: center;">Disable</button></div></div></div></div><div class="modal-footer"><button id="settings-version-btn" style="background:none; border:none; padding:0; cursor:pointer; font-family: 'Space Mono', monospace; font-size: calc(10px * var(--font-scale)); color: var(--muted); margin-right: auto; transition: color 0.15s;" title="View Release Notes" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">v0.0.0</button><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
 
 <div class="modal-overlay" id="summary-overlay">
   <div class="modal">
@@ -185,6 +185,20 @@
       <button class="banner-btn secondary" id="stop-recurrence-btn" style="display: none; color: var(--error);">Stop Recurring</button>
       <button class="banner-btn secondary" id="close-recurrence-setup">Cancel</button>
     </div>
+  </div>
+</div>
+<div id="quick-add-container" class="quick-add-modal" style="display: none;">
+  <div class="quick-add-input-wrapper">
+    <input type="text" id="quick-add-input" placeholder="Type task here... (e.g. Review PR)" autofocus />
+  </div>
+  <div class="quick-add-day-selector" id="quick-add-day-selector">
+    <!-- Day chips will be rendered here dynamically -->
+  </div>
+  <div class="quick-add-footer">
+    <div class="quick-add-legend-item"><span class="kbc">Enter</span> Save & Close</div>
+    <div class="quick-add-legend-item"><span class="kbc">Ctrl + Enter</span> Save & Keep</div>
+    <div class="quick-add-legend-item"><span class="kbc">Alt + 1-7</span> Day Selection</div>
+    <div class="quick-add-legend-item"><span class="kbc">Esc</span> Close</div>
   </div>
 </div>
 <script src="dist/renderer.js"></script>
