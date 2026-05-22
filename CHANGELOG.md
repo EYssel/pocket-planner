@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](https://github.com/EYssel/planner-app/compare/v1.11.0...v1.13.0) (2026-05-22)
+
+### Features
+*   The default theme now aligns perfectly with the app's overall color scheme for a more cohesive look.
+*   You can now customize the font size to your preference, making Weekly Planner even more comfortable to use.
+*   Introducing recurring tasks! Easily set tasks to repeat daily, weekly, or monthly, so you never miss a beat.
+
+### Bug Fixes
+*   Resolved minor styling issues in the recurring task setup window.
+
 ## [1.12.0](https://github.com/EYssel/planner-app/compare/v1.11.0...v1.12.0) (2026-05-22)
 
 
