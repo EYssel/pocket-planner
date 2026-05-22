@@ -40,6 +40,7 @@ export interface SettingOptions {
   workEnd: number;
   doneTasksCollapsed: boolean;
   lastRunVersion: string;
+  quickAddShortcut: string;
 }
 
 export interface PlannerAPI {
@@ -80,6 +81,8 @@ export interface PlannerAPI {
   deleteRecurringTask: (id: string) => Promise<void>;
   syncRecurringTasks: (weekKey: string) => Promise<void>;
   searchPlans: (query: string, options: { status: string; scope: string }) => Promise<SearchResult[]>;
+  closeQuickAdd: () => Promise<void>;
+  onPlansUpdated: (cb: (data: { dayKey: string }) => void) => void;
 }
 
 export interface SearchResult {

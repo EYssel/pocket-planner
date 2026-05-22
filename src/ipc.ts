@@ -22,7 +22,8 @@ import {
 } from './store';
 import { reschedule, triggerManualNotification, INTERVAL_OPTIONS } from './notifications';
 import { updateTooltip } from './tray';
-import { updateProgress } from './window';
+import { updateProgress, reRegisterQuickAddShortcut, closeQuickAddWindow, getMainWindow } from './window';
+import { initMenu } from './menu';
 import { 
   weekInfoFromKey, 
   currentWeekKey, 
@@ -59,6 +60,15 @@ export function registerHandlers(): void {
     if (['notificationInterval', 'workStart', 'workEnd'].includes(key as string)) {
       reschedule();
     }
+    if (key === 'quickAddShortcut') {
+      reRegisterQuickAddShortcut(value as string);
+      initMenu();
+    }
+    return true;
+  });
+
+  ipcMain.handle('close-quick-add', () => {
+    closeQuickAddWindow();
     return true;
   });
 
@@ -91,6 +101,10 @@ export function registerHandlers(): void {
 
   ipcMain.handle('save-plans', (_: any, { dayKey, plans }: { dayKey: string, plans: Task[] }) => {
     savePlans(dayKey, plans);
+    const mainWin = getMainWindow();
+    if (mainWin && !mainWin.isDestroyed()) {
+      mainWin.webContents.send('plans-updated', { dayKey });
+    }
     return true;
   });
 

@@ -1,6 +1,6 @@
 'use strict';
 
-import { app } from 'electron';
+import { app, globalShortcut } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -23,12 +23,12 @@ if (!app.isPackaged) {
   app.setAppUserModelId(prodName);
 }
 
-import { createWindow, initSingleInstance } from './src/window';
+import { createWindow, initSingleInstance, reRegisterQuickAddShortcut } from './src/window';
 import { createTray, init as initTray } from './src/tray';
 import { init as initNotifications, reschedule } from './src/notifications';
 import { registerHandlers } from './src/ipc';
 import { initUpdater } from './src/updater';
-import { store } from './src/store';
+import { store, getSetting } from './src/store';
 import { runMigrations } from './src/migrations';
 
 import { initMenu } from './src/menu';
@@ -61,10 +61,17 @@ app.whenReady().then(() => {
   createWindow('planner');
   reschedule();
   initUpdater();
+
+  // Register global shortcut
+  reRegisterQuickAddShortcut(getSetting('quickAddShortcut'));
 });
 
 app.on('before-quit', () => {
   global.isQuitting = true;
+});
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
 });
 
 app.on('window-all-closed', (e: Electron.IpcMainEvent | any) => {

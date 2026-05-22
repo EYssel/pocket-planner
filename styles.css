@@ -346,7 +346,18 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 .task-item.done .check-btn { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 
 .task-text-container { position: relative; width: 100%; min-height: 18px; }
-.task-display { font-size: calc(12px * var(--font-scale)); line-height: 1.4; color: var(--text); word-break: break-word; white-space: pre-wrap; }
+.task-display {
+  font-size: calc(12px * var(--font-scale));
+  line-height: 1.4;
+  color: var(--text);
+  word-break: break-word;
+  white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .task-edit {
   background: transparent; border: none; color: var(--text); font-family: 'DM Sans', sans-serif;
   font-size: calc(12px * var(--font-scale)); outline: none; width: 100%; line-height: 1.4; resize: none; overflow: hidden; display: none;
@@ -574,7 +585,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 }
 
 .search-icon {
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale));
 }
 
 #search-input {
@@ -582,7 +593,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   border: none;
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
+  font-size: calc(15px * var(--font-scale));
   outline: none;
   width: 100%;
 }
@@ -604,7 +615,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 
 .filter-label {
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale));
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -621,7 +632,8 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   color: var(--muted);
   border-radius: 4px;
   padding: 4px 10px;
-  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  font-size: calc(11px * var(--font-scale));
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -653,12 +665,12 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   padding: 40px;
   text-align: center;
   color: var(--muted);
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
 }
 
 .search-group-header {
   font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale));
   color: var(--accent);
   padding: 12px 20px 6px;
   text-transform: uppercase;
@@ -683,14 +695,14 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 }
 
 .search-result-status {
-  width: 20px;
-  height: 20px;
+  width: calc(20px * var(--font-scale));
+  height: calc(20px * var(--font-scale));
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
   margin-right: 12px;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale));
   border: 1px solid var(--border);
   color: var(--muted);
   flex-shrink: 0;
@@ -709,14 +721,14 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 }
 
 .search-result-text {
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale));
   color: var(--text);
   line-height: 1.4;
   word-break: break-word;
 }
 
 .search-result-notes {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale));
   color: var(--muted);
   margin-top: 6px;
   padding-left: 8px;
@@ -732,7 +744,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   align-items: flex-end;
   margin-left: 16px;
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale));
   color: var(--muted);
   flex-shrink: 0;
   text-align: right;
@@ -751,7 +763,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 }
 
 .search-tip {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale));
   color: var(--muted);
 }
 
@@ -761,7 +773,7 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
   border-radius: 3px;
   padding: 2px 5px;
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale));
 }
 
 mark {
@@ -793,4 +805,167 @@ mark {
     transform: scale(1);
   }
 }
+
+/* ==========================================
+   Quick Add Task Mode & UI
+   ========================================== */
+
+/* Hide other layouts in quick-add-mode */
+body.quick-add-mode header,
+body.quick-add-mode #week-grid,
+body.quick-add-mode .banner,
+body.quick-add-mode .modal-overlay,
+body.quick-add-mode .icon-btn,
+body.quick-add-mode #weekly-cleanup-banner {
+  display: none !important;
+}
+
+body.quick-add-mode {
+  background: var(--bg) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+}
+
+/* Spotlight-style Modal Box */
+.quick-add-modal {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.05) inset;
+  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: calc(16px * var(--font-scale)) calc(16px * var(--font-scale)) calc(24px * var(--font-scale));
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glassmorphism/Glow effect for themes */
+.quick-add-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2, var(--accent)));
+}
+
+/* Input Area */
+.quick-add-input-wrapper {
+  margin-bottom: calc(12px * var(--font-scale));
+}
+
+#quick-add-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: inherit;
+  font-size: calc(15px * var(--font-scale));
+  padding: calc(10px * var(--font-scale)) calc(14px * var(--font-scale));
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#quick-add-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.25);
+}
+
+/* Day Selector Chips */
+.quick-add-day-selector {
+  display: flex;
+  gap: calc(8px * var(--font-scale));
+  margin-bottom: calc(8px * var(--font-scale));
+  overflow: visible;
+  padding-top: calc(8px * var(--font-scale));
+  padding-bottom: calc(8px * var(--font-scale));
+}
+
+.quick-add-chip {
+  flex: 1;
+  text-align: center;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: calc(6px * var(--font-scale)) calc(4px * var(--font-scale));
+  cursor: pointer;
+  font-size: calc(11px * var(--font-scale));
+  font-family: 'Space Mono', monospace;
+  color: var(--muted);
+  user-select: none;
+  transition: all 0.2s ease;
+  min-width: 50px;
+}
+
+.quick-add-chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.quick-add-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+  font-weight: bold;
+}
+
+/* Footer & Legends */
+.quick-add-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  padding-top: calc(10px * var(--font-scale));
+  margin-top: auto;
+}
+
+.quick-add-legend-item {
+  font-size: calc(10px * var(--font-scale));
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: calc(4px * var(--font-scale));
+}
+
+.quick-add-legend-item .kbc {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px calc(4px * var(--font-scale));
+  font-family: 'Space Mono', monospace;
+  color: var(--text);
+}
+
+/* Shortcut Recording states in Settings */
+#shortcut-display-input.recording {
+  border-color: var(--accent2, var(--accent)) !important;
+  box-shadow: 0 0 10px rgba(255, 107, 53, 0.4) !important;
+  background: var(--surface2) !important;
+  animation: pulseRecording 1.5s infinite ease-in-out;
+  color: var(--accent2, var(--accent)) !important;
+}
+
+@keyframes pulseRecording {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 

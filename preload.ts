@@ -47,4 +47,6 @@ contextBridge.exposeInMainWorld('planner', {
   deleteRecurringTask: (id: string) => ipcRenderer.invoke('delete-recurring-task', id),
   syncRecurringTasks: (weekKey: string) => ipcRenderer.invoke('sync-recurring-tasks', weekKey),
   searchPlans: (query: string, options: { status: string; scope: string }) => ipcRenderer.invoke('search-plans', { query, options }),
+  closeQuickAdd: () => ipcRenderer.invoke('close-quick-add'),
+  onPlansUpdated: (cb: (data: { dayKey: string }) => void) => ipcRenderer.on('plans-updated', (_: any, data: any) => cb(data)),
 });

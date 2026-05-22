@@ -2,11 +2,14 @@
 
 import { Menu, app, shell } from 'electron';
 import { checkForUpdates } from './updater';
+import { getSetting } from './store';
+import { toggleQuickAddWindow } from './window';
 
 /**
  * Initializes the application menu.
  */
 export function initMenu(): void {
+  const shortcut = getSetting('quickAddShortcut');
   const template: Electron.MenuItemConstructorOptions[] = [
     {
       label: 'File',
@@ -30,7 +33,18 @@ export function initMenu(): void {
         { role: 'cut' },
         { role: 'copy' },
         { role: 'paste' },
-        { role: 'selectAll' }
+        { role: 'selectAll' },
+        ...(shortcut && shortcut !== 'None' ? [
+          { type: 'separator' },
+          {
+            label: 'Quick Add Task',
+            accelerator: shortcut,
+            visible: false,
+            click: () => {
+              toggleQuickAddWindow();
+            }
+          }
+        ] as Electron.MenuItemConstructorOptions[] : [])
       ]
     },
     {

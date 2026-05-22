@@ -87,6 +87,8 @@ export const testNotificationBtn = document.getElementById('test-notification-bt
 export const collapseDoneSetting = document.getElementById('collapse-done-setting') as HTMLInputElement;
 export const workStartInput  = document.getElementById('work-start') as HTMLInputElement;
 export const workEndInput    = document.getElementById('work-end') as HTMLInputElement;
+export const shortcutDisplayInput = document.getElementById('shortcut-display-input') as HTMLInputElement;
+export const clearShortcutBtn = document.getElementById('clear-shortcut-btn') as HTMLButtonElement;
 
 export function renderGrid(weekData: WeekData | null, defaultDoneCollapsed: boolean, callbacks: any) {
   if (!grid) return;
@@ -189,8 +191,8 @@ export function buildTaskItem(dayKey: string, task: Plan, index: number, callbac
   item.innerHTML = `
     <button class="check-btn" title="Toggle">${task.done ? '✓' : ''}</button>
     <div class="task-text-container">
-      <div class="task-display" title="${escapeHtml(task.text)}">${escapeHtml(task.text)}</div>
-      <textarea class="task-edit" placeholder="Task…" rows="1">${escapeHtml(task.text)}</textarea>
+      <div class="task-display" title="${escapeHtml(task.text)}">${escapeHtml(truncate(task.text))}</div>
+      <textarea class="task-edit" placeholder="Task…" rows="1" maxlength="200">${escapeHtml(task.text)}</textarea>
     </div>
     <button class="recur-btn ${task.recurringId ? 'is-recurring' : ''}" title="${task.recurringId ? 'Edit Recurrence' : 'Make Recurring'}">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
@@ -269,6 +271,11 @@ export function escapeHtml(str: string) {
             .replace(/>/g,'&gt;')
             .replace(/"/g,'&quot;')
             .replace(/'/g,'&#39;');
+}
+
+export function truncate(text: string, limit: number = 100): string {
+  if (!text || text.length <= limit) return text;
+  return text.slice(0, limit) + '...';
 }
 
 export function renderMarkdown(text: string): string {

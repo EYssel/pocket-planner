@@ -6,8 +6,19 @@ import * as modals from './modals';
 import { setupEventListeners } from './events';
 import { setupDropTarget } from './dragDrop';
 import { WeekData, Plan } from './types';
+import { initQuickAdd } from './quickAdd';
 
 async function init() {
+  if (window.location.hash === '#quick-add') {
+    try {
+      await modals.initAppearance();
+      await initQuickAdd();
+    } catch (err) {
+      console.error('Quick Add initialization failed:', err);
+    }
+    return;
+  }
+
   try {
     const appInfo = await window.planner.getAppInfo();
     if (appInfo) {

@@ -4,6 +4,10 @@ import { app, BrowserWindow } from 'electron';
 import { createWindow } from '../src/window';
 import * as path from 'path';
 
+jest.mock('../src/store', () => ({
+  getSetting: jest.fn().mockReturnValue('medium'),
+}));
+
 jest.mock('electron', () => {
   const mApp = {
     getName: jest.fn(),
@@ -15,6 +19,8 @@ jest.mock('electron', () => {
     on: jest.fn(),
     show: jest.fn(),
     focus: jest.fn(),
+    close: jest.fn(),
+    isVisible: jest.fn().mockReturnValue(false),
     webContents: {
       send: jest.fn(),
     },
@@ -22,9 +28,14 @@ jest.mock('electron', () => {
     setProgressBar: jest.fn(),
     setTitle: jest.fn(),
   }));
+  const mGlobalShortcut = {
+    register: jest.fn().mockReturnValue(true),
+    unregisterAll: jest.fn(),
+  };
   return {
     app: mApp,
     BrowserWindow: mBrowserWindow,
+    globalShortcut: mGlobalShortcut,
   };
 });
 
@@ -126,6 +137,127 @@ describe('Window Creation Title', () => {
       expect(app.setBadgeCount).toHaveBeenCalledWith(4);
       
       Object.defineProperty(process, 'platform', { value: originalPlatform });
+    });
+  });
+
+  describe('Quick Add Window Management', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    test('createQuickAddWindow should create a frameless window and load index.html with hash', () => {
+      jest.isolateModules(() => {
+        const { createQuickAddWindow } = require('../src/window');
+        const { BrowserWindow } = require('electron');
+        
+        createQuickAddWindow();
+
+        expect(BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
+          width: 500,
+          height: 200,
+          frame: false,
+          resizable: false,
+          alwaysOnTop: true
+        }));
+
+        const mockWindow = (BrowserWindow as unknown as jest.Mock).mock.results[0].value;
+        expect(mockWindow.loadFile).toHaveBeenCalledWith(
+          expect.stringContaining('index.html'),
+          expect.objectContaining({ hash: 'quick-add' })
+        );
+      });
+    });
+
+    test('createQuickAddWindow should scale window height dynamically based on fontSize setting', () => {
+      jest.isolateModules(() => {
+        const { createQuickAddWindow } = require('../src/window');
+        const { BrowserWindow } = require('electron');
+        const { getSetting } = require('../src/store');
+
+        (getSetting as jest.Mock).mockReturnValue('extra-large');
+
+        createQuickAddWindow();
+
+        expect(BrowserWindow).toHaveBeenCalledWith(expect.objectContaining({
+          width: 500,
+          height: 280,
+          frame: false,
+        }));
+      });
+    });
+
+    test('closeQuickAddWindow should close the window if exists', () => {
+      jest.isolateModules(() => {
+        const { createQuickAddWindow, closeQuickAddWindow } = require('../src/window');
+        const { BrowserWindow } = require('electron');
+
+        createQuickAddWindow();
+        const mockWindow = (BrowserWindow as unknown as jest.Mock).mock.results[0].value;
+        
+        closeQuickAddWindow();
+        expect(mockWindow.close).toHaveBeenCalled();
+      });
+    });
+
+    test('reRegisterQuickAddShortcut should register a global shortcut', () => {
+      jest.isolateModules(() => {
+        const { reRegisterQuickAddShortcut } = require('../src/window');
+        const { globalShortcut } = require('electron');
+
+        reRegisterQuickAddShortcut('Ctrl+Shift+Space');
+        expect(globalShortcut.unregisterAll).toHaveBeenCalled();
+        expect(globalShortcut.register).toHaveBeenCalledWith('Ctrl+Shift+Space', expect.any(Function));
+      });
+    });
+
+    test('reRegisterQuickAddShortcut should not register shortcut if set to None', () => {
+      jest.isolateModules(() => {
+        const { reRegisterQuickAddShortcut } = require('../src/window');
+        const { globalShortcut } = require('electron');
+
+        reRegisterQuickAddShortcut('None');
+        expect(globalShortcut.unregisterAll).toHaveBeenCalled();
+        expect(globalShortcut.register).not.toHaveBeenCalled();
+      });
+    });
+
+    test('toggleQuickAddWindow should create a window if it does not exist, and debounce rapid consecutive calls', () => {
+      jest.isolateModules(() => {
+        const { toggleQuickAddWindow } = require('../src/window');
+        const { BrowserWindow } = require('electron');
+
+        const originalNow = Date.now;
+        let mockTime = 1000;
+        Date.now = jest.fn().mockImplementation(() => mockTime);
+
+        try {
+          // First call: Should create a window
+          toggleQuickAddWindow();
+          expect(BrowserWindow).toHaveBeenCalledTimes(1);
+
+          // Second call (10ms later): Should be ignored (debounced)
+          mockTime += 10;
+          toggleQuickAddWindow();
+          expect(BrowserWindow).toHaveBeenCalledTimes(1);
+
+          // Third call (300ms later): Should toggle or show
+          // Since it exists, it calls show/focus on existing (BrowserWindow constructor called only once)
+          mockTime += 300;
+          toggleQuickAddWindow();
+          expect(BrowserWindow).toHaveBeenCalledTimes(1);
+
+          // Set window visible state to true to test closing toggle
+          const mockWindow = (BrowserWindow as unknown as jest.Mock).mock.results[0].value;
+          mockWindow.isVisible.mockReturnValue(true);
+
+          // Fourth call (another 300ms later): Should call close
+          mockTime += 300;
+          toggleQuickAddWindow();
+          expect(mockWindow.close).toHaveBeenCalledTimes(1);
+        } finally {
+          Date.now = originalNow;
+        }
+      });
     });
   });
 });

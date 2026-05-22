@@ -32,6 +32,7 @@ exports[`Renderer UI Builders buildTaskItem renders a done task correctly 1`] = 
       
     <textarea
       class="task-edit"
+      maxlength="200"
       placeholder="Task…"
       rows="1"
     >
@@ -160,6 +161,7 @@ exports[`Renderer UI Builders buildTaskItem renders an active task correctly 1`]
       
     <textarea
       class="task-edit"
+      maxlength="200"
       placeholder="Task…"
       rows="1"
     >
@@ -288,6 +290,7 @@ exports[`Renderer UI Builders buildTaskItem renders escaped HTML to prevent XSS 
       
     <textarea
       class="task-edit"
+      maxlength="200"
       placeholder="Task…"
       rows="1"
     >
@@ -464,6 +467,7 @@ exports[`Renderer UI Builders createDaySection renders a full day section with t
       
         <textarea
           class="task-edit"
+          maxlength="200"
           placeholder="Task…"
           rows="1"
         >
@@ -618,6 +622,7 @@ exports[`Renderer UI Builders createDaySection renders a full day section with t
       
           <textarea
             class="task-edit"
+            maxlength="200"
             placeholder="Task…"
             rows="1"
           >

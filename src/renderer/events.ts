@@ -224,7 +224,6 @@ export function setupEventListeners(callbacks: {
       if (addBtn) {
         const dayKey = addBtn.dataset.day!;
         state.addTask(dayKey);
-        await callbacks.saveDay(dayKey);
         
         // Focus the new task
         const tasksEl = document.getElementById(`tasks-${dayKey}`);
@@ -293,7 +292,7 @@ export function setupEventListeners(callbacks: {
                 <div class="summary-item" style="flex-direction: column; gap: 0;">
                   <div style="display: flex; gap: 12px;">
                     <span class="summary-item-bullet">✓</span>
-                    <span>${ui.escapeHtml(p.text)}</span>
+                    <span>${ui.escapeHtml(ui.truncate(p.text))}</span>
                   </div>
                   ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
@@ -308,7 +307,7 @@ export function setupEventListeners(callbacks: {
                 <div class="summary-item" style="flex-direction: column; gap: 0;">
                   <div style="display: flex; gap: 12px;">
                     <span class="summary-item-bullet">→</span>
-                    <span>${ui.escapeHtml(p.text)}</span>
+                    <span>${ui.escapeHtml(ui.truncate(p.text))}</span>
                   </div>
                   ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
@@ -323,7 +322,7 @@ export function setupEventListeners(callbacks: {
                 <div class="summary-item" style="flex-direction: column; gap: 0;">
                   <div style="display: flex; gap: 12px;">
                     <span class="summary-item-bullet">•</span>
-                    <span>${ui.escapeHtml(p.text)}</span>
+                    <span>${ui.escapeHtml(ui.truncate(p.text))}</span>
                   </div>
                   ${formatNotesHtml(p.notes)}
                 </div>`).join('') 
@@ -398,6 +397,97 @@ export function setupEventListeners(callbacks: {
 
   ui.openSettings?.addEventListener('click',  () => ui.settingsOverlay.classList.add('show'));
   ui.closeSettings?.addEventListener('click', () => ui.settingsOverlay.classList.remove('show'));
+
+  // Configurable shortcut recording
+  let originalShortcutText = '';
+  let recordedShortcut = '';
+
+  ui.shortcutDisplayInput?.addEventListener('focus', () => {
+    originalShortcutText = ui.shortcutDisplayInput.value;
+    ui.shortcutDisplayInput.value = '';
+    ui.shortcutDisplayInput.placeholder = 'Press key combination...';
+    ui.shortcutDisplayInput.classList.add('recording');
+    recordedShortcut = '';
+  });
+
+  ui.shortcutDisplayInput?.addEventListener('blur', () => {
+    ui.shortcutDisplayInput.classList.remove('recording');
+    ui.shortcutDisplayInput.placeholder = 'Click to record...';
+    if (!recordedShortcut) {
+      ui.shortcutDisplayInput.value = originalShortcutText;
+    }
+  });
+
+  ui.shortcutDisplayInput?.addEventListener('keydown', async (e: KeyboardEvent) => {
+    e.preventDefault();
+    
+    if (e.key === 'Escape') {
+      recordedShortcut = '';
+      ui.shortcutDisplayInput.blur();
+      return;
+    }
+
+    const modifiers: string[] = [];
+    if (e.ctrlKey || e.metaKey) modifiers.push('CommandOrControl');
+    if (e.altKey) modifiers.push('Alt');
+    if (e.shiftKey) modifiers.push('Shift');
+
+    // If it's a modifier key, update the display with the modifier combination so far
+    if (['Control', 'Shift', 'Alt', 'Meta'].includes(e.key)) {
+      const displayModifiers: string[] = [];
+      if (e.ctrlKey || e.metaKey) displayModifiers.push('Ctrl');
+      if (e.altKey) displayModifiers.push('Alt');
+      if (e.shiftKey) displayModifiers.push('Shift');
+      ui.shortcutDisplayInput.value = displayModifiers.join(' + ') + (displayModifiers.length > 0 ? ' + ...' : '');
+      return;
+    }
+
+    // Map other keys
+    let key = e.key;
+    if (key === ' ') {
+      key = 'Space';
+    } else if (key.length === 1) {
+      key = key.toUpperCase();
+    } else if (key === 'ArrowUp') {
+      key = 'Up';
+    } else if (key === 'ArrowDown') {
+      key = 'Down';
+    } else if (key === 'ArrowLeft') {
+      key = 'Left';
+    } else if (key === 'ArrowRight') {
+      key = 'Right';
+    } else if (key.match(/^F[1-9][0-2]?$/)) {
+      // F1-F12 keys are fine as-is
+    } else {
+      // Ignore other keys like Tab, Backspace, CapsLock, etc. if not matched
+      return;
+    }
+
+    if (modifiers.length > 0) {
+      recordedShortcut = [...modifiers, key].join('+');
+      await window.planner.setSetting('quickAddShortcut', recordedShortcut);
+      ui.shortcutDisplayInput.value = modals.formatShortcutLabel(recordedShortcut);
+      ui.shortcutDisplayInput.blur();
+    }
+  });
+
+  ui.clearShortcutBtn?.addEventListener('click', async () => {
+    recordedShortcut = 'None';
+    await window.planner.setSetting('quickAddShortcut', recordedShortcut);
+    if (ui.shortcutDisplayInput) {
+      ui.shortcutDisplayInput.value = modals.formatShortcutLabel(recordedShortcut);
+    }
+  });
+
+  // plans-updated live refresh
+  window.planner.onPlansUpdated(async (data: { dayKey: string }) => {
+    if (state.currentWeekKey) {
+      const weekKey = await window.planner.weekKeyFromDayKey(data.dayKey);
+      if (weekKey === state.currentWeekKey) {
+        await callbacks.loadWeek(state.currentWeekKey);
+      }
+    }
+  });
 
   window.planner.onCheckingForUpdates(() => {
     ui.updateBanner.classList.add('show');
@@ -538,7 +628,6 @@ export function setupEventListeners(callbacks: {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       state.addTask(dayKey);
-      await callbacks.saveDay(dayKey);
       
       const tasksEl = document.getElementById(`tasks-${dayKey}`);
       if (tasksEl) {

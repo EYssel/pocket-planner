@@ -71,6 +71,12 @@ describe('Renderer State Logic', () => {
     expect(state.weekData!.days[0].plans[0].text).toBe('Updated Task 1');
   });
 
+  test('updateTask truncates task text to 200 characters', () => {
+    const longText = 'b'.repeat(300);
+    state.updateTask('2026-05-04', 0, longText);
+    expect(state.weekData!.days[0].plans[0].text).toBe('b'.repeat(200));
+  });
+
   test('toggleTask flips the done status', () => {
     state.toggleTask('2026-05-04', 0);
     expect(state.weekData!.days[0].plans[0].done).toBe(true);

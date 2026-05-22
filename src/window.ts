@@ -1,14 +1,113 @@
 'use strict';
 
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, globalShortcut } from 'electron';
 import * as path from 'path';
 import { getTaskPrefix } from './messages';
+import { getSetting } from './store';
 
 let mainWindow: BrowserWindow | null = null;
+let quickAddWindow: BrowserWindow | null = null;
+let lastToggleTime = 0;
 
 // Extend the NodeJS Global interface to include isQuitting
 declare global {
   var isQuitting: boolean;
+}
+
+export function getMainWindow(): BrowserWindow | null {
+  return mainWindow;
+}
+
+export function createQuickAddWindow(): void {
+  if (quickAddWindow && !quickAddWindow.isDestroyed()) {
+    quickAddWindow.show();
+    quickAddWindow.focus();
+    return;
+  }
+
+  const fontSize = getSetting('fontSize');
+  const heights = {
+    'extra-small': 160,
+    'small': 180,
+    'medium': 200,
+    'large': 240,
+    'extra-large': 280,
+  };
+  const height = heights[fontSize] || 200;
+
+  quickAddWindow = new BrowserWindow({
+    width: 500,
+    height,
+    frame: false,
+    resizable: false,
+    alwaysOnTop: true,
+    backgroundColor: '#0f0f0f',
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  quickAddWindow.loadFile(path.join(__dirname, '..', 'index.html'), { hash: 'quick-add' });
+
+  quickAddWindow.once('ready-to-show', () => {
+    if (quickAddWindow) {
+      quickAddWindow.show();
+      quickAddWindow.focus();
+    }
+  });
+
+  quickAddWindow.on('blur', () => {
+    if (quickAddWindow && !quickAddWindow.isDestroyed()) {
+      quickAddWindow.close();
+    }
+  });
+
+  quickAddWindow.on('closed', () => {
+    quickAddWindow = null;
+  });
+}
+
+export function toggleQuickAddWindow(): void {
+  const now = Date.now();
+  if (now - lastToggleTime < 250) {
+    return;
+  }
+  lastToggleTime = now;
+
+  if (quickAddWindow && !quickAddWindow.isDestroyed() && quickAddWindow.isVisible()) {
+    quickAddWindow.close();
+  } else {
+    createQuickAddWindow();
+  }
+}
+
+export function closeQuickAddWindow(): void {
+  if (quickAddWindow && !quickAddWindow.isDestroyed()) {
+    quickAddWindow.close();
+  }
+}
+
+
+export function reRegisterQuickAddShortcut(shortcut: string): void {
+  globalShortcut.unregisterAll();
+
+  if (!shortcut || shortcut === 'None') {
+    return;
+  }
+
+  try {
+    const success = globalShortcut.register(shortcut, () => {
+      toggleQuickAddWindow();
+    });
+    if (!success) {
+      console.error(`Failed to register global shortcut: ${shortcut}`);
+    }
+  } catch (err) {
+    console.error(`Error registering global shortcut ${shortcut}:`, err);
+  }
 }
 
 export function createWindow(mode: string = 'planner'): void {
