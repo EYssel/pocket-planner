@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.15.2](https://github.com/EYssel/planner-app/compare/v1.15.1...v1.15.2) (2026-05-25)
+
+### Features
+
+### Bug Fixes
+* Fixed an issue where button icons would sometimes overlap task text, ensuring your tasks are always clear and easy to read.
+
 ### [1.15.1](https://github.com/EYssel/planner-app/compare/v1.15.0...v1.15.1) (2026-05-25)
 
 ### Features
