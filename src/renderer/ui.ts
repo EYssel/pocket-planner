@@ -194,13 +194,15 @@ export function buildTaskItem(dayKey: string, task: Plan, index: number, callbac
       <div class="task-display" title="${escapeHtml(task.text)}">${escapeHtml(truncate(task.text))}</div>
       <textarea class="task-edit" placeholder="Task…" rows="1" maxlength="200">${escapeHtml(task.text)}</textarea>
     </div>
-    <button class="recur-btn ${task.recurringId ? 'is-recurring' : ''}" title="${task.recurringId ? 'Edit Recurrence' : 'Make Recurring'}">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-    </button>
-    <button class="note-btn ${task.notes ? 'has-notes' : ''}" title="Task Notes">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-    </button>
-    <button class="del-btn" title="Delete">×</button>
+    <div class="task-actions">
+      <button class="recur-btn ${task.recurringId ? 'is-recurring' : ''}" title="${task.recurringId ? 'Edit Recurrence' : 'Make Recurring'}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+      </button>
+      <button class="note-btn ${task.notes ? 'has-notes' : ''}" title="Task Notes">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </button>
+      <button class="del-btn" title="Delete">×</button>
+    </div>
   `;
 
   const display = item.querySelector('.task-display') as HTMLElement;

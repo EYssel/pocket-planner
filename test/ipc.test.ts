@@ -286,6 +286,7 @@ describe('ipc', () => {
     });
 
     test('search-plans should handle parse errors gracefully', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const mockDays = {
         'invalid-key': [{ text: 'some text', done: false }]
       };
@@ -299,6 +300,8 @@ describe('ipc', () => {
         options: { status: 'all', scope: 'both' }
       });
       expect(results).toEqual([]);
+      expect(consoleErrorSpy).toHaveBeenCalled();
+      consoleErrorSpy.mockRestore();
     });
 
     test('close-quick-add should call closeQuickAddWindow', async () => {
