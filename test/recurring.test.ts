@@ -57,7 +57,7 @@ describe('Recurring Tasks', () => {
   });
 
   describe('Generation (Sync)', () => {
-    test('generateRecurringTasks should inject tasks for applicable days', () => {
+    test('generateRecurringTasks should inject tasks for applicable days and populate the generation log', () => {
       const templates: RecurringTask[] = [
         { id: 'daily', text: 'Daily', days: [1, 2, 3, 4, 5, 6] },
         { id: 'mon-wed', text: 'Mon-Wed', days: [1, 3] }
@@ -65,14 +65,11 @@ describe('Recurring Tasks', () => {
 
       mockStoreInstance.get.mockImplementation((key, def) => {
         if (key === 'recurringTasks') return templates;
-        if (key.startsWith('days.')) return []; // Start with empty days
+        if (key.startsWith('recurringGenerations.')) return {};
+        if (key.startsWith('days.')) return [];
         return def;
       });
 
-      // week 2026-W17 (April 20-26, 2026)
-      // Mon: 2026-04-20
-      // Wed: 2026-04-22
-      // Sat: 2026-04-25 (WE)
       store.generateRecurringTasks('2026-W17');
 
       // Verify Monday (1) - should have both
@@ -90,22 +87,72 @@ describe('Recurring Tasks', () => {
       expect(mockStoreInstance.set).toHaveBeenCalledWith('days.2026-W17-WE', [
         { text: 'Daily', done: false, recurringId: 'daily', notes: undefined }
       ]);
+
+      // Verify generation log was saved
+      expect(mockStoreInstance.set).toHaveBeenCalledWith('recurringGenerations.2026-W17', {
+        daily: ['2026-04-20', '2026-04-21', '2026-04-22', '2026-04-23', '2026-04-24', '2026-W17-WE'],
+        'mon-wed': ['2026-04-20', '2026-04-22']
+      });
     });
 
-    test('generateRecurringTasks should not inject if already exists', () => {
+    test('generateRecurringTasks should not inject if already logged in generations', () => {
       const templates: RecurringTask[] = [
         { id: 'daily', text: 'Daily', days: [1] }
       ];
 
       mockStoreInstance.get.mockImplementation((key, def) => {
         if (key === 'recurringTasks') return templates;
-        if (key === 'days.2026-04-20') return [{ text: 'Daily', done: true, recurringId: 'daily' }];
+        if (key === 'recurringGenerations.2026-W17') return { daily: ['2026-04-20'] };
+        if (key === 'days.2026-04-20') return []; // Empty day
         return [];
       });
 
       store.generateRecurringTasks('2026-W17');
 
-      // Should not have called set for 2026-04-20 because it already existed
+      // Should not have called set for days.2026-04-20 because it was already logged
+      const calls = mockStoreInstance.set.mock.calls.filter(c => c[0] === 'days.2026-04-20');
+      expect(calls.length).toBe(0);
+    });
+
+    test('generateRecurringTasks should not duplicate if task was moved to another day', () => {
+      const templates: RecurringTask[] = [
+        { id: 'daily', text: 'Daily', days: [1, 2] }
+      ];
+
+      mockStoreInstance.get.mockImplementation((key, def) => {
+        if (key === 'recurringTasks') return templates;
+        if (key === 'recurringGenerations.2026-W17') return { daily: ['2026-04-20', '2026-04-21'] };
+        if (key === 'days.2026-04-20') return []; // Monday task was moved
+        if (key === 'days.2026-04-21') return [
+          { text: 'Daily', done: false, recurringId: 'daily' },
+          { text: 'Daily', done: false, recurringId: 'daily' }
+        ];
+        return [];
+      });
+
+      store.generateRecurringTasks('2026-W17');
+
+      // Should not regenerate on Monday since it was already generated
+      const calls = mockStoreInstance.set.mock.calls.filter(c => c[0] === 'days.2026-04-20');
+      expect(calls.length).toBe(0);
+    });
+
+    test('generateRecurringTasks should not duplicate if task was moved to another week', () => {
+      const templates: RecurringTask[] = [
+        { id: 'daily', text: 'Daily', days: [1] }
+      ];
+
+      // Current week is 2026-W17. Task was moved to week 2026-W18.
+      mockStoreInstance.get.mockImplementation((key, def) => {
+        if (key === 'recurringTasks') return templates;
+        if (key === 'recurringGenerations.2026-W17') return { daily: ['2026-04-20'] };
+        if (key === 'days.2026-04-20') return []; // Moved out of this week's Monday
+        return [];
+      });
+
+      store.generateRecurringTasks('2026-W17');
+
+      // Should not regenerate on Monday of W17 since it was already generated there
       const calls = mockStoreInstance.set.mock.calls.filter(c => c[0] === 'days.2026-04-20');
       expect(calls.length).toBe(0);
     });

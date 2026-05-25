@@ -85,8 +85,8 @@ describe('store', () => {
       expect(setCall[1][0].deletedAt).toBeDefined();
     });
 
-    test('restoreFromRecycleBin should move task back to its original day', () => {
-      const task = { text: 'Restorable task', done: false, dayKey: '2026-04-23', deletedAt: '...' };
+    test('restoreFromRecycleBin should move task back to its original day and preserve recurringId', () => {
+      const task = { text: 'Restorable task', done: false, dayKey: '2026-04-23', deletedAt: '...', recurringId: 'daily' };
       mockStoreInstance.get.mockImplementation((key) => {
         if (key === 'recycleBin') return [task];
         if (key === 'days.2026-04-23') return [];
@@ -98,7 +98,7 @@ describe('store', () => {
       // Should have cleared the bin
       expect(mockStoreInstance.set).toHaveBeenCalledWith('recycleBin', []);
       // Should have added to the day
-      expect(mockStoreInstance.set).toHaveBeenCalledWith('days.2026-04-23', [{ text: 'Restorable task', done: false }]);
+      expect(mockStoreInstance.set).toHaveBeenCalledWith('days.2026-04-23', [{ text: 'Restorable task', done: false, recurringId: 'daily' }]);
     });
 
     test('clearRecycleBin should empty the bin', () => {
