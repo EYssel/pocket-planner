@@ -256,11 +256,51 @@ body.dragging-active #next-week {
 .day-tasks::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
 .task-item {
-  display: grid; grid-template-columns: 16px 1fr auto auto auto; align-items: start;
+  position: relative;
+  display: grid; grid-template-columns: 16px 1fr; align-items: start;
   gap: 4px; padding: 4px 6px; border-radius: var(--radius); border: 1px solid transparent;
   animation: fadeIn 0.15s ease both; cursor: grab;
 }
 .task-item:active { cursor: grabbing; }
+
+.task-actions {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  display: none;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+  z-index: 2;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent 0%, var(--surface) 8px, var(--surface) 100%);
+  padding-left: 8px;
+}
+
+.day-col.today .task-actions {
+  background: linear-gradient(90deg, transparent 0%, var(--today-bg) 8px, var(--today-bg) 100%);
+}
+
+/* Hide task actions during editing */
+.task-item.editing .task-actions {
+  display: none !important;
+}
+
+/* Show actions container if hovered or if it contains an active indicator */
+.task-item:hover .task-actions,
+.task-item:has(.note-btn.has-notes) .task-actions,
+.task-item:has(.recur-btn.is-recurring) .task-actions {
+  display: flex;
+}
+
+/* Spacing for indicators when not hovering to prevent overlapping text */
+.task-item:has(.note-btn.has-notes) .task-text-container,
+.task-item:has(.recur-btn.is-recurring) .task-text-container {
+  padding-right: 24px;
+}
+.task-item:has(.note-btn.has-notes):has(.recur-btn.is-recurring) .task-text-container {
+  padding-right: 48px;
+}
 
 .note-btn, .recur-btn, .del-btn {
   background: transparent; border: none; color: var(--muted); cursor: pointer;
@@ -269,8 +309,9 @@ body.dragging-active #next-week {
 }
 
 .note-btn svg, .recur-btn svg { width: 13px; height: 13px; }
+.del-btn { font-size: 14px; }
 
-/* Show all icons on row hover */
+/* Show all icons inside task actions on row hover */
 .task-item:hover .note-btn,
 .task-item:hover .recur-btn,
 .task-item:hover .del-btn {
@@ -365,9 +406,6 @@ body.dragging-active .day-tasks { border: 1px dashed var(--accent); background: 
 .task-item.editing .task-display { display: none; }
 .task-item.editing .task-edit { display: block; }
 .task-item.done .task-display { color: var(--text); }
-.del-btn { display: none; background: transparent; border: none; color: transparent; cursor: pointer; font-size: 14px; transition: color 0.1s; }
-.task-item:hover .del-btn { display: block; color: var(--muted); }
-.del-btn:hover { color: var(--accent2) !important; }
 
 .add-task-btn {
   display: flex; align-items: center; gap: 4px; background: transparent; border: none;
