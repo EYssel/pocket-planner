@@ -11,6 +11,7 @@ interface Schema {
   days: Record<string, Task[]>;
   recycleBin: (Task & { dayKey: string; deletedAt: string })[];
   recurringTasks: RecurringTask[];
+  recurringGenerations: Record<string, Record<string, string[]>>;
 }
 
 const isDev = app ? !app.isPackaged : true;
@@ -35,6 +36,7 @@ const getStoreOptions = () => {
       days: {},
       recycleBin: [],
       recurringTasks: [],
+      recurringGenerations: {},
     },
   };
 
@@ -103,32 +105,54 @@ export function deleteRecurringTask(id: string): void {
 export function generateRecurringTasks(weekKey: string): void {
   const dayKeys = weekDayKeys(weekKey);
   const templates = getRecurringTasks();
+  
+  // Get or initialize the generation record for this week (weekKey -> templateId -> array of dayKeys)
+  const generations = store.get(`recurringGenerations.${weekKey}` as any, {}) as Record<string, string[]>;
+  let generationsChanged = false;
 
-  dayKeys.forEach((dayKey, index) => {
-    const dayNum = index + 1; // 1-5 for Mon-Fri, 6 for Weekend
-    const applicable = templates.filter(t => t.days.includes(dayNum));
-    
-    if (applicable.length === 0) return;
+  // Load plans for all days in the week to avoid repetitive file reads
+  const plansMap: Record<string, Task[]> = {};
+  dayKeys.forEach(dayKey => {
+    plansMap[dayKey] = getPlans(dayKey);
+  });
 
-    const currentPlans = getPlans(dayKey);
-    let changed = false;
+  const changedDays = new Set<string>();
 
-    applicable.forEach(template => {
-      const exists = currentPlans.some(p => p.recurringId === template.id);
-      if (!exists) {
-        currentPlans.push({
-          text: template.text,
-          done: false,
-          recurringId: template.id
-        });
-        changed = true;
+  templates.forEach(template => {
+    template.days.forEach(dayNum => {
+      const dayKey = dayKeys[dayNum - 1];
+      if (!dayKey) return;
+
+      const templateGens = generations[template.id] || [];
+      const alreadyGenerated = templateGens.includes(dayKey);
+
+      if (!alreadyGenerated) {
+        const existsOnDay = plansMap[dayKey].some(p => p.recurringId === template.id);
+        if (!existsOnDay) {
+          plansMap[dayKey].push({
+            text: template.text,
+            done: false,
+            recurringId: template.id
+          });
+          changedDays.add(dayKey);
+        }
+
+        if (!generations[template.id]) {
+          generations[template.id] = [];
+        }
+        generations[template.id].push(dayKey);
+        generationsChanged = true;
       }
     });
-
-    if (changed) {
-      savePlans(dayKey, currentPlans);
-    }
   });
+
+  changedDays.forEach(dayKey => {
+    savePlans(dayKey, plansMap[dayKey]);
+  });
+
+  if (generationsChanged) {
+    store.set(`recurringGenerations.${weekKey}` as any, generations);
+  }
 }
 
 // ── Recycle Bin ───────────────────────────────────────────────────────────────
@@ -151,9 +175,9 @@ export function restoreFromRecycleBin(index: number): void {
   const [task] = bin.splice(index, 1);
   if (!task) return;
 
-  const { dayKey, text, done, notes } = task;
+  const { dayKey, text, done, notes, recurringId } = task;
   const plans = getPlans(dayKey);
-  plans.push({ text, done, notes });
+  plans.push({ text, done, notes, recurringId });
   savePlans(dayKey, plans);
   store.set('recycleBin', bin);
 }
