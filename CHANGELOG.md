@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.17.0](https://github.com/EYssel/planner-app/compare/v1.15.2...v1.17.0) (2026-05-26)
+
+### Features
+*   We've added Homebrew integration, making it simpler to install and keep Weekly Planner up-to-date on your system.
+
+### Bug Fixes
+*   Resolved an issue affecting how the application processes YAML files, improving overall stability.
+
 ## [1.16.0](https://github.com/EYssel/planner-app/compare/v1.15.2...v1.16.0) (2026-05-26)
 
 ### Features
