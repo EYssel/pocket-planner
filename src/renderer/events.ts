@@ -487,6 +487,22 @@ export function setupEventListeners(callbacks: {
       return;
     }
 
+    // Prevent Ctrl + Alt combinations due to Windows AltGr and layout conflicts
+    if ((e.ctrlKey || e.metaKey) && e.altKey) {
+      ui.shortcutDisplayInput.value = 'Ctrl + Alt combinations are not allowed';
+      ui.shortcutDisplayInput.classList.add('recording-error');
+      setTimeout(() => {
+        if (ui.shortcutDisplayInput) {
+          ui.shortcutDisplayInput.classList.remove('recording-error');
+          if (ui.shortcutDisplayInput.classList.contains('recording')) {
+            ui.shortcutDisplayInput.value = '';
+            ui.shortcutDisplayInput.placeholder = 'Press key combination...';
+          }
+        }
+      }, 2000);
+      return;
+    }
+
     const modifiers: string[] = [];
     if (e.ctrlKey || e.metaKey) modifiers.push('CommandOrControl');
     if (e.altKey) modifiers.push('Alt');
@@ -505,6 +521,30 @@ export function setupEventListeners(callbacks: {
     // Map other keys
     let key = '';
     const code = e.code;
+
+    // Check if the key code represents an allowed key (letters, digits, space, function keys, arrows)
+    const isLetter = code.startsWith('Key');
+    const isDigit = code.startsWith('Digit');
+    const isFKey = /^F[1-9][0-2]?$/.test(code);
+    const isAllowedSpecial = ['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(code);
+    
+    const isAllowedCode = isLetter || isDigit || isFKey || isAllowedSpecial;
+
+    if (code && !isAllowedCode) {
+      ui.shortcutDisplayInput.value = 'Symbol keys are not allowed';
+      ui.shortcutDisplayInput.classList.add('recording-error');
+      setTimeout(() => {
+        if (ui.shortcutDisplayInput) {
+          ui.shortcutDisplayInput.classList.remove('recording-error');
+          if (ui.shortcutDisplayInput.classList.contains('recording')) {
+            ui.shortcutDisplayInput.value = '';
+            ui.shortcutDisplayInput.placeholder = 'Press key combination...';
+          }
+        }
+      }, 2000);
+      return;
+    }
+
     if (code && KEY_CODE_MAP[code]) {
       key = KEY_CODE_MAP[code];
     } else {
@@ -512,11 +552,7 @@ export function setupEventListeners(callbacks: {
       key = e.key;
       if (key === ' ' || key === '\u00A0') {
         key = 'Space';
-      } else if (key === '+') {
-        key = 'Plus';
-      } else if (key === '-') {
-        key = '-';
-      } else if (key.length === 1) {
+      } else if (key.length === 1 && /[a-zA-Z0-9]/.test(key)) {
         key = key.toUpperCase();
       } else if (key === 'ArrowUp') {
         key = 'Up';
@@ -529,7 +565,18 @@ export function setupEventListeners(callbacks: {
       } else if (key.match(/^F[1-9][0-2]?$/)) {
         // F1-F12 keys are fine as-is
       } else {
-        // Ignore other keys like Tab, Backspace, CapsLock, etc. if not matched
+        // Reject symbols and other keys in fallback
+        ui.shortcutDisplayInput.value = 'Symbol keys are not allowed';
+        ui.shortcutDisplayInput.classList.add('recording-error');
+        setTimeout(() => {
+          if (ui.shortcutDisplayInput) {
+            ui.shortcutDisplayInput.classList.remove('recording-error');
+            if (ui.shortcutDisplayInput.classList.contains('recording')) {
+              ui.shortcutDisplayInput.value = '';
+              ui.shortcutDisplayInput.placeholder = 'Press key combination...';
+            }
+          }
+        }, 2000);
         return;
       }
     }

@@ -135,6 +135,31 @@ describe('Renderer Events - Keyboard Shortcut Recording', () => {
     expect(mockPlanner.setSetting).not.toHaveBeenCalled();
   });
 
+  test('pressing Ctrl+Alt key combination displays error and does not save', () => {
+    jest.useFakeTimers();
+    const input = document.getElementById('shortcut-display-input') as HTMLInputElement;
+    input.dispatchEvent(new Event('focus'));
+
+    const ctrlAltEvent = new KeyboardEvent('keydown', {
+      key: 'K',
+      code: 'KeyK',
+      ctrlKey: true,
+      altKey: true
+    });
+    input.dispatchEvent(ctrlAltEvent);
+
+    expect(input.value).toBe('Ctrl + Alt combinations are not allowed');
+    expect(input.classList.contains('recording-error')).toBe(true);
+    expect(mockPlanner.setSetting).not.toHaveBeenCalled();
+
+    // Fast-forward time
+    jest.advanceTimersByTime(2000);
+    expect(input.classList.contains('recording-error')).toBe(false);
+    expect(input.value).toBe('');
+
+    jest.useRealTimers();
+  });
+
   test('recording Ctrl+Shift+Space (Standard Space)', async () => {
     const input = document.getElementById('shortcut-display-input') as HTMLInputElement;
     input.dispatchEvent(new Event('focus'));
@@ -171,23 +196,29 @@ describe('Renderer Events - Keyboard Shortcut Recording', () => {
     expect(input.value).toBe('Ctrl + Shift + Space');
   });
 
-  test('recording Ctrl+Shift+Alt+- (resolves to Minus physically)', async () => {
+  test('recording Ctrl+Shift+- (resolves to Minus physically) should be blocked', async () => {
+    jest.useFakeTimers();
     const input = document.getElementById('shortcut-display-input') as HTMLInputElement;
     input.dispatchEvent(new Event('focus'));
 
     const minusEvent = new KeyboardEvent('keydown', {
-      key: '—', // Em-dash (often output on Alt+Shift+-)
+      key: '_', // Underscore (often output on Shift+-)
       code: 'Minus',
       ctrlKey: true,
-      shiftKey: true,
-      altKey: true
+      shiftKey: true
     });
     input.dispatchEvent(minusEvent);
 
-    await new Promise(process.nextTick);
+    expect(input.value).toBe('Symbol keys are not allowed');
+    expect(input.classList.contains('recording-error')).toBe(true);
+    expect(mockPlanner.setSetting).not.toHaveBeenCalled();
 
-    expect(mockPlanner.setSetting).toHaveBeenCalledWith('quickAddShortcut', 'CommandOrControl+Alt+Shift+-');
-    expect(input.value).toBe('Ctrl + Alt + Shift + -');
+    // Fast-forward time
+    jest.advanceTimersByTime(2000);
+    expect(input.classList.contains('recording-error')).toBe(false);
+    expect(input.value).toBe('');
+
+    jest.useRealTimers();
   });
 
   test('recording Ctrl+Shift+A (Standard letter key)', async () => {
@@ -208,7 +239,8 @@ describe('Renderer Events - Keyboard Shortcut Recording', () => {
     expect(input.value).toBe('Ctrl + Shift + A');
   });
 
-  test('recording Ctrl+Shift+= (resolves to Equal physically)', async () => {
+  test('recording Ctrl+Shift+= (resolves to Equal physically) should be blocked', async () => {
+    jest.useFakeTimers();
     const input = document.getElementById('shortcut-display-input') as HTMLInputElement;
     input.dispatchEvent(new Event('focus'));
 
@@ -220,9 +252,15 @@ describe('Renderer Events - Keyboard Shortcut Recording', () => {
     });
     input.dispatchEvent(equalEvent);
 
-    await new Promise(process.nextTick);
+    expect(input.value).toBe('Symbol keys are not allowed');
+    expect(input.classList.contains('recording-error')).toBe(true);
+    expect(mockPlanner.setSetting).not.toHaveBeenCalled();
 
-    expect(mockPlanner.setSetting).toHaveBeenCalledWith('quickAddShortcut', 'CommandOrControl+Shift+=');
-    expect(input.value).toBe('Ctrl + Shift + =');
+    // Fast-forward time
+    jest.advanceTimersByTime(2000);
+    expect(input.classList.contains('recording-error')).toBe(false);
+    expect(input.value).toBe('');
+
+    jest.useRealTimers();
   });
 });
