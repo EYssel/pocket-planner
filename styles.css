@@ -1006,4 +1006,11 @@ body.quick-add-mode {
   }
 }
 
+#shortcut-display-input.recording-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4) !important;
+  color: #ef4444 !important;
+  background: var(--surface2) !important;
+}
+
 

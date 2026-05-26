@@ -54,12 +54,23 @@ export const store = new Store<Schema>(getStoreOptions());
 
 export function getSetting<K extends keyof SettingOptions>(key: K): SettingOptions[K] {
   const val = store.get(`settings.${key}` as any);
-  if (val === undefined) return DEFAULT_SETTINGS[key];
-  return val as SettingOptions[K];
+  let result = val === undefined ? DEFAULT_SETTINGS[key] : val;
+  if (key === 'quickAddShortcut' && typeof result === 'string') {
+    result = result
+      .replace(/\bMinus\b/g, '-')
+      .replace(/\bEqual\b/g, '=') as any;
+  }
+  return result as SettingOptions[K];
 }
 
 export function setSetting<K extends keyof SettingOptions>(key: K, value: SettingOptions[K]): void {
-  store.set(`settings.${key}` as any, value);
+  let val = value;
+  if (key === 'quickAddShortcut' && typeof val === 'string') {
+    val = val
+      .replace(/\bMinus\b/g, '-')
+      .replace(/\bEqual\b/g, '=') as any;
+  }
+  store.set(`settings.${key}` as any, val);
 }
 
 // ── Plans (day-keyed) ─────────────────────────────────────────────────────────
