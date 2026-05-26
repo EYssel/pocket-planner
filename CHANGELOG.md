@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.20.0](https://github.com/EYssel/planner-app/compare/v1.15.2...v1.20.0) (2026-05-26)
+
+### Features
+* Modals are now resizable, allowing you to adjust their size to better suit your needs.
+
+### Bug Fixes
+* Enhanced overall shortcut handling for a smoother experience.
+* Fixed an issue where pressing "Enter" multiple times to add consecutive tasks was not working correctly.
+* Resolved issues with special characters and Windows AltGr key preventing proper input or shortcut registration.
+* Improved stability and error handling for shortcut registrations.
+
 ## [1.19.0](https://github.com/EYssel/planner-app/compare/v1.15.2...v1.19.0) (2026-05-26)
 
 ### Features
