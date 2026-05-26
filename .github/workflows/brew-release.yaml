@@ -1,0 +1,64 @@
+name: Update Homebrew Cask
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-cask:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Download macOS DMG
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p dist
+          gh release download "${{ github.event.release.tag_name }}" --pattern "*.dmg" --dir dist
+
+      - name: Generate and Update Cask
+        env:
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          # 1. Locate the DMG file
+          DMG_PATH=$(find dist -maxdepth 1 -name "*.dmg" | head -n 1)
+          if [ -z "$DMG_PATH" ]; then
+            echo "Error: DMG file not found in dist/"
+            exit 1
+          fi
+          DMG_FILENAME=$(basename "$DMG_PATH")
+          echo "Found DMG: $DMG_FILENAME"
+
+          # 2. Calculate SHA256 checksum
+          SHA256=$(shasum -a 256 "$DMG_PATH" | awk '{ print $1 }')
+          echo "SHA256: $SHA256"
+
+          # 3. Retrieve version (remove leading 'v' from tag name)
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          VERSION="${TAG_NAME#v}"
+          echo "Version: $VERSION"
+
+          # 4. Prepare URL Filename for Homebrew Cask (URL-encoded and uses #{version})
+          URL_FILENAME="${DMG_FILENAME// /%20}"
+          URL_FILENAME=$(echo "$URL_FILENAME" | sed "s/$VERSION/#{version}/g")
+          echo "URL Filename for Cask: $URL_FILENAME"
+
+          # 5. Clone homebrew-tap
+          git clone https://x-access-token:${TAP_TOKEN}@github.com/EYssel/homebrew-tap.git homebrew-tap
+          mkdir -p homebrew-tap/Casks
+
+          # 6. Generate the Cask formula from template
+          sed -e "s/__VERSION__/${VERSION}/g" \
+              -e "s/__SHA256__/${SHA256}/g" \
+              -e "s/__URL_FILENAME__/${URL_FILENAME}/g" \
+              scripts/weekly-planner.rb.template > homebrew-tap/Casks/weekly-planner.rb
+
+          # 7. Commit and Push to Tap
+          cd homebrew-tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/weekly-planner.rb
+          git commit -m "bump: weekly-planner to v${VERSION}" || echo "No changes to commit"
+          git push origin HEAD
