@@ -4,6 +4,7 @@ import { app, BrowserWindow, globalShortcut } from 'electron';
 import * as path from 'path';
 import { getTaskPrefix } from './messages';
 import { getSetting } from './store';
+import { sendNotification } from './notifications';
 
 let mainWindow: BrowserWindow | null = null;
 let quickAddWindow: BrowserWindow | null = null;
@@ -102,15 +103,27 @@ export function reRegisterQuickAddShortcut(shortcut: string): void {
     .replace(/\bMinus\b/g, '-')
     .replace(/\bEqual\b/g, '=');
 
+  const readableShortcut = sanitizedShortcut.replace('CommandOrControl', process.platform === 'darwin' ? 'Cmd' : 'Ctrl');
+
   try {
     const success = globalShortcut.register(sanitizedShortcut, () => {
       toggleQuickAddWindow();
     });
     if (!success) {
       console.error(`Failed to register global shortcut: ${sanitizedShortcut}`);
+      sendNotification(
+        'Shortcut Registration Failed',
+        `Could not register global shortcut "${readableShortcut}". It is likely in use by another application.`,
+        'settings'
+      );
     }
   } catch (err) {
     console.error(`Error registering global shortcut ${sanitizedShortcut}:`, err);
+    sendNotification(
+      'Shortcut Registration Failed',
+      `Could not register global shortcut "${readableShortcut}". It is likely in use by another application.`,
+      'settings'
+    );
   }
 }
 

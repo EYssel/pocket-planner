@@ -8,6 +8,10 @@ jest.mock('../src/store', () => ({
   getSetting: jest.fn().mockReturnValue('medium'),
 }));
 
+jest.mock('../src/notifications', () => ({
+  sendNotification: jest.fn(),
+}));
+
 jest.mock('electron', () => {
   const mApp = {
     getName: jest.fn(),
@@ -231,6 +235,51 @@ describe('Window Creation Title', () => {
         reRegisterQuickAddShortcut('None');
         expect(globalShortcut.unregisterAll).toHaveBeenCalled();
         expect(globalShortcut.register).not.toHaveBeenCalled();
+      });
+    });
+
+    test('reRegisterQuickAddShortcut should send notification if registration fails (returns false)', () => {
+      jest.isolateModules(() => {
+        const { reRegisterQuickAddShortcut } = require('../src/window');
+        const { globalShortcut } = require('electron');
+        const { sendNotification } = require('../src/notifications');
+
+        (globalShortcut.register as jest.Mock).mockReturnValueOnce(false);
+
+        reRegisterQuickAddShortcut('Ctrl+Shift+Space');
+        expect(globalShortcut.unregisterAll).toHaveBeenCalled();
+        expect(globalShortcut.register).toHaveBeenCalledWith('Ctrl+Shift+Space', expect.any(Function));
+        expect(sendNotification).toHaveBeenCalledWith(
+          'Shortcut Registration Failed',
+          'Could not register global shortcut "Ctrl+Shift+Space". It is likely in use by another application.',
+          'settings'
+        );
+      });
+    });
+
+    test('reRegisterQuickAddShortcut should send notification if registration throws an error', () => {
+      jest.isolateModules(() => {
+        const { reRegisterQuickAddShortcut } = require('../src/window');
+        const { globalShortcut } = require('electron');
+        const { sendNotification } = require('../src/notifications');
+
+        const originalPlatform = process.platform;
+        Object.defineProperty(process, 'platform', { value: 'darwin' });
+
+        try {
+          (globalShortcut.register as jest.Mock).mockImplementationOnce(() => {
+            throw new Error('Native registration error');
+          });
+
+          reRegisterQuickAddShortcut('CommandOrControl+Shift+Space');
+          expect(sendNotification).toHaveBeenCalledWith(
+            'Shortcut Registration Failed',
+            'Could not register global shortcut "Cmd+Shift+Space". It is likely in use by another application.',
+            'settings'
+          );
+        } finally {
+          Object.defineProperty(process, 'platform', { value: originalPlatform });
+        }
       });
     });
 
