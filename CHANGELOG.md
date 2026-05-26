@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.19.0](https://github.com/EYssel/planner-app/compare/v1.15.2...v1.19.0) (2026-05-26)
+
+### Features
+
+*   We've made it easier for macOS users to install and update Weekly Planner using Homebrew.
+
+### Bug Fixes
+
+*   Addressed issues related to Homebrew commands, ensuring a smoother experience for Homebrew users.
+*   Improved the reliability of custom keyboard shortcuts, preventing errors when conflicts occur.
+*   Resolved problems when using special characters and certain key combinations (like AltGr) in shortcuts, improving compatibility for various keyboard layouts.
+
 ## [1.18.0](https://github.com/EYssel/planner-app/compare/v1.15.2...v1.18.0) (2026-05-26)
 
 ### Features
