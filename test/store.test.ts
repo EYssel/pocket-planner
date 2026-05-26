@@ -34,6 +34,22 @@ describe('store', () => {
       store.setSetting('theme' as any, 'light' as any);
       expect(mockStoreInstance.set).toHaveBeenCalledWith('settings.theme', 'light');
     });
+
+    test('getSetting should sanitize quickAddShortcut containing legacy Minus and Equal', () => {
+      mockStoreInstance.get.mockReturnValue('CommandOrControl+Alt+Shift+Minus');
+      expect(store.getSetting('quickAddShortcut')).toBe('CommandOrControl+Alt+Shift+-');
+
+      mockStoreInstance.get.mockReturnValue('CommandOrControl+Shift+Equal');
+      expect(store.getSetting('quickAddShortcut')).toBe('CommandOrControl+Shift+=');
+    });
+
+    test('setSetting should sanitize quickAddShortcut containing legacy Minus and Equal when saving', () => {
+      store.setSetting('quickAddShortcut', 'CommandOrControl+Alt+Shift+Minus');
+      expect(mockStoreInstance.set).toHaveBeenCalledWith('settings.quickAddShortcut', 'CommandOrControl+Alt+Shift+-');
+
+      store.setSetting('quickAddShortcut', 'CommandOrControl+Shift+Equal');
+      expect(mockStoreInstance.set).toHaveBeenCalledWith('settings.quickAddShortcut', 'CommandOrControl+Shift+=');
+    });
   });
 
   describe('Plans', () => {

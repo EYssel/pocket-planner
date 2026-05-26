@@ -186,8 +186,8 @@ describe('Renderer Events - Keyboard Shortcut Recording', () => {
 
     await new Promise(process.nextTick);
 
-    expect(mockPlanner.setSetting).toHaveBeenCalledWith('quickAddShortcut', 'CommandOrControl+Alt+Shift+Minus');
-    expect(input.value).toBe('Ctrl + Alt + Shift + Minus');
+    expect(mockPlanner.setSetting).toHaveBeenCalledWith('quickAddShortcut', 'CommandOrControl+Alt+Shift+-');
+    expect(input.value).toBe('Ctrl + Alt + Shift + -');
   });
 
   test('recording Ctrl+Shift+A (Standard letter key)', async () => {
@@ -222,7 +222,7 @@ describe('Renderer Events - Keyboard Shortcut Recording', () => {
 
     await new Promise(process.nextTick);
 
-    expect(mockPlanner.setSetting).toHaveBeenCalledWith('quickAddShortcut', 'CommandOrControl+Shift+Equal');
-    expect(input.value).toBe('Ctrl + Shift + Equal');
+    expect(mockPlanner.setSetting).toHaveBeenCalledWith('quickAddShortcut', 'CommandOrControl+Shift+=');
+    expect(input.value).toBe('Ctrl + Shift + =');
   });
 });

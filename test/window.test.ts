@@ -210,6 +210,19 @@ describe('Window Creation Title', () => {
       });
     });
 
+    test('reRegisterQuickAddShortcut should sanitize legacy key names during registration', () => {
+      jest.isolateModules(() => {
+        const { reRegisterQuickAddShortcut } = require('../src/window');
+        const { globalShortcut } = require('electron');
+
+        reRegisterQuickAddShortcut('CommandOrControl+Alt+Shift+Minus');
+        expect(globalShortcut.register).toHaveBeenCalledWith('CommandOrControl+Alt+Shift+-', expect.any(Function));
+
+        reRegisterQuickAddShortcut('CommandOrControl+Shift+Equal');
+        expect(globalShortcut.register).toHaveBeenCalledWith('CommandOrControl+Shift+=', expect.any(Function));
+      });
+    });
+
     test('reRegisterQuickAddShortcut should not register shortcut if set to None', () => {
       jest.isolateModules(() => {
         const { reRegisterQuickAddShortcut } = require('../src/window');

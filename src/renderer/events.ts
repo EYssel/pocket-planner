@@ -44,8 +44,8 @@ const KEY_CODE_MAP: Record<string, string> = {
   F19: 'F19', F20: 'F20', F21: 'F21', F22: 'F22', F23: 'F23', F24: 'F24',
 
   // Punctuation / Symbols
-  Minus: 'Minus',
-  Equal: 'Equal',
+  Minus: '-',
+  Equal: '=',
   BracketLeft: '[',
   BracketRight: ']',
   Semicolon: ';',
@@ -515,7 +515,7 @@ export function setupEventListeners(callbacks: {
       } else if (key === '+') {
         key = 'Plus';
       } else if (key === '-') {
-        key = 'Minus';
+        key = '-';
       } else if (key.length === 1) {
         key = key.toUpperCase();
       } else if (key === 'ArrowUp') {

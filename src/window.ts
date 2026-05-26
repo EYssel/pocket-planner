@@ -98,15 +98,19 @@ export function reRegisterQuickAddShortcut(shortcut: string): void {
     return;
   }
 
+  const sanitizedShortcut = shortcut
+    .replace(/\bMinus\b/g, '-')
+    .replace(/\bEqual\b/g, '=');
+
   try {
-    const success = globalShortcut.register(shortcut, () => {
+    const success = globalShortcut.register(sanitizedShortcut, () => {
       toggleQuickAddWindow();
     });
     if (!success) {
-      console.error(`Failed to register global shortcut: ${shortcut}`);
+      console.error(`Failed to register global shortcut: ${sanitizedShortcut}`);
     }
   } catch (err) {
-    console.error(`Error registering global shortcut ${shortcut}:`, err);
+    console.error(`Error registering global shortcut ${sanitizedShortcut}:`, err);
   }
 }
 
