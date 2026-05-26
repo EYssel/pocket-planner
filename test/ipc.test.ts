@@ -326,5 +326,15 @@ describe('ipc', () => {
       expect(store.savePlans).toHaveBeenCalledWith('2026-05-25', []);
       expect(mockWin.webContents.send).toHaveBeenCalledWith('plans-updated', { dayKey: '2026-05-25' });
     });
+
+    test('save-plans should not broadcast plans-updated if sender is main window', async () => {
+      const { getMainWindow } = require('../src/window');
+      const mockWin = getMainWindow();
+      mockWin.webContents.send.mockClear();
+      
+      await handlers['save-plans']({ sender: mockWin.webContents }, { dayKey: '2026-05-25', plans: [] });
+      expect(store.savePlans).toHaveBeenCalledWith('2026-05-25', []);
+      expect(mockWin.webContents.send).not.toHaveBeenCalled();
+    });
   });
 });

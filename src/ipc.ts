@@ -99,10 +99,11 @@ export function registerHandlers(): void {
     return { ...info, days };
   });
 
-  ipcMain.handle('save-plans', (_: any, { dayKey, plans }: { dayKey: string, plans: Task[] }) => {
+  ipcMain.handle('save-plans', (event: any, { dayKey, plans }: { dayKey: string, plans: Task[] }) => {
     savePlans(dayKey, plans);
     const mainWin = getMainWindow();
-    if (mainWin && !mainWin.isDestroyed()) {
+    const isSenderMainWindow = event && event.sender && mainWin && event.sender === mainWin.webContents;
+    if (mainWin && !mainWin.isDestroyed() && !isSenderMainWindow) {
       mainWin.webContents.send('plans-updated', { dayKey });
     }
     return true;
