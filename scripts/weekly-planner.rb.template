@@ -12,8 +12,6 @@ cask "weekly-planner" do
   caveats <<~EOS
     Because this app is self-signed/unsigned, you may need to clear the quarantine attribute after installation:
       xattr -cr "/Applications/Weekly Planner.app"
-    Alternatively, you can install it using:
-      brew install --cask --no-quarantine weekly-planner
   EOS
 
   zap trash: [
