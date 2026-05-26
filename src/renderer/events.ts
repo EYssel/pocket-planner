@@ -499,7 +499,7 @@ export function setupEventListeners(callbacks: {
   window.planner.onUpdateAvailable((version: string, isMac: boolean) => {
     ui.updateBanner.classList.add('show');
     if (isMac) {
-      ui.updateStatus.innerHTML = `<strong>Update Available</strong> Version ${version} is ready to download.`;
+      ui.updateStatus.innerHTML = `<strong>Update Available</strong> Version ${version} is ready. Run <code>brew upgrade weekly-planner</code> or download manual update.`;
       ui.updateProgressContainer.style.display = 'none';
       ui.installUpdateBtn.style.display = 'inline-block';
       ui.installUpdateBtn.disabled = false;
@@ -507,7 +507,7 @@ export function setupEventListeners(callbacks: {
       
       // Setup macOS specific button
       ui.copyMacCmdBtn.style.display = 'inline-block';
-      const cmd = `xattr -cr /Applications/*Weekly*Planner*${version}*.dmg`;
+      const cmd = `xattr -cr "/Applications/Weekly Planner.app" 2>/dev/null; xattr -cr ~/Downloads/Weekly*Planner*${version}*.dmg 2>/dev/null`;
       ui.copyMacCmdBtn.onclick = async () => {
         await window.planner.copyToClipboard(cmd);
         const originalText = ui.copyMacCmdBtn.textContent;
