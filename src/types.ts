@@ -41,6 +41,7 @@ export interface SettingOptions {
   doneTasksCollapsed: boolean;
   lastRunVersion: string;
   quickAddShortcut: string;
+  modalSizes?: Record<string, { width: number; height: number }>;
 }
 
 export interface PlannerAPI {

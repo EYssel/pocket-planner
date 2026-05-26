@@ -3,6 +3,7 @@
 import * as state from './state';
 import * as ui from './ui';
 import * as modals from './modals';
+import { initModalResizing } from './modalResize';
 
 const KEY_CODE_MAP: Record<string, string> = {
   // Letters
@@ -69,6 +70,7 @@ export function setupEventListeners(callbacks: {
   saveDay: (dayKey: string) => Promise<void>,
   checkStaleTasks: () => Promise<void>
 }) {
+  initModalResizing();
   ui.prevBtn?.addEventListener('click', async () => callbacks.loadWeek(await window.planner.offsetWeekKey(state.currentWeekKey!, -1)));
   ui.nextBtn?.addEventListener('click', async () => callbacks.loadWeek(await window.planner.offsetWeekKey(state.currentWeekKey!, +1)));
   ui.todayBtn?.addEventListener('click', async () => callbacks.loadWeek(await window.planner.currentWeekKey()));

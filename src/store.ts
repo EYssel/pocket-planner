@@ -25,6 +25,7 @@ const DEFAULT_SETTINGS: SettingOptions = {
   doneTasksCollapsed: true,
   lastRunVersion: '0.0.0',
   quickAddShortcut: 'CommandOrControl+Shift+Space',
+  modalSizes: {},
 };
 
 // We explicitly calculate the path to avoid initialization order issues in main.ts
