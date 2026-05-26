@@ -138,4 +138,4 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Casks/weekly-planner.rb
           git commit -m "bump: weekly-planner to v${VERSION}" || echo "No changes to commit"
-          git push origin master || git push origin main
+          git push origin HEAD
