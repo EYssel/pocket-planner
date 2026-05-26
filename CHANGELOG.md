@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](https://github.com/EYssel/planner-app/compare/v1.15.2...v1.16.0) (2026-05-26)
+
+### Features
+*   Weekly Planner can now be easily installed and updated on macOS systems using Homebrew.
+
+### Bug Fixes
+*   Resolved a minor issue related to data file handling, improving overall stability.
+
 ### [1.15.2](https://github.com/EYssel/planner-app/compare/v1.15.1...v1.15.2) (2026-05-25)
 
 ### Features
