@@ -1,0 +1,25 @@
+cask "weekly-planner" do
+  version "__VERSION__"
+  sha256 "__SHA256__"
+
+  url "https://github.com/EYssel/planner-app/releases/download/v#{version}/__URL_FILENAME__"
+  name "Weekly Planner"
+  desc "A simple weekly planning desktop app"
+  homepage "https://github.com/EYssel/planner-app"
+
+  app "Weekly Planner.app"
+
+  caveats <<~EOS
+    Because this app is self-signed/unsigned, you may need to clear the quarantine attribute after installation:
+      xattr -cr "/Applications/Weekly Planner.app"
+    Alternatively, you can install it using:
+      brew install --cask --no-quarantine weekly-planner
+  EOS
+
+  zap trash: [
+    "~/Library/Application Support/weekly-planner",
+    "~/Library/Application Support/weekly-planner-dev",
+    "~/Library/Preferences/com.estianyssel.weekly-planner.plist",
+    "~/Library/Saved Application State/com.estianyssel.weekly-planner.savedState",
+  ]
+end

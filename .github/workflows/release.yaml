@@ -124,39 +124,16 @@ jobs:
 
           # 5. Clone homebrew-tap
           git clone https://x-access-token:${TAP_TOKEN}@github.com/EYssel/homebrew-tap.git homebrew-tap
-          cd homebrew-tap
-          mkdir -p Casks
+          mkdir -p homebrew-tap/Casks
 
-          # 6. Write the Cask formula
-          cat <<EOF > Casks/weekly-planner.rb
-cask "weekly-planner" do
-  version "${VERSION}"
-  sha256 "${SHA256}"
-
-  url "https://github.com/EYssel/planner-app/releases/download/v#{version}/${URL_FILENAME}"
-  name "Weekly Planner"
-  desc "A simple weekly planning desktop app"
-  homepage "https://github.com/EYssel/planner-app"
-
-  app "Weekly Planner.app"
-
-  caveats <<~EOS
-    Because this app is self-signed/unsigned, you may need to clear the quarantine attribute after installation:
-      xattr -cr "/Applications/Weekly Planner.app"
-    Alternatively, you can install it using:
-      brew install --cask --no-quarantine weekly-planner
-  EOS
-
-  zap trash: [
-    "~/Library/Application Support/weekly-planner",
-    "~/Library/Application Support/weekly-planner-dev",
-    "~/Library/Preferences/com.estianyssel.weekly-planner.plist",
-    "~/Library/Saved Application State/com.estianyssel.weekly-planner.savedState",
-  ]
-end
-EOF
+          # 6. Generate the Cask formula from template
+          sed -e "s/__VERSION__/${VERSION}/g" \
+              -e "s/__SHA256__/${SHA256}/g" \
+              -e "s/__URL_FILENAME__/${URL_FILENAME}/g" \
+              scripts/weekly-planner.rb.template > homebrew-tap/Casks/weekly-planner.rb
 
           # 7. Commit and Push to Tap
+          cd homebrew-tap
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add Casks/weekly-planner.rb
