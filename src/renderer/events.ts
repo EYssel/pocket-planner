@@ -460,6 +460,35 @@ export function setupEventListeners(callbacks: {
   ui.openSettings?.addEventListener('click',  () => ui.settingsOverlay.classList.add('show'));
   ui.closeSettings?.addEventListener('click', () => ui.settingsOverlay.classList.remove('show'));
 
+  // Rebranding Modal Tab click handlers
+  ui.tabWin?.addEventListener('click', () => modals.showMigrationInstructions('win'));
+  ui.tabMac?.addEventListener('click', () => modals.showMigrationInstructions('mac'));
+  ui.tabLinux?.addEventListener('click', () => modals.showMigrationInstructions('linux'));
+
+  // Open & Close rebranding modal
+  ui.closeRebrandingBtn?.addEventListener('click', () => ui.rebrandingOverlay.classList.remove('show'));
+  ui.openRebrandingSettingsBtn?.addEventListener('click', async () => {
+    ui.settingsOverlay.classList.remove('show');
+    const os = modals.detectUserOS();
+    modals.showMigrationInstructions(os);
+    const hideRebrand = await window.planner.getSetting('hideRebrandingModal');
+    if (ui.hideRebrandingCheckbox) {
+      ui.hideRebrandingCheckbox.checked = !!hideRebrand;
+    }
+    ui.rebrandingOverlay.classList.add('show');
+  });
+
+  // Download Pocket Planner action
+  ui.downloadPocketPlannerBtn?.addEventListener('click', async () => {
+    await window.planner.openExternal('https://github.com/pocket-planner/desktop-app-releases');
+  });
+
+  // Checkbox state storage
+  ui.hideRebrandingCheckbox?.addEventListener('change', async () => {
+    const checked = ui.hideRebrandingCheckbox.checked;
+    await window.planner.setSetting('hideRebrandingModal', checked);
+  });
+
   // Configurable shortcut recording
   let originalShortcutText = '';
   let recordedShortcut = '';

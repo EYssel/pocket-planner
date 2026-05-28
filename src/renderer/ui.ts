@@ -80,6 +80,16 @@ export const viewReleaseNotesBtn = document.getElementById('view-release-notes-b
 export const dismissReleaseNotesBtn = document.getElementById('dismiss-release-notes-btn') as HTMLButtonElement;
 export const settingsVersionBtn = document.getElementById('settings-version-btn') as HTMLButtonElement;
 
+export const rebrandingOverlay = document.getElementById('rebranding-overlay') as HTMLElement;
+export const closeRebrandingBtn = document.getElementById('close-rebranding-btn') as HTMLButtonElement;
+export const downloadPocketPlannerBtn = document.getElementById('download-pocket-planner-btn') as HTMLButtonElement;
+export const hideRebrandingCheckbox = document.getElementById('hide-rebranding-checkbox') as HTMLInputElement;
+export const tabWin = document.getElementById('tab-win') as HTMLButtonElement;
+export const tabMac = document.getElementById('tab-mac') as HTMLButtonElement;
+export const tabLinux = document.getElementById('tab-linux') as HTMLButtonElement;
+export const rebrandInstructions = document.getElementById('rebrand-instructions') as HTMLElement;
+export const openRebrandingSettingsBtn = document.getElementById('open-rebranding-settings-btn') as HTMLButtonElement;
+
 export const summaryModalTitle = document.getElementById('summary-modal-title') as HTMLElement;
 
 export const intervalSelect  = document.getElementById('interval-select') as HTMLSelectElement;

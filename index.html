@@ -73,7 +73,7 @@
     <span>Collapse Done Tasks by Default</span>
   </label>
 </div>
-<div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div><div class="settings-group" style="grid-column: 1 / -1;"><label class="settings-label">Quick Add Shortcut</label><div style="display: flex; gap: 8px;"><input type="text" id="shortcut-display-input" class="settings-input" readonly placeholder="Click to record..." style="cursor: pointer; text-align: center; font-weight: bold; caret-color: transparent;" /><button class="banner-btn secondary" id="clear-shortcut-btn" style="padding: 0 12px; height: 36px; display: flex; align-items: center; justify-content: center;">Disable</button></div><small style="display: block; margin-top: 6px; font-size: calc(11px * var(--font-scale)); color: var(--muted); line-height: 1.4;">Tip: Avoid combining multiple modifiers (e.g. Ctrl+Alt+Shift) with symbol keys like "-" or "=" on Windows/macOS, as these are often intercepted by the keyboard layout driver. Prefer letters instead.</small></div></div></div><div class="modal-footer"><button id="settings-version-btn" style="background:none; border:none; padding:0; cursor:pointer; font-family: 'Space Mono', monospace; font-size: calc(10px * var(--font-scale)); color: var(--muted); margin-right: auto; transition: color 0.15s;" title="View Release Notes" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">v0.0.0</button><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
+<div class="settings-group"><label class="settings-label">Work Start</label><input type="number" id="work-start" class="settings-input" min="0" max="23"></div><div class="settings-group"><label class="settings-label">Work End</label><input type="number" id="work-end" class="settings-input" min="0" max="23"></div><div class="settings-group" style="grid-column: 1 / -1;"><label class="settings-label">Quick Add Shortcut</label><div style="display: flex; gap: 8px;"><input type="text" id="shortcut-display-input" class="settings-input" readonly placeholder="Click to record..." style="cursor: pointer; text-align: center; font-weight: bold; caret-color: transparent;" /><button class="banner-btn secondary" id="clear-shortcut-btn" style="padding: 0 12px; height: 36px; display: flex; align-items: center; justify-content: center;">Disable</button></div><small style="display: block; margin-top: 6px; font-size: calc(11px * var(--font-scale)); color: var(--muted); line-height: 1.4;">Tip: Avoid combining multiple modifiers (e.g. Ctrl+Alt+Shift) with symbol keys like "-" or "=" on Windows/macOS, as these are often intercepted by the keyboard layout driver. Prefer letters instead.</small></div><div class="settings-group row" style="grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 15px; margin-top: 5px;"><button class="banner-btn secondary" id="open-rebranding-settings-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;"><span>ℹ️</span> View Rebranding & Migration Guide</button></div></div></div><div class="modal-footer"><button id="settings-version-btn" style="background:none; border:none; padding:0; cursor:pointer; font-family: 'Space Mono', monospace; font-size: calc(10px * var(--font-scale)); color: var(--muted); margin-right: auto; transition: color 0.15s;" title="View Release Notes" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">v0.0.0</button><button class="banner-btn secondary" id="close-settings">Close</button></div></div></div>
 
 <div class="modal-overlay" id="summary-overlay">
   <div class="modal resizable">
@@ -203,5 +203,55 @@
     <div class="quick-add-legend-item"><span class="kbc">Esc</span> Close</div>
   </div>
 </div>
+
+<div class="modal-overlay" id="rebranding-overlay">
+  <div class="modal rebranding-modal" style="max-width: 520px;">
+    <div class="modal-header">
+      <div class="modal-title">Pocket Planner Rebranding</div>
+    </div>
+    <div class="modal-body" style="max-height: 70vh; overflow-y: auto; line-height: 1.6;">
+      <p style="margin-bottom: 15px;">
+        Weekly Planner has been discontinued and rebranded to <strong>Pocket Planner</strong>! 
+        To continue receiving new features, performance updates, and bug fixes, please download the new app.
+      </p>
+      
+      <div style="margin: 20px 0; text-align: center;">
+        <button class="banner-btn" id="download-pocket-planner-btn" style="padding: 10px 20px; font-weight: bold; font-family: 'Space Mono', monospace;">
+          Download Pocket Planner
+        </button>
+      </div>
+
+      <h3 style="margin-top: 25px; font-size: calc(14px * var(--font-scale)); font-family: 'Space Mono', monospace; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 10px;">
+        How to Migrate Your Data
+      </h3>
+      <p style="margin-bottom: 12px; font-size: 0.95em;">
+        You can easily carry over all of your tasks, history, recurring templates, and settings. 
+        Select your operating system to see step-by-step instructions:
+      </p>
+      
+      <div class="rebrand-tabs" style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <button class="banner-btn secondary tab-btn active" id="tab-win">Windows</button>
+        <button class="banner-btn secondary tab-btn" id="tab-mac">macOS</button>
+        <button class="banner-btn secondary tab-btn" id="tab-linux">Linux</button>
+      </div>
+      
+      <div id="rebrand-instructions" style="background: var(--surface2); padding: 15px; border-radius: 6px; border: 1px solid var(--border); font-size: calc(12px * var(--font-scale)); font-family: sans-serif; line-height: 1.5; color: var(--text);">
+        <!-- Instructions injected dynamically -->
+      </div>
+      
+      <div style="margin-top: 25px;">
+        <label class="custom-checkbox">
+          <input type="checkbox" id="hide-rebranding-checkbox">
+          <div class="checkbox-box">✓</div>
+          <span>Don't show this message on startup</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="banner-btn secondary" id="close-rebranding-btn">Close</button>
+    </div>
+  </div>
+</div>
+
 <script src="dist/renderer.js"></script>
 </body></html>
