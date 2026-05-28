@@ -49,9 +49,23 @@ const sampleTasks = [
   "Read a book chapter"
 ];
 
+let existingSettings: any = {};
+if (fs.existsSync(configPath)) {
+  try {
+    const raw = fs.readFileSync(configPath, 'utf8');
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.settings) {
+      existingSettings = parsed.settings;
+    }
+  } catch (err) {
+    // Ignore read/parse errors
+  }
+}
+
 const data: any = {
   settings: {
-    notificationInterval: 60
+    notificationInterval: 60,
+    ...existingSettings
   },
   days: {},
   recycleBin: []

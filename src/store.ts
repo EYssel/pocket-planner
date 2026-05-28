@@ -26,6 +26,7 @@ const DEFAULT_SETTINGS: SettingOptions = {
   lastRunVersion: '0.0.0',
   quickAddShortcut: 'CommandOrControl+Shift+Space',
   modalSizes: {},
+  hideRebrandingModal: false,
 };
 
 // We explicitly calculate the path to avoid initialization order issues in main.ts

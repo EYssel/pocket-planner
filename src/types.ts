@@ -42,6 +42,7 @@ export interface SettingOptions {
   lastRunVersion: string;
   quickAddShortcut: string;
   modalSizes?: Record<string, { width: number; height: number }>;
+  hideRebrandingModal?: boolean;
 }
 
 export interface PlannerAPI {

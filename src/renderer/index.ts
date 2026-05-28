@@ -59,6 +59,17 @@ async function init() {
     });
     await modals.initReleaseNotes();
 
+    // Show rebranding & migration prompt if not opted out
+    const hideRebrand = await window.planner.getSetting('hideRebrandingModal');
+    if (ui.hideRebrandingCheckbox) {
+      ui.hideRebrandingCheckbox.checked = !!hideRebrand;
+    }
+    if (!hideRebrand) {
+      const detectedOS = modals.detectUserOS();
+      modals.showMigrationInstructions(detectedOS);
+      ui.rebrandingOverlay.classList.add('show');
+    }
+
     (document as any).fonts.ready.then(() => {
       document.querySelectorAll('.task-edit').forEach(ta => ui.autoResize(ta as HTMLTextAreaElement));
     });

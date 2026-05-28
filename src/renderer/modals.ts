@@ -298,3 +298,54 @@ export async function initSettings(callbacks: { loadWeek: (key: string) => Promi
   await callbacks.loadWeek(currentWeekKey);
   await callbacks.checkStaleTasks();
 }
+
+const OS_INSTRUCTIONS: Record<string, string> = {
+  win: `
+    <ol>
+      <li>Press <code>Win + R</code>, paste <code>%APPDATA%\\weekly-planner</code>, and press Enter to locate your data.</li>
+      <li>Locate the file named <code>config.json</code> (or <code>config-dev.json</code> in dev mode) and copy it.</li>
+      <li>Download and install <strong>Pocket Planner</strong>. Run it once, then close it completely.</li>
+      <li>Press <code>Win + R</code>, paste <code>%APPDATA%\\pocket-planner</code>, and press Enter.</li>
+      <li>Paste the copied file in this directory (overwrite the existing <code>config.json</code>).</li>
+    </ol>
+  `,
+  mac: `
+    <ol>
+      <li>Open Finder, press <code>Cmd + Shift + G</code>, paste <code>~/Library/Application Support/weekly-planner</code>, and press Enter.</li>
+      <li>Locate the file named <code>config.json</code> and copy it.</li>
+      <li>Download and install <strong>Pocket Planner</strong>. Run it once, then close it completely.</li>
+      <li>In Finder, press <code>Cmd + Shift + G</code>, paste <code>~/Library/Application Support/pocket-planner</code>, and press Enter.</li>
+      <li>Paste the copied file in this directory (overwrite the existing <code>config.json</code>).</li>
+    </ol>
+  `,
+  linux: `
+    <ol>
+      <li>Open your terminal and navigate to <code>~/.config/weekly-planner</code>.</li>
+      <li>Locate the file named <code>config.json</code> and copy it.</li>
+      <li>Download and run the <strong>Pocket Planner</strong> AppImage. Run it once, then close it completely.</li>
+      <li>Navigate to <code>~/.config/pocket-planner</code>.</li>
+      <li>Paste/move the copied file to this directory, overwriting <code>config.json</code>.</li>
+    </ol>
+  `
+};
+
+export function showMigrationInstructions(os: string) {
+  if (ui.rebrandInstructions) {
+    ui.rebrandInstructions.innerHTML = OS_INSTRUCTIONS[os] || OS_INSTRUCTIONS.win;
+  }
+  
+  [ui.tabWin, ui.tabMac, ui.tabLinux].forEach(btn => {
+    if (btn) btn.classList.remove('active');
+  });
+
+  const activeBtn = os === 'win' ? ui.tabWin : os === 'mac' ? ui.tabMac : ui.tabLinux;
+  if (activeBtn) activeBtn.classList.add('active');
+}
+
+export function detectUserOS(): string {
+  const platform = navigator.platform.toLowerCase();
+  const agent = navigator.userAgent.toLowerCase();
+  if (platform.includes('mac') || agent.includes('macintosh')) return 'mac';
+  if (platform.includes('linux') || agent.includes('linux')) return 'linux';
+  return 'win';
+}

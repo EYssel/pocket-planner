@@ -1067,4 +1067,48 @@ body.quick-add-mode {
   background: var(--surface2) !important;
 }
 
+/* Rebranding Modal & Tabs Styles */
+.rebrand-tabs .tab-btn {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: calc(12px * var(--font-scale));
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.rebrand-tabs .tab-btn.active {
+  background-color: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.rebrand-tabs .tab-btn:hover:not(.active) {
+  background-color: var(--surface2);
+  color: var(--text);
+}
+
+#rebrand-instructions ol {
+  margin-left: 20px;
+  margin-top: 6px;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+#rebrand-instructions li {
+  margin-bottom: 8px;
+}
+
+#rebrand-instructions li:last-child {
+  margin-bottom: 0;
+}
+
+#rebrand-instructions code {
+  background: var(--surface);
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.95em;
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
+
 
